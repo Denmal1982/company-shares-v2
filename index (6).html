@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Company Shares — Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#f4f5f9;--bg1:#ffffff;--bg2:#f8f9fc;--bg3:#eef0f6;
+  --border:#e2e5ef;--border2:#d0d4e8;
+  --txt:#1a1d2e;--txt2:#5a6080;--txt3:#9299b8;
+  --purple:#6355d4;--purple2:#8678e8;--purple-bg:#eeecfc;--purple-light:#f5f3ff;
+  --green:#0ea86a;--green-bg:#e8f8f2;--green-light:#f0fdf8;
+  --red:#e03e3e;--red-bg:#fdf0f0;
+  --amber:#d97706;--amber-bg:#fffbeb;
+  --blue:#2563eb;--blue-bg:#eff6ff;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --shadow-md:0 4px 24px rgba(0,0,0,.08);
+  --font:Inter,-apple-system,sans-serif;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+}
+body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:var(--bg1);border-bottom:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:0;z-index:10}
+.nav-left{display:flex;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.logo-name{font-size:15px;font-weight:700;color:var(--txt)}
+.net-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid #d6d0f8;font-weight:600}
+.nav-link{font-size:13px;color:var(--txt3);text-decoration:none;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);transition:all .15s;font-weight:500}
+.nav-link:hover{color:var(--txt2);border-color:var(--border2);background:var(--bg2)}
+.btn-wallet{font-size:13px;padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg1);color:var(--txt);cursor:pointer;transition:all .15s;font-weight:600;box-shadow:var(--shadow)}
+.btn-wallet:hover{border-color:var(--purple);color:var(--purple)}
+.btn-wallet.connected{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.addr-mono{font-family:monospace;font-size:11px;color:var(--txt3)}
+
+/* LAYOUT */
+.main{padding:24px 28px;max-width:1200px;margin:0 auto}
+@media(max-width:800px){.main{padding:14px}}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
+.stat-label{font-size:11px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.stat-val{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.stat-sub{font-size:11px;color:var(--txt3);margin-top:4px}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:700px){.grid-2{grid-template-columns:1fr}}
+
+/* CARD */
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-title{font-size:12px;font-weight:700;color:var(--txt3);margin-bottom:16px;text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;justify-content:space-between}
+.card-title-main{font-size:14px;font-weight:700;color:var(--txt);letter-spacing:0;text-transform:none}
+
+/* DIVIDENDS */
+.token-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.token-row:last-child{border-bottom:none}
+.token-icon{width:36px;height:36px;border-radius:10px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--purple);flex-shrink:0}
+.token-info{flex:1}
+.token-name{font-size:13px;font-weight:700;color:var(--txt)}
+.token-addr{font-size:11px;color:var(--txt3);font-family:monospace;margin-top:1px}
+.token-pending{font-size:16px;font-weight:800;color:var(--green)}
+.token-pending.zero{color:var(--txt3);font-weight:600}
+.btn-claim{font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;transition:all .15s;font-weight:600}
+.btn-claim:hover:not([disabled]){border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.btn-claim[disabled]{opacity:.4;cursor:not-allowed}
+.btn-claim-all{font-size:12px;padding:5px 14px;border-radius:var(--radius-sm);border:1px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;transition:all .15s;font-weight:700}
+.btn-claim-all:hover{background:var(--green);color:#fff}
+
+/* ORDER */
+.order-box{background:linear-gradient(135deg,var(--purple-light),var(--blue-bg));border:1px solid #d6d0f8;border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.order-label{font-size:11px;color:var(--txt3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.order-val{font-size:16px;font-weight:700;color:var(--txt)}
+
+/* FORM */
+.form-row{margin-bottom:12px}
+.form-label{font-size:12px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:600}
+.form-inp{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg1);color:var(--txt);outline:none;transition:border .15s;font-family:var(--font)}
+.form-inp:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-bg)}
+.form-inp::placeholder{color:var(--txt3)}
+.form-select{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg1);color:var(--txt);outline:none;cursor:pointer;font-family:var(--font)}
+.form-select:focus{border-color:var(--purple)}
+
+.btn-primary{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;cursor:pointer;transition:all .15s;margin-top:6px;letter-spacing:.2px;box-shadow:0 2px 8px rgba(99,85,212,.3)}
+.btn-primary:hover{opacity:.92;box-shadow:0 4px 16px rgba(99,85,212,.4)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.btn-danger{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,#c0392b,var(--red));color:#fff;cursor:pointer;margin-top:8px;box-shadow:0 2px 8px rgba(224,62,62,.3)}
+.btn-danger:hover{opacity:.92}
+
+/* EXECUTE ORDER */
+.execute-card{background:linear-gradient(135deg,var(--green-light),#f0fff8);border:1px solid #a7f3d0;border-radius:var(--radius);padding:16px;margin-bottom:12px}
+
+/* GRANTS */
+.grant-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;transition:border .15s}
+.grant-item:hover{border-color:var(--border2)}
+.grant-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.grant-id{font-size:11px;color:var(--txt3);font-weight:600}
+.grant-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+.grant-badge.active{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0}
+.grant-badge.expired{background:var(--amber-bg);color:var(--amber);border:1px solid #fde68a}
+.grant-badge.inactive{background:var(--bg3);color:var(--txt3);border:1px solid var(--border)}
+.grant-info{font-size:13px;color:var(--txt2);margin-bottom:4px}
+.grant-info span{color:var(--txt);font-weight:700}
+.grant-progress{height:5px;background:var(--border);border-radius:3px;margin:10px 0}
+.grant-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--purple),var(--blue))}
+.grant-actions{display:flex;gap:6px;margin-top:8px}
+.btn-sm{font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid;background:transparent;cursor:pointer;transition:all .15s;font-weight:700}
+.btn-sm.expire{color:var(--amber);border-color:#fde68a}
+.btn-sm.expire:hover{background:var(--amber-bg)}
+.btn-sm.revoke{color:var(--red);border-color:#fca5a5}
+.btn-sm.revoke:hover{background:var(--red-bg)}
+
+/* TABS for token selection */
+.token-toggle{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.token-toggle-btn{font-size:12px;padding:5px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;font-weight:600;transition:all .15s}
+.token-toggle-btn:hover{border-color:var(--border2);background:var(--bg3)}
+.token-toggle-btn.selected{border-color:var(--purple);color:var(--purple);background:var(--purple-bg)}
+
+/* STATUS */
+.status{font-size:13px;padding:12px 16px;border-radius:var(--radius);margin-bottom:16px;display:none;line-height:1.5;font-weight:500;border:1px solid}
+.status.info{background:var(--purple-bg);color:var(--purple);border-color:#d6d0f8;display:block}
+.status.success{background:var(--green-bg);color:var(--green);border-color:#a7f3d0;display:block}
+.status.error{background:var(--red-bg);color:var(--red);border-color:#fca5a5;display:block}
+
+.divider{display:flex;align-items:center;gap:8px;margin:14px 0;font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.empty-state{font-size:13px;color:var(--txt3);text-align:center;padding:24px 0;font-weight:500}
+
+.section-header{display:flex;align-items:baseline;gap:8px;margin-bottom:16px}
+.section-title{font-size:18px;font-weight:800;color:var(--txt)}
+.section-sub{font-size:13px;color:var(--txt3)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <div class="logo">
+      <div class="logo-icon">CS</div>
+      <span class="logo-name">Company Shares</span>
+      <span class="net-pill">Sepolia</span>
+    </div>
+    <a class="nav-link" href="index.html">← syntUSDv4 Pool</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="addr-mono" id="addr-display"></span>
+    <button class="btn-wallet" id="btn-wallet" onclick="connectWallet()">Connect wallet</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="status" id="status-msg"></div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">My Shares</div>
+      <div class="stat-val" id="st-balance" style="color:var(--purple)">—</div>
+      <div class="stat-sub">CSH balance</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Locked</div>
+      <div class="stat-val" id="st-locked" style="color:var(--amber)">—</div>
+      <div class="stat-sub">in active orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Supply</div>
+      <div class="stat-val" id="st-supply" style="color:var(--txt)">—</div>
+      <div class="stat-sub">CSH issued</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">My Share</div>
+      <div class="stat-val" id="st-pct" style="color:var(--blue)">—</div>
+      <div class="stat-sub">of total supply</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- DIVIDENDS -->
+    <div class="card">
+      <div class="card-title">
+        <span class="card-title-main">Dividends</span>
+        <button class="btn-claim-all" id="btn-claim-all" onclick="doClaimAll()" disabled>Claim All</button>
+      </div>
+      <div id="dividends-list"><div class="empty-state">Connect wallet to view dividends</div></div>
+    </div>
+
+    <!-- ORDER -->
+    <div class="card">
+      <div class="card-title"><span class="card-title-main">Incoming Order</span></div>
+      <div id="incoming-order"><div class="empty-state">No incoming order for your address</div></div>
+
+      <div class="divider">create private order</div>
+      <div class="card-title"><span class="card-title-main">Create Order</span></div>
+
+      <div class="form-row">
+        <label class="form-label">Buyer address</label>
+        <input class="form-inp" id="ord-buyer" placeholder="0x..."/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-row">
+          <label class="form-label">Share amount (CSH)</label>
+          <input class="form-inp" id="ord-amount" type="number" placeholder="0" min="0"/>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Price (token units)</label>
+          <input class="form-inp" id="ord-price" type="number" placeholder="0" min="0"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Payment token</label>
+        <select class="form-select" id="ord-token">
+          <option value="">— select token —</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="btn-create-order" onclick="doCreateOrder()" disabled>Create Private Order</button>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- GRANTS FORM -->
+    <div class="card">
+      <div class="card-title"><span class="card-title-main">Create Grant</span></div>
+      <div class="form-row">
+        <label class="form-label">Recipient address</label>
+        <input class="form-inp" id="gr-recipient" placeholder="0x..."/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-row">
+          <label class="form-label">Amount (CSH)</label>
+          <input class="form-inp" id="gr-amount" type="number" placeholder="0" min="0"/>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Duration (days)</label>
+          <input class="form-inp" id="gr-duration" type="number" placeholder="30" min="1" max="3650"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Allowed tokens for dividends</label>
+        <div class="token-toggle" id="gr-tokens-list"></div>
+      </div>
+      <button class="btn-primary" id="btn-create-grant" onclick="doCreateGrant()" disabled>Create Grant</button>
+    </div>
+
+    <!-- GRANTS LIST -->
+    <div class="card">
+      <div class="card-title"><span class="card-title-main">My Grants</span></div>
+      <div id="grants-list"><div class="empty-state">Connect wallet to view grants</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+// ================================================================
+// CONFIG
+// ================================================================
+const CONTRACT_ADDR = "0xea1972c0727b8043597d7e0e9dc731eb5cb937ea"
+const CHAIN_ID      = 11155111
+const RPC_URL       = "https://ethereum-sepolia.publicnode.com"
+const EXPLORER      = "https://sepolia.etherscan.io"
+// ================================================================
+
+const ABI = [
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function lockedBalance(address) view returns (uint256)",
+  "function getSupportedTokens() view returns (address[])",
+  "function isSupportedToken(address) view returns (bool)",
+  "function pendingDividends(address,address) view returns (uint256)",
+  "function claim(address) returns ()",
+  "function claimAll() returns ()",
+  "function orders(address) view returns (address seller, uint256 shareAmount, uint256 price, address paymentToken)",
+  "function createPrivateOrder(address,uint256,uint256,address) returns ()",
+  "function cancelOrder(address) returns ()",
+  "function executeOrder() returns ()",
+  "function createGrant(address,uint256,uint256,address[]) returns (uint256)",
+  "function expireGrant(uint256) returns ()",
+  "function revokeGrant(uint256) returns ()",
+  "function getGrant(uint256) view returns (address,address,uint256,uint64,uint64,bool,bool,address[])",
+  "function grantsOfRecipient(address) view returns (uint256[])",
+  "function grantsOfGrantor(address) view returns (uint256[])",
+]
+const ERC20_ABI = [
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function balanceOf(address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
+  "function allowance(address,address) view returns (uint256)",
+]
+
+let provider, signer, contract, userAddr
+let supportedTokens = []
+let tokenMeta = {}
+let selectedGrantTokens = new Set()
+
+const rpc = new ethers.providers.JsonRpcProvider(RPC_URL)
+const contractRO = (CONTRACT_ADDR && CONTRACT_ADDR !== '')
+  ? new ethers.Contract(CONTRACT_ADDR, ABI, rpc)
+  : null
+
+function fmt(bn, dec, dp) {
+  const n = parseFloat(ethers.utils.formatUnits(bn, dec))
+  dp = dp ?? 2
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M'
+  if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K'
+  return n.toFixed(dp)
+}
+function shortAddr(a) { return a.slice(0, 6) + '...' + a.slice(-4) }
+function setStatus(msg, type) {
+  const el = document.getElementById('status-msg')
+  el.textContent = msg; el.className = 'status ' + type
+  if (type === 'success') setTimeout(() => el.className = 'status', 4000)
+}
+function clearStatus() { document.getElementById('status-msg').className = 'status' }
+
+async function connectWallet() {
+  await new Promise(r => setTimeout(r, 100))
+  let eth = null
+  if (window.ethereum?.isMetaMask) eth = window.ethereum
+  else if (window.ethereum?.providers) eth = window.ethereum.providers.find(p => p.isMetaMask)
+  else if (window.ethereum) eth = window.ethereum
+  if (!eth) { alert('MetaMask not found'); return }
+  try {
+    provider = new ethers.providers.Web3Provider(eth)
+    await provider.send('eth_requestAccounts', [])
+    const net = await provider.getNetwork()
+    if (net.chainId !== CHAIN_ID) {
+      try { await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] }) } catch (e) {}
+      provider = new ethers.providers.Web3Provider(eth)
+    }
+    signer = provider.getSigner()
+    userAddr = await signer.getAddress()
+    contract = new ethers.Contract(CONTRACT_ADDR, ABI, signer)
+    const short = userAddr.slice(0, 6) + '...' + userAddr.slice(-4)
+    document.getElementById('btn-wallet').textContent = short
+    document.getElementById('btn-wallet').classList.add('connected')
+    document.getElementById('addr-display').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-6)
+    ;['btn-claim-all', 'btn-create-order', 'btn-create-grant'].forEach(id =>
+      document.getElementById(id).disabled = false
+    )
+    await loadAll()
+    clearStatus()
+  } catch (e) { setStatus('Failed: ' + (e.message || e), 'error') }
+}
+
+async function loadAll() {
+  await loadTokenMeta()
+  await Promise.all([loadStats(), loadDividends(), loadOrders(), loadGrants()])
+}
+
+async function loadTokenMeta() {
+  if (!CONTRACT_ADDR || CONTRACT_ADDR === '') return
+  const c = contract || contractRO
+  if (!c) return
+  try {
+    supportedTokens = await c.getSupportedTokens()
+    for (const addr of supportedTokens) {
+      if (!tokenMeta[addr]) {
+        const tok = new ethers.Contract(addr, ERC20_ABI, rpc)
+        const [sym, dec] = await Promise.all([tok.symbol(), tok.decimals()])
+        tokenMeta[addr] = { symbol: sym, decimals: dec }
+      }
+    }
+    const sel = document.getElementById('ord-token')
+    sel.innerHTML = '<option value="">— select token —</option>'
+    supportedTokens.forEach(addr => {
+      const opt = document.createElement('option')
+      opt.value = addr
+      opt.textContent = tokenMeta[addr]?.symbol || shortAddr(addr)
+      sel.appendChild(opt)
+    })
+    const grList = document.getElementById('gr-tokens-list')
+    grList.innerHTML = ''
+    supportedTokens.forEach(addr => {
+      const sym = tokenMeta[addr]?.symbol || shortAddr(addr)
+      const btn = document.createElement('button')
+      btn.className = 'token-toggle-btn'
+      btn.textContent = sym
+      btn.dataset.addr = addr
+      btn.onclick = () => {
+        if (selectedGrantTokens.has(addr)) {
+          selectedGrantTokens.delete(addr)
+          btn.classList.remove('selected')
+        } else {
+          selectedGrantTokens.add(addr)
+          btn.classList.add('selected')
+        }
+      }
+      grList.appendChild(btn)
+    })
+  } catch (e) { console.error('loadTokenMeta', e) }
+}
+
+async function loadStats() {
+  if (!userAddr || !CONTRACT_ADDR || CONTRACT_ADDR === '') return
+  const c = contract || contractRO
+  try {
+    const [bal, locked, ts] = await Promise.all([
+      c.balanceOf(userAddr),
+      c.lockedBalance(userAddr),
+      c.totalSupply(),
+    ])
+    document.getElementById('st-balance').textContent = fmt(bal, 6, 2)
+    document.getElementById('st-locked').textContent = fmt(locked, 6, 2)
+    document.getElementById('st-supply').textContent = fmt(ts, 6, 2)
+    const pct = ts.gt(0)
+      ? (parseFloat(ethers.utils.formatUnits(bal, 6)) / parseFloat(ethers.utils.formatUnits(ts, 6)) * 100).toFixed(4)
+      : '0.0000'
+    document.getElementById('st-pct').textContent = pct + '%'
+  } catch (e) { console.error('loadStats', e) }
+}
+
+async function loadDividends() {
+  if (!userAddr || !CONTRACT_ADDR || CONTRACT_ADDR === '') return
+  const c = contract || contractRO
+  const el = document.getElementById('dividends-list')
+  if (supportedTokens.length === 0) { el.innerHTML = '<div class="empty-state">No supported tokens configured</div>'; return }
+  try {
+    const rows = await Promise.all(supportedTokens.map(async addr => {
+      const pending = await c.pendingDividends(userAddr, addr)
+      const meta = tokenMeta[addr] || { symbol: '?', decimals: 18 }
+      const isZero = pending.isZero()
+      const color = isZero ? '' : 'style="color:var(--green)"'
+      return `<div class="token-row">
+        <div class="token-icon">${meta.symbol.slice(0, 3)}</div>
+        <div class="token-info" style="flex:1">
+          <div class="token-name">${meta.symbol}</div>
+          <div class="token-addr">${shortAddr(addr)}</div>
+        </div>
+        <div class="token-pending${isZero ? ' zero' : ''}" style="margin:0 12px">
+          ${fmt(pending, meta.decimals, 6)}
+        </div>
+        <button class="btn-claim" onclick="doClaim('${addr}')" ${isZero ? 'disabled' : ''}>Claim</button>
+      </div>`
+    }))
+    el.innerHTML = rows.join('')
+  } catch (e) { el.innerHTML = '<div class="empty-state">Error loading dividends</div>' }
+}
+
+async function loadOrders() {
+  if (!userAddr || !CONTRACT_ADDR || CONTRACT_ADDR === '') return
+  const c = contract || contractRO
+  try {
+    const inc = await c.orders(userAddr)
+    const incEl = document.getElementById('incoming-order')
+    if (inc.shareAmount.gt(0)) {
+      const meta = tokenMeta[inc.paymentToken] || { symbol: '?', decimals: 18 }
+      incEl.innerHTML = `
+        <div class="execute-card">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div><div class="order-label">From</div><div class="order-val">${shortAddr(inc.seller)}</div></div>
+            <div><div class="order-label">Shares</div><div class="order-val">${fmt(inc.shareAmount, 6, 2)} CSH</div></div>
+            <div><div class="order-label">Price</div><div class="order-val">${fmt(inc.price, meta.decimals, 4)} ${meta.symbol}</div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="doExecuteOrder()">Execute Order — Buy Shares</button>`
+    } else {
+      incEl.innerHTML = '<div class="empty-state">No incoming order</div>'
+    }
+  } catch (e) { console.error('loadOrders', e) }
+}
+
+async function loadGrants() {
+  if (!userAddr || !CONTRACT_ADDR || CONTRACT_ADDR === '') return
+  const c = contract || contractRO
+  const el = document.getElementById('grants-list')
+  try {
+    const [asGrantor, asRecipient] = await Promise.all([
+      c.grantsOfGrantor(userAddr),
+      c.grantsOfRecipient(userAddr),
+    ])
+    const allIds = [...new Set([...asGrantor.map(b => b.toNumber()), ...asRecipient.map(b => b.toNumber())])]
+    if (allIds.length === 0) { el.innerHTML = '<div class="empty-state">No grants found</div>'; return }
+    const grantData = await Promise.all(allIds.map(id => c.getGrant(id)))
+    const now = Math.floor(Date.now() / 1000)
+    const html = allIds.map((id, idx) => {
+      const [grantor, recipient, amount, startTime, endTime, active, isExpired, allowedTokens] = grantData[idx]
+      const isGrantor = grantor.toLowerCase() === userAddr.toLowerCase()
+      const start = startTime.toNumber(), end = endTime.toNumber()
+      const pct = end > start ? Math.min((now - start) / (end - start) * 100, 100).toFixed(0) : 100
+      const endDate = new Date(end * 1000).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })
+      const badge = active
+        ? (isExpired ? '<span class="grant-badge expired">Expired</span>' : '<span class="grant-badge active">Active</span>')
+        : '<span class="grant-badge inactive">Closed</span>'
+      const tokStr = allowedTokens.map(a => tokenMeta[a]?.symbol || shortAddr(a)).join(', ')
+      let actions = ''
+      if (active && isExpired) actions += `<button class="btn-sm expire" onclick="doExpireGrant(${id})">Settle Expired</button>`
+      if (active && !isExpired && isGrantor) actions += `<button class="btn-sm revoke" onclick="doRevokeGrant(${id})">Revoke</button>`
+      return `<div class="grant-item">
+        <div class="grant-header">
+          <span class="grant-id">Grant #${id} · ${isGrantor ? '↑ sent' : '↓ received'}</span>
+          ${badge}
+        </div>
+        <div class="grant-info">Amount: <span>${fmt(amount, 6, 2)} CSH</span></div>
+        <div class="grant-info"><span>${shortAddr(grantor)}</span> → <span>${shortAddr(recipient)}</span> · Expires <span>${endDate}</span></div>
+        <div class="grant-info">Tokens: <span>${tokStr}</span></div>
+        ${active ? `<div class="grant-progress"><div class="grant-progress-fill" style="width:${pct}%"></div></div>` : ''}
+        ${actions ? `<div class="grant-actions">${actions}</div>` : ''}
+      </div>`
+    }).join('')
+    el.innerHTML = html
+  } catch (e) { el.innerHTML = '<div class="empty-state">Error loading grants</div>'; console.error(e) }
+}
+
+async function doClaim(tokenAddr) {
+  if (!signer) { setStatus('Connect wallet', 'error'); return }
+  try {
+    setStatus('Claiming...', 'info')
+    await (await contract.claim(tokenAddr)).wait()
+    setStatus('Claimed!', 'success')
+    await loadDividends()
+  } catch (e) { setStatus('Error: ' + (e.reason || e.message), 'error') }
+}
+
+async function doClaimAll() {
+  if (!signer) { setStatus('Connect wallet', 'error'); return }
+  try {
+    setStatus('Claiming all dividends...', 'info')
+    await (await contract.claimAll()).wait()
+    setStatus('All dividends claimed!', 'success')
+    await loadDividends()
+    await loadStats()
+  } catch (e) { setStatus('Error: ' + (e.reason || e.message), 'error') }
+}
+
+async function doCreateOrder() {
+  if (!signer) { setStatus('Connect wallet', 'error'); return }
+  const buyer = document.getElementById('ord-buyer').value.trim()
+  const amount = document.getElementById('ord-amount').value
+  const price = document.getElementById('ord-price').value
+  const token = document.getElementById('ord-token').value
+  if (!buyer || !ethers.utils.isAddress(buyer)) { setStatus('Invalid buyer address', 'error'); return }
+  if (!amount || parseFloat(amount) <= 0) { setStatus('Enter share amount', 'error'); return }
+  if (!price || parseFloat(price) <= 0) { setStatus('Enter price', 'error'); return }
+  if (!token) { setStatus('Select payment token', 'error'); return }
+  try {
+    const amtRaw = ethers.utils.parseUnits(amount, 6)
+    const priceRaw = ethers.utils.parseUnits(price, tokenMeta[token]?.decimals || 18)
+    setStatus('Creating order...', 'info')
+    await (await contract.createPrivateOrder(buyer, amtRaw, priceRaw, token)).wait()
+    setStatus(`Order created for ${shortAddr(buyer)}`, 'success')
+    document.getElementById('ord-buyer').value = ''
+    document.getElementById('ord-amount').value = ''
+    document.getElementById('ord-price').value = ''
+    await loadStats()
+  } catch (e) { setStatus('Error: ' + (e.reason || e.message), 'error') }
+}
+
+async function doExecuteOrder() {
+  if (!signer) { setStatus('Connect wallet', 'error'); return }
+  try {
+    const order = await contract.orders(userAddr)
+    if (order.shareAmount.isZero()) { setStatus('No active order', 'error'); return }
+    const tok = new ethers.Contract(order.paymentToken, ERC20_ABI, signer)
+    const al = await tok.allowance(userAddr, CONTRACT_ADDR)
+    if (al.lt(order.price)) {
+      setStatus('Approving payment token...', 'info')
+      await (await tok.approve(CONTRACT_ADDR, ethers.constants.MaxUint256)).wait()
+    }
+    setStatus('Executing order...', 'info')
+    await (await contract.executeOrder()).wait()
+    setStatus('Order executed! Shares transferred.', 'success')
+    await loadAll()
+  } catch (e) { setStatus('Error: ' + (e.reason || e.message), 'error') }
+}
+
+async function doCreateGrant() {
+  if (!signer) { setStatus('Connect wallet', 'error'); return }
+  const recipient = document.getElementById('gr-recipient').value.trim()
+  const amount = document.getElementById('gr-amount').value
+  const duration = document.getElementById('gr-duration').value
+  const tokens = [...selectedGrantTokens]
+  if (!recipient || !ethers.utils.isAddress(recipient)) { setStatus('Invalid recipient address', 'error'); return }
+  if (!amount || parseFloat(amount) <= 0) { setStatus('Enter amount', 'error'); return }
+  if (!duration || parseInt(duration) < 1) { setStatus('Enter duration', 'error'); return }
+  if (tokens.length === 0) { setStatus('Select at least one allowed token', 'error'); return }
+  try {
+    const amtRaw = ethers.utils.parseUnits(amount, 6)
+    setStatus('Creating grant...', 'info')
+    await (await contract.createGrant(recipient, amtRaw, parseInt(duration) * 86400, tokens)).wait()
+    setStatus('Grant created!', 'success')
+    document.getElementById('gr-recipient').value = ''
+    document.getElementById('gr-amount').value = ''
+    document.getElementById('gr-duration').value = ''
+    selectedGrantTokens.clear()
+    document.querySelectorAll('.token-toggle-btn').forEach(b => b.classList.remove('selected'))
+    await loadAll()
+  } catch (e) { setStatus('Error: ' + (e.reason || e.message), 'error') }
+}
+
+async function doExpireGrant(id) {
+  if (!signer) return
+  try {
+    setStatus('Settling expired grant...', 'info')
+    await (await contract.expireGrant(id)).wait()
+    setStatus('Grant settled!', 'success')
+    await loadAll()
+  } catch (e) { setStatus('Error: ' + (e.reason || e.message), 'error') }
+}
+
+async function doRevokeGrant(id) {
+  if (!signer) return
+  if (!confirm('Revoke this grant? Shares will return to you.')) return
+  try {
+    setStatus('Revoking grant...', 'info')
+    await (await contract.revokeGrant(id)).wait()
+    setStatus('Grant revoked!', 'success')
+    await loadAll()
+  } catch (e) { setStatus('Error: ' + (e.reason || e.message), 'error') }
+}
+
+if (contractRO) loadTokenMeta()
+</script>
+</body>
+</html>
