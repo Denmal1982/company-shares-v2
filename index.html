@@ -131,6 +131,22 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 .divider{display:flex;align-items:center;gap:8px;margin:18px 0 14px;font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .empty-state{font-size:13px;color:var(--txt3);text-align:center;padding:24px 0;font-weight:500;line-height:1.6}
+
+/* ADMIN */
+.admin-card{display:none;border-color:#fcd9a5;background:linear-gradient(180deg,#fffdf7,var(--bg1))}
+.admin-card.show{display:block}
+.danger-box{font-size:12px;line-height:1.6;padding:12px 14px;border-radius:var(--radius-sm);background:var(--red-bg);border:1px solid #fca5a5;color:#8c2020;margin-bottom:14px}
+.danger-box strong{display:block;margin-bottom:4px;color:var(--red)}
+.btn-danger{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:1px solid var(--red);background:var(--red-bg);color:var(--red);cursor:pointer;font-family:var(--font)}
+.btn-danger:hover:not(:disabled){background:var(--red);color:#fff}
+.btn-danger:disabled{opacity:.35;cursor:not-allowed}
+.check-list{margin:10px 0}
+.check-item{font-size:12px;padding:6px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.check-item.pass{color:var(--green)}
+.check-item.fail{color:var(--red);font-weight:600}
+.pause-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.pause-row:last-child{border-bottom:none}
+code{font-family:monospace;font-size:.92em;background:var(--bg3);padding:1px 5px;border-radius:4px}
 *:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -295,6 +311,97 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
       <div id="contract-info"><div class="empty-state">Загрузка…</div></div>
     </div>
   </div>
+
+  <div class="card admin-card" id="pending-owner-card">
+    <div class="card-title">
+      <span class="card-title-main">Вам предложено владение контрактом</span>
+      <span class="badge warn">Ожидает принятия</span>
+    </div>
+    <div class="form-hint" style="margin-bottom:12px">
+      Текущий владелец передаёт вам управление. Пока вы не примете, полномочия остаются у него.
+      После принятия вы получите право добавлять распределяемые токены (необратимо),
+      ставить паузу синхронизации и выводить посторонние токены.
+    </div>
+    <button class="btn-primary" id="btn-accept-owner" onclick="doAcceptOwnership()">Принять владение</button>
+  </div>
+
+  <div class="card admin-card" id="admin-card">
+    <div class="card-title">
+      <span class="card-title-main">Панель владельца</span>
+      <span class="badge warn">Только для owner</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(event,'adm-token')">Токен дохода</button>
+      <button class="tab" onclick="switchTab(event,'adm-pause')">Пауза</button>
+      <button class="tab" onclick="switchTab(event,'adm-rescue')">Вывод чужого</button>
+      <button class="tab" onclick="switchTab(event,'adm-owner')">Владение</button>
+    </div>
+
+    <div class="tab-panel active" id="adm-token">
+      <div class="danger-box">
+        <strong>Действие необратимо по трём осям сразу.</strong>
+        Слот занимается навсегда (освободить нельзя), токен навсегда исключается из <code>rescue</code>,
+        и каждый перевод долей дорожает на один внешний вызов.
+        Держите список коротким: 2–3 токена, не 10.
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="adm-token-addr">Адрес токена</label>
+        <input class="form-inp" id="adm-token-addr" placeholder="0x..." autocomplete="off"/>
+        <div class="form-hint">
+          Не подходят: fee-on-transfer (разница ляжет на держателей), rebase (при отрицательном
+          ребейзе последние не доберут), токены с дорогим или ненадёжным <code>balanceOf</code> —
+          он вызывается в горячем пути каждого перевода.
+        </div>
+      </div>
+      <div id="adm-token-check" class="check-list"></div>
+      <button class="btn-secondary" onclick="checkTokenBeforeAdd()" style="margin-bottom:8px">Проверить токен</button>
+      <button class="btn-danger" id="btn-add-token" onclick="doAddDistToken()" disabled>Добавить необратимо</button>
+      <div class="form-hint" id="adm-slots"></div>
+    </div>
+
+    <div class="tab-panel" id="adm-pause">
+      <div class="form-hint" style="margin-bottom:12px">
+        Аварийный выключатель против сломанного токена: если его <code>balanceOf</code> начал жечь газ,
+        переводы долей становятся невозможны для всех. Пауза убирает внешний вызов из горячего пути.
+        Прав на вывод средств не даёт, начисленное за время паузы не теряется.
+        <strong>Перед снятием паузы вызовите «Разложить» по этому токену.</strong>
+      </div>
+      <div id="adm-pause-list"><div class="empty-state">Распределяемых токенов нет.</div></div>
+    </div>
+
+    <div class="tab-panel" id="adm-rescue">
+      <div class="form-hint" style="margin-bottom:12px">
+        Только для токенов, которые <strong>никогда</strong> не добавлялись в распределение —
+        случайные переводы на адрес контракта. Распределяемые токены и припаркованные доли
+        защищены навсегда.
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="adm-rescue-token">Адрес токена</label>
+        <input class="form-inp" id="adm-rescue-token" placeholder="0x..." autocomplete="off"/>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="adm-rescue-to">Получатель</label>
+        <input class="form-inp" id="adm-rescue-to" placeholder="0x..." autocomplete="off"/>
+        <div class="form-hint">Рекомендация из руководства: фиксированный адрес сейфа, а не произвольный.</div>
+      </div>
+      <button class="btn-danger" id="btn-rescue" onclick="doRescue()">Вывести</button>
+    </div>
+
+    <div class="tab-panel" id="adm-owner">
+      <div class="form-hint" style="margin-bottom:12px">
+        Передача двухшаговая: пока новый владелец не вызовет «Принять», полномочия остаются у вас.
+        Отказаться от владения нельзя — функции <code>renounceOwnership</code> в контракте нет.
+      </div>
+      <div id="adm-pending"></div>
+      <div class="form-row">
+        <label class="form-label" for="adm-new-owner">Новый владелец</label>
+        <input class="form-inp" id="adm-new-owner" placeholder="0x..." autocomplete="off"/>
+        <div class="form-hint">Для мейннета — мультисиг 2 из 3. Ключ не может забрать средства, но может необратимо засорить список токенов.</div>
+      </div>
+      <button class="btn-danger" id="btn-transfer-owner" onclick="doTransferOwnership()">Передать владение</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
@@ -326,6 +433,15 @@ const ABI = [
   "function leasedInOf(address) view returns (uint256)",
   "function custodyOf(address) view returns (uint256)",
   "function owner() view returns (address)",
+  "function pendingOwner() view returns (address)",
+  "function MAX_DISTRIBUTION_TOKENS() view returns (uint256)",
+  "function distributionTokensLength() view returns (uint256)",
+  "function wasDistributionToken(address) view returns (bool)",
+  "function addDistributionToken(address)",
+  "function setTokenSyncPaused(address,bool)",
+  "function rescue(address,address)",
+  "function transferOwnership(address)",
+  "function acceptOwnership()",
   "function getDistributionTokens() view returns (address[])",
   "function isDistributionToken(address) view returns (bool)",
   "function syncPaused(address) view returns (bool)",
@@ -421,6 +537,13 @@ function setBusy(v) {
     document.getElementById(id).disabled = v || !signer
   })
   document.getElementById('btn-claim-all').disabled = v || !signer
+  ;['btn-add-token','btn-rescue','btn-transfer-owner','btn-accept-owner'].forEach(id => {
+    const el = document.getElementById(id)
+    if (!el) return
+    // btn-add-token разблокируется только успешной проверкой токена
+    if (id === 'btn-add-token') { if (v) el.disabled = true }
+    else el.disabled = v || !signer
+  })
   document.querySelectorAll('.btn-sm, .btn-claim').forEach(b => { if (!b.dataset.keepDisabled) b.disabled = v })
 }
 function switchTab(ev, id) {
@@ -468,7 +591,7 @@ async function connectWallet() {
 
 async function refreshAll() {
   await loadTokenMeta()
-  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadContractInfo()])
+  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadContractInfo(), loadAdmin()])
 }
 
 async function loadTokenMeta() {
@@ -1047,6 +1170,239 @@ async function doEndLease(lessor, renter) {
     setStatus('Аренда завершена, доли вернулись арендодателю.', 'success')
     await refreshAll()
   } catch (e) { setStatus('Не удалось завершить: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+// ---------- Панель владельца ----------
+
+let isOwner = false
+
+async function loadAdmin() {
+  const c = contract || contractRO
+  const admEl = document.getElementById('admin-card')
+  const pendEl = document.getElementById('pending-owner-card')
+  if (!c || !userAddr) { admEl.classList.remove('show'); pendEl.classList.remove('show'); return }
+
+  try {
+    const [owner, pending] = await Promise.all([c.owner(), c.pendingOwner()])
+    isOwner = owner.toLowerCase() === userAddr.toLowerCase()
+    const isPending = pending !== ethers.constants.AddressZero
+      && pending.toLowerCase() === userAddr.toLowerCase()
+
+    admEl.classList.toggle('show', isOwner)
+    pendEl.classList.toggle('show', isPending)
+    if (!isOwner) return
+
+    const [len, max] = await Promise.all([c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS()])
+    document.getElementById('adm-slots').textContent =
+      `Занято слотов: ${len.toString()} из ${max.toString()}. Освободить нельзя.`
+
+    // Ожидающая передача владения
+    const pendBox = document.getElementById('adm-pending')
+    pendBox.innerHTML = pending !== ethers.constants.AddressZero
+      ? `<div class="danger-box"><strong>Передача уже запущена</strong>
+         Ждём принятия от ${esc(shortAddr(pending))}. Пока не принято, полномочия у вас.
+         Новая передача на другой адрес заменит эту.</div>`
+      : ''
+
+    // Список токенов с переключателем паузы
+    const rows = await Promise.all(distTokens.map(async addr => {
+      const m = meta(addr)
+      const paused = await c.syncPaused(addr)
+      return `<div class="pause-row">
+        <div>
+          <div class="token-name">${esc(m.symbol)} ${paused ? '<span class="badge warn">На паузе</span>' : '<span class="badge ok">Активен</span>'}</div>
+          <div class="token-addr">${shortAddr(addr)}</div>
+        </div>
+        <button class="btn-claim" onclick="doSetPause('${addr}',${paused ? 'false' : 'true'})">
+          ${paused ? 'Снять паузу' : 'Поставить паузу'}
+        </button>
+      </div>`
+    }))
+    document.getElementById('adm-pause-list').innerHTML =
+      rows.length ? rows.join('') : '<div class="empty-state">Распределяемых токенов нет.</div>'
+  } catch (e) { console.error('loadAdmin', e) }
+}
+
+/// Всё, что можно проверить ДО необратимой транзакции.
+async function checkTokenBeforeAdd() {
+  const c = contract || contractRO
+  const el = document.getElementById('adm-token-check')
+  const btn = document.getElementById('btn-add-token')
+  const addr = document.getElementById('adm-token-addr').value.trim()
+  btn.disabled = true
+  el.innerHTML = ''
+
+  if (!ethers.utils.isAddress(addr)) {
+    el.innerHTML = '<div class="check-item fail">✕ Некорректный адрес</div>'; return
+  }
+
+  const checks = []
+  let allPass = true
+  const add = (ok, text) => { checks.push({ ok, text }); if (!ok) allPass = false }
+
+  try {
+    const code = await rpc.getCode(addr)
+    add(code !== '0x', code !== '0x' ? 'По адресу есть контракт' : 'По адресу нет контракта — это EOA или пустой адрес')
+
+    if (addr.toLowerCase() === CONTRACT_ADDR.toLowerCase()) {
+      add(false, 'Нельзя добавить сам контракт долей')
+    }
+
+    const [already, was, len, max] = await Promise.all([
+      c.isDistributionToken(addr), c.wasDistributionToken(addr),
+      c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS(),
+    ])
+    add(!already, already ? 'Токен уже добавлен' : 'Токен ещё не добавлен')
+    if (was && !already) add(false, 'Токен уже был распределяемым раньше')
+    add(len.lt(max), len.lt(max) ? `Свободных слотов: ${max.sub(len).toString()}` : 'Слоты кончились')
+
+    // balanceOf вызывается в горячем пути каждого перевода долей
+    try {
+      const tok = new ethers.Contract(addr, ERC20_ABI, rpc)
+      const bal = await tok.balanceOf(CONTRACT_ADDR)
+      add(true, `balanceOf отвечает, сейчас на контракте: ${exact(bal, 18)}`)
+      try {
+        const [sym, dec] = await Promise.all([tok.symbol(), tok.decimals()])
+        add(true, `Токен: ${sym}, знаков: ${dec}`)
+      } catch { add(true, 'symbol/decimals не читаются — не критично') }
+    } catch {
+      add(false, 'balanceOf не отвечает — добавлять нельзя, сломает переводы долей')
+    }
+  } catch (e) {
+    add(false, 'Ошибка проверки: ' + errText(e))
+  }
+
+  el.innerHTML = checks.map(ch =>
+    `<div class="check-item ${ch.ok ? 'pass' : 'fail'}">${ch.ok ? '✓' : '✕'} <span>${esc(ch.text)}</span></div>`
+  ).join('')
+
+  if (allPass) {
+    el.innerHTML += '<div class="check-item pass">✓ Автоматические проверки пройдены. Fee-on-transfer и rebase проверить программно нельзя — убедитесь вручную.</div>'
+    btn.disabled = false
+  }
+}
+
+async function doAddDistToken() {
+  if (needWallet()) return
+  const addr = document.getElementById('adm-token-addr').value.trim()
+  if (!ethers.utils.isAddress(addr)) { setStatus('Некорректный адрес токена.', 'error'); return }
+
+  const typed = prompt(
+    'НЕОБРАТИМОЕ ДЕЙСТВИЕ\n\n' +
+    'Токен ' + addr + ' будет добавлен в распределение навсегда.\n' +
+    'Убрать его из списка нельзя. Вывести через rescue — тоже нельзя, никогда.\n\n' +
+    'Для подтверждения введите: ДОБАВИТЬ'
+  )
+  if (typed !== 'ДОБАВИТЬ') { setStatus('Отменено.', 'info'); return }
+
+  try {
+    setBusy(true); setStatus('Добавляем токен…', 'info')
+    await (await contract.addDistributionToken(addr)).wait()
+    setStatus('Токен добавлен в распределение. Действие необратимо.', 'success')
+    document.getElementById('adm-token-addr').value = ''
+    document.getElementById('adm-token-check').innerHTML = ''
+    document.getElementById('btn-add-token').disabled = true
+    await refreshAll()
+  } catch (e) { setStatus('Не удалось добавить: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doSetPause(addr, pause) {
+  if (needWallet()) return
+  const m = meta(addr)
+  if (pause) {
+    if (!confirm(
+      `Поставить паузу синхронизации ${m.symbol}?\n\n` +
+      `Приток перестанет раскладываться по держателям. Начисленное ранее остаётся доступным.\n\n` +
+      `ВАЖНО: при активной паузе нарушается порядок «синхронизация до перемещения веса» — ` +
+      `покупатель долей может получить часть дохода за период продавца. Держите паузу минимально.`
+    )) return
+  } else {
+    if (!confirm(
+      `Снять паузу с ${m.symbol}?\n\n` +
+      `Сразу после снятия вызовите «Разложить» по этому токену, ` +
+      `чтобы накопленное за паузу разошлось по держателям.`
+    )) return
+  }
+  try {
+    setBusy(true); setStatus(pause ? 'Ставим паузу…' : 'Снимаем паузу…', 'info')
+    await (await contract.setTokenSyncPaused(addr, pause)).wait()
+    setStatus(pause ? 'Пауза установлена.' : 'Пауза снята. Не забудьте «Разложить».', 'success')
+    await refreshAll()
+  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doRescue() {
+  if (needWallet()) return
+  const token = document.getElementById('adm-rescue-token').value.trim()
+  const to = document.getElementById('adm-rescue-to').value.trim()
+  if (!ethers.utils.isAddress(token)) { setStatus('Некорректный адрес токена.', 'error'); return }
+  if (!ethers.utils.isAddress(to)) { setStatus('Некорректный адрес получателя.', 'error'); return }
+
+  try {
+    setBusy(true)
+    // Проверяем заранее, чтобы не тратить газ на заведомый revert
+    const was = await contract.wasDistributionToken(token)
+    if (was) {
+      setStatus('Этот токен распределялся контрактом — вывести его нельзя никогда.', 'error'); return
+    }
+    if (token.toLowerCase() === CONTRACT_ADDR.toLowerCase()) {
+      setStatus('Припаркованные доли защищены, вывести их нельзя.', 'error'); return
+    }
+    const tok = new ethers.Contract(token, ERC20_ABI, rpc)
+    let amountTxt = ''
+    try {
+      const [bal, sym, dec] = await Promise.all([tok.balanceOf(CONTRACT_ADDR), tok.symbol(), tok.decimals()])
+      if (bal.isZero()) { setStatus('На контракте нет этого токена.', 'error'); return }
+      amountTxt = `${exact(bal, dec)} ${sym}`
+    } catch { amountTxt = 'весь баланс' }
+
+    if (!confirm(`Вывести ${amountTxt}\nна адрес ${to}?`)) return
+
+    setStatus('Выводим…', 'info')
+    await (await contract.rescue(token, to)).wait()
+    setStatus('Выведено.', 'success')
+    document.getElementById('adm-rescue-token').value = ''
+    await loadContractInfo()
+  } catch (e) { setStatus('Не удалось вывести: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doTransferOwnership() {
+  if (needWallet()) return
+  const to = document.getElementById('adm-new-owner').value.trim()
+  if (!ethers.utils.isAddress(to)) { setStatus('Некорректный адрес.', 'error'); return }
+  if (to.toLowerCase() === userAddr.toLowerCase()) { setStatus('Вы уже владелец.', 'error'); return }
+
+  if (!confirm(
+    `Передать владение адресу ${to}?\n\n` +
+    `Передача двухшаговая: пока новый владелец не вызовет «Принять», полномочия остаются у вас. ` +
+    `Это защищает от передачи на неверный адрес.\n\n` +
+    `Убедитесь, что этот адрес контролируется вами или доверенным мультисигом ` +
+    `и способен отправлять транзакции.`
+  )) return
+
+  try {
+    setBusy(true); setStatus('Передаём владение…', 'info')
+    await (await contract.transferOwnership(to)).wait()
+    setStatus(`Передача запущена. Ждём принятия от ${shortAddr(to)}.`, 'success')
+    document.getElementById('adm-new-owner').value = ''
+    await loadAdmin()
+  } catch (e) { setStatus('Не удалось передать: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doAcceptOwnership() {
+  if (needWallet()) return
+  if (!confirm('Принять владение контрактом?')) return
+  try {
+    setBusy(true); setStatus('Принимаем владение…', 'info')
+    await (await contract.acceptOwnership()).wait()
+    setStatus('Вы теперь владелец контракта.', 'success')
+    await refreshAll()
+  } catch (e) { setStatus('Не удалось принять: ' + errText(e), 'error') }
   finally { setBusy(false) }
 }
 
