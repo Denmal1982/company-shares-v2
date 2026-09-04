@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Company Shares — Dashboard</title>
+<title>BasisPointShare — Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -15,105 +15,105 @@
   --red:#e03e3e;--red-bg:#fdf0f0;
   --amber:#d97706;--amber-bg:#fffbeb;
   --blue:#2563eb;--blue-bg:#eff6ff;
+  --teal:#0d9488;--teal-bg:#f0fdfa;
   --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
-  --shadow-md:0 4px 24px rgba(0,0,0,.08);
   --font:Inter,-apple-system,sans-serif;
   --radius:12px;--radius-sm:8px;--radius-lg:16px;
 }
 body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh}
 
-/* NAV */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:var(--bg1);border-bottom:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:0;z-index:10}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:var(--bg1);border-bottom:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
 .nav-left{display:flex;align-items:center;gap:16px}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;letter-spacing:-.5px}
-.logo-name{font-size:15px;font-weight:700;color:var(--txt)}
+.logo-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.logo-name{font-size:15px;font-weight:700}
 .net-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid #d6d0f8;font-weight:600}
-.nav-link{font-size:13px;color:var(--txt3);text-decoration:none;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);transition:all .15s;font-weight:500}
-.nav-link:hover{color:var(--txt2);border-color:var(--border2);background:var(--bg2)}
 .btn-wallet{font-size:13px;padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg1);color:var(--txt);cursor:pointer;transition:all .15s;font-weight:600;box-shadow:var(--shadow)}
 .btn-wallet:hover{border-color:var(--purple);color:var(--purple)}
 .btn-wallet.connected{border-color:var(--green);color:var(--green);background:var(--green-bg)}
-.btn-refresh{font-size:13px;padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg1);color:var(--txt3);cursor:pointer;transition:all .15s;font-weight:600}
-.btn-refresh:hover{color:var(--purple);border-color:var(--border2)}
+.btn-refresh{font-size:13px;padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg1);color:var(--txt3);cursor:pointer;font-weight:600}
+.btn-refresh:hover:not([disabled]){color:var(--purple);border-color:var(--border2)}
 .btn-refresh[disabled]{opacity:.4;cursor:not-allowed}
 .addr-mono{font-family:monospace;font-size:11px;color:var(--txt3)}
 
-/* LAYOUT */
 .main{padding:24px 28px;max-width:1200px;margin:0 auto}
 @media(max-width:800px){.main{padding:14px}}
 
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
 .stat-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
 .stat-label{font-size:11px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
-.stat-val{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.stat-val{font-size:24px;font-weight:800;letter-spacing:-.5px}
 .stat-sub{font-size:11px;color:var(--txt3);margin-top:4px}
 
-/* GRID */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 @media(max-width:700px){.grid-2{grid-template-columns:1fr}}
 
-/* CARD */
 .card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
-.card-title{font-size:12px;font-weight:700;color:var(--txt3);margin-bottom:16px;text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.card-title-main{font-size:14px;font-weight:700;color:var(--txt);letter-spacing:0;text-transform:none}
+.card-title{font-size:12px;font-weight:700;color:var(--txt3);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-title-main{font-size:14px;font-weight:700;color:var(--txt)}
 
-/* DIVIDENDS */
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{font-size:13px;padding:8px 14px;border:none;background:none;color:var(--txt3);cursor:pointer;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font)}
+.tab:hover{color:var(--txt2)}
+.tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
 .token-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
 .token-row:last-child{border-bottom:none}
 .token-icon{width:36px;height:36px;border-radius:10px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--purple);flex-shrink:0}
 .token-info{flex:1;min-width:0}
-.token-name{font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:6px}
+.token-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
 .token-addr{font-size:11px;color:var(--txt3);font-family:monospace;margin-top:1px}
 .token-amounts{text-align:right;margin:0 12px}
 .token-pending{font-size:16px;font-weight:800;color:var(--green)}
 .token-pending.zero{color:var(--txt3);font-weight:600}
 .token-partial{font-size:11px;color:var(--amber);font-weight:600;margin-top:2px}
-.btn-claim{font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;transition:all .15s;font-weight:600;flex-shrink:0}
+.btn-claim{font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;font-weight:600;flex-shrink:0}
 .btn-claim:hover:not([disabled]){border-color:var(--green);color:var(--green);background:var(--green-bg)}
 .btn-claim[disabled]{opacity:.4;cursor:not-allowed}
-.btn-claim-all{font-size:12px;padding:5px 14px;border-radius:var(--radius-sm);border:1px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;transition:all .15s;font-weight:700}
+.btn-claim-all{font-size:12px;padding:5px 14px;border-radius:var(--radius-sm);border:1px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;font-weight:700}
 .btn-claim-all:hover:not([disabled]){background:var(--green);color:#fff}
 .btn-claim-all[disabled]{opacity:.4;cursor:not-allowed}
 
-/* FORM */
 .form-row{margin-bottom:12px}
 .form-label{font-size:12px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:600}
-.form-hint{font-size:11px;color:var(--txt3);margin-top:4px}
-.form-inp{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg1);color:var(--txt);outline:none;transition:border .15s;font-family:var(--font)}
-.form-inp:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-bg)}
-.form-inp::placeholder{color:var(--txt3)}
-.form-select{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg1);color:var(--txt);outline:none;cursor:pointer;font-family:var(--font)}
-.form-select:focus{border-color:var(--purple)}
+.form-hint{font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.5}
+.form-inp,.form-select{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg1);color:var(--txt);outline:none;font-family:var(--font)}
+.form-inp:focus,.form-select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-bg)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-.btn-primary{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;cursor:pointer;transition:all .15s;margin-top:6px;letter-spacing:.2px;box-shadow:0 2px 8px rgba(99,85,212,.3)}
-.btn-primary:hover:not(:disabled){opacity:.92;box-shadow:0 4px 16px rgba(99,85,212,.4)}
+.btn-primary{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;cursor:pointer;margin-top:6px;box-shadow:0 2px 8px rgba(99,85,212,.3);font-family:var(--font)}
+.btn-primary:hover:not(:disabled){opacity:.92}
 .btn-primary:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.btn-secondary{width:100%;padding:11px;font-size:13px;font-weight:700;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;font-family:var(--font)}
+.btn-secondary:hover:not(:disabled){border-color:var(--purple);color:var(--purple)}
+.btn-secondary:disabled{opacity:.35;cursor:not-allowed}
 
-/* OFFERS */
-.offer-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;transition:border .15s}
-.offer-item:hover{border-color:var(--border2)}
+.offer-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
 .offer-item.incoming{background:linear-gradient(135deg,var(--green-light),#f0fff8);border-color:#a7f3d0}
+.offer-item.lease{background:var(--teal-bg);border-color:#99f6e4}
 .offer-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
 .offer-who{font-size:11px;color:var(--txt3);font-weight:600;font-family:monospace}
 .badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
 .badge.ok{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0}
 .badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid #fde68a}
 .badge.dead{background:var(--bg3);color:var(--txt3);border:1px solid var(--border)}
+.badge.active{background:var(--teal-bg);color:var(--teal);border:1px solid #99f6e4}
 .offer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 @media(max-width:480px){.offer-grid{grid-template-columns:1fr 1fr}}
 .offer-label{font-size:11px;color:var(--txt3);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.offer-val{font-size:15px;font-weight:700;color:var(--txt)}
+.offer-val{font-size:15px;font-weight:700}
 .offer-actions{display:flex;gap:8px;margin-top:12px}
-.btn-sm{font-size:12px;padding:7px 14px;border-radius:6px;border:1px solid;background:transparent;cursor:pointer;transition:all .15s;font-weight:700;flex:1}
-.btn-sm.buy{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--purple),var(--blue));box-shadow:0 2px 8px rgba(99,85,212,.28)}
-.btn-sm.buy:hover{opacity:.92}
+.btn-sm{font-size:12px;padding:7px 14px;border-radius:6px;border:1px solid;background:transparent;cursor:pointer;font-weight:700;flex:1;font-family:var(--font)}
+.btn-sm.buy{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--purple),var(--blue))}
+.btn-sm.buy:hover:not([disabled]){opacity:.92}
 .btn-sm.cancel{color:var(--red);border-color:#fca5a5}
-.btn-sm.cancel:hover{background:var(--red-bg)}
+.btn-sm.cancel:hover:not([disabled]){background:var(--red-bg)}
+.btn-sm.end{color:var(--teal);border-color:#99f6e4}
+.btn-sm.end:hover:not([disabled]){background:var(--teal-bg)}
+.btn-sm[disabled]{opacity:.4;cursor:not-allowed}
 
-/* INFO LIST */
 .info-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
 .info-row:last-child{border-bottom:none}
 .info-key{color:var(--txt3);font-weight:600}
@@ -121,19 +121,16 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 .info-val a{color:var(--purple);text-decoration:none}
 .info-val a:hover{text-decoration:underline}
 
-/* STATUS */
 .status{font-size:13px;padding:12px 16px;border-radius:var(--radius);margin-bottom:16px;display:none;line-height:1.5;font-weight:500;border:1px solid}
 .status.info{background:var(--purple-bg);color:var(--purple);border-color:#d6d0f8;display:block}
 .status.success{background:var(--green-bg);color:var(--green);border-color:#a7f3d0;display:block}
 .status.error{background:var(--red-bg);color:var(--red);border-color:#fca5a5;display:block}
-.banner{font-size:13px;padding:12px 16px;border-radius:var(--radius);margin-bottom:16px;font-weight:600;border:1px solid #fde68a;background:var(--amber-bg);color:var(--amber);display:none}
+.banner{font-size:13px;padding:12px 16px;border-radius:var(--radius);margin-bottom:16px;font-weight:600;border:1px solid #fde68a;background:var(--amber-bg);color:var(--amber);display:none;line-height:1.5}
 .banner.show{display:block}
 
 .divider{display:flex;align-items:center;gap:8px;margin:18px 0 14px;font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
 .empty-state{font-size:13px;color:var(--txt3);text-align:center;padding:24px 0;font-weight:500;line-height:1.6}
-
 *:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -143,141 +140,219 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 <nav class="nav">
   <div class="nav-left">
     <div class="logo">
-      <div class="logo-icon">CS</div>
-      <span class="logo-name">Company Shares</span>
+      <div class="logo-icon">BPS</div>
+      <span class="logo-name">BasisPointShare</span>
       <span class="net-pill">Sepolia</span>
     </div>
-    <a class="nav-link" href="index.html">← syntUSDv4 Pool</a>
   </div>
   <div style="display:flex;align-items:center;gap:10px">
     <span class="addr-mono" id="addr-display"></span>
-    <button class="btn-refresh" id="btn-refresh" onclick="refreshAll()" disabled>Refresh</button>
-    <button class="btn-wallet" id="btn-wallet" onclick="connectWallet()">Connect wallet</button>
+    <button class="btn-refresh" id="btn-refresh" onclick="refreshAll()" disabled>Обновить</button>
+    <button class="btn-wallet" id="btn-wallet" onclick="connectWallet()">Подключить кошелёк</button>
   </div>
 </nav>
 
 <div class="main">
-  <div class="banner" id="paused-banner">Trading is paused by the contract owner. You can still claim dividends and transfer shares.</div>
+  <div class="banner" id="warn-banner"></div>
   <div class="status" id="status-msg"></div>
 
   <div class="stats-row">
     <div class="stat-card">
-      <div class="stat-label">My shares</div>
-      <div class="stat-val" id="st-balance" style="color:var(--purple)">—</div>
-      <div class="stat-sub">available + locked</div>
+      <div class="stat-label">Мой вес</div>
+      <div class="stat-val" id="st-weight" style="color:var(--purple)">—</div>
+      <div class="stat-sub">участвует в доходе</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Available</div>
+      <div class="stat-label">Свободно</div>
       <div class="stat-val" id="st-free" style="color:var(--green)">—</div>
-      <div class="stat-sub">free to send or sell</div>
+      <div class="stat-sub">можно распорядиться</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Locked</div>
+      <div class="stat-label">В сделках</div>
       <div class="stat-val" id="st-locked" style="color:var(--amber)">—</div>
-      <div class="stat-sub">in open offers</div>
+      <div class="stat-sub">OTC + предложения аренды</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Total supply</div>
-      <div class="stat-val" id="st-supply" style="color:var(--txt)">—</div>
-      <div class="stat-sub">CSH issued</div>
+      <div class="stat-label">Сдано / арендовано</div>
+      <div class="stat-val" id="st-lease" style="color:var(--teal)">—</div>
+      <div class="stat-sub">out / in</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">My share</div>
+      <div class="stat-label">Припарковано</div>
+      <div class="stat-val" id="st-custody" style="color:var(--txt3)">—</div>
+      <div class="stat-sub">вне распределения</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Моя доля</div>
       <div class="stat-val" id="st-pct" style="color:var(--blue)">—</div>
-      <div class="stat-sub">of total supply</div>
+      <div class="stat-sub">от activeSupply</div>
     </div>
   </div>
 
   <div class="grid-2">
     <div class="card">
       <div class="card-title">
-        <span class="card-title-main">Dividends</span>
-        <button class="btn-claim-all" id="btn-claim-all" onclick="doClaimAll()" disabled>Claim all</button>
+        <span class="card-title-main">Дивиденды</span>
+        <button class="btn-claim-all" id="btn-claim-all" onclick="doClaimAll()" disabled>Забрать всё</button>
       </div>
-      <div id="dividends-list"><div class="empty-state">Connect your wallet to see what you have earned.</div></div>
+      <div id="dividends-list"><div class="empty-state">Подключите кошелёк, чтобы увидеть накопленное.</div></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="card-title-main">Offers to you</span></div>
-      <div id="incoming-list"><div class="empty-state">Connect your wallet to see offers addressed to you.</div></div>
+      <div class="card-title"><span class="card-title-main">Предложения вам</span></div>
+      <div id="incoming-list"><div class="empty-state">Подключите кошелёк, чтобы увидеть адресованные вам предложения.</div></div>
     </div>
   </div>
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title"><span class="card-title-main">Sell shares</span></div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(event,'tab-otc')">Продать</button>
+        <button class="tab" onclick="switchTab(event,'tab-lease')">Сдать в аренду</button>
+        <button class="tab" onclick="switchTab(event,'tab-park')">Парковка</button>
+      </div>
 
-      <div class="form-row">
-        <label class="form-label" for="ord-buyer">Buyer address</label>
-        <input class="form-inp" id="ord-buyer" placeholder="0x..." autocomplete="off"/>
+      <div class="tab-panel active" id="tab-otc">
+        <div class="form-row">
+          <label class="form-label" for="otc-buyer">Адрес покупателя</label>
+          <input class="form-inp" id="otc-buyer" placeholder="0x..." autocomplete="off"/>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label" for="otc-units">Долей</label>
+            <input class="form-inp" id="otc-units" type="number" placeholder="0" min="0" step="any"/>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="otc-price">Цена целиком</label>
+            <input class="form-inp" id="otc-price" type="number" placeholder="0" min="0" step="any"/>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label" for="otc-token">Оплата в</label>
+            <select class="form-select" id="otc-token"><option value="">Выберите токен</option></select>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="otc-days">Действует, дней</label>
+            <input class="form-inp" id="otc-days" type="number" placeholder="7" min="1" max="364" value="7"/>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-create-otc" onclick="doCreateOTC()" disabled>Создать предложение</button>
+        <div class="form-hint">Доли остаются вашими и продолжают приносить доход до самого исполнения. Они переходят в «В сделках» и их нельзя отправить в другое место.</div>
       </div>
-      <div class="form-grid">
-        <div class="form-row">
-          <label class="form-label" for="ord-amount">Shares to sell</label>
-          <input class="form-inp" id="ord-amount" type="number" placeholder="0" min="0" step="any"/>
-        </div>
-        <div class="form-row">
-          <label class="form-label" for="ord-price">Total price</label>
-          <input class="form-inp" id="ord-price" type="number" placeholder="0" min="0" step="any"/>
-        </div>
-      </div>
-      <div class="form-grid">
-        <div class="form-row">
-          <label class="form-label" for="ord-token">Paid in</label>
-          <select class="form-select" id="ord-token"><option value="">Select token</option></select>
-        </div>
-        <div class="form-row">
-          <label class="form-label" for="ord-days">Expires in (days)</label>
-          <input class="form-inp" id="ord-days" type="number" placeholder="7" min="1" max="364" value="7"/>
-        </div>
-      </div>
-      <button class="btn-primary" id="btn-create-order" onclick="doCreateOrder()" disabled>Create offer</button>
-      <div class="form-hint">Shares stay yours and keep earning dividends until the buyer pays. They move to Locked and cannot be sent elsewhere.</div>
 
-      <div class="divider">your open offers</div>
-      <div id="outgoing-list"><div class="empty-state">No open offers.</div></div>
+      <div class="tab-panel" id="tab-lease">
+        <div class="form-row">
+          <label class="form-label" for="lease-renter">Адрес арендатора</label>
+          <input class="form-inp" id="lease-renter" placeholder="0x..." autocomplete="off"/>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label" for="lease-units">Долей</label>
+            <input class="form-inp" id="lease-units" type="number" placeholder="0" min="0" step="any"/>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="lease-price">Платёж вперёд</label>
+            <input class="form-inp" id="lease-price" type="number" placeholder="0" min="0" step="any"/>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label" for="lease-token">Оплата в</label>
+            <select class="form-select" id="lease-token"><option value="">Выберите токен</option></select>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="lease-duration">Срок аренды, дней</label>
+            <input class="form-inp" id="lease-duration" type="number" placeholder="30" min="1" max="730" value="30"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="lease-days">Предложение действует, дней</label>
+          <input class="form-inp" id="lease-days" type="number" placeholder="7" min="1" max="364" value="7"/>
+        </div>
+        <button class="btn-primary" id="btn-create-lease" onclick="doCreateLease()" disabled>Предложить аренду</button>
+        <div class="form-hint">Собственность остаётся у вас, арендатор получает только доход на срок. Платёж приходит сразу и целиком. Вернуть доли после истечения может кто угодно.</div>
+      </div>
+
+      <div class="tab-panel" id="tab-park">
+        <div class="form-row">
+          <label class="form-label" for="park-amount">Долей</label>
+          <input class="form-inp" id="park-amount" type="number" placeholder="0" min="0" step="any"/>
+        </div>
+        <div class="form-grid">
+          <button class="btn-primary" id="btn-park" onclick="doPark()" disabled style="margin-top:0">Припарковать</button>
+          <button class="btn-secondary" id="btn-unpark" onclick="doUnpark()" disabled>Вернуть</button>
+        </div>
+        <div class="form-hint"><strong style="color:var(--amber)">Парковка — безвозмездный отказ от дохода.</strong> Припаркованные доли исключаются из распределения: вы не получаете ничего, а ваша часть потока достаётся остальным держателям. Компенсации нет. Механизм задуман для контрактов-обёрток и пулов ликвидности. Вернуть доли может только тот, кто их припарковал.</div>
+      </div>
+
+      <div class="divider">мои открытые предложения</div>
+      <div id="outgoing-list"><div class="empty-state">Открытых предложений нет.</div></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="card-title-main">Contract</span></div>
-      <div id="contract-info"><div class="empty-state">Loading contract details…</div></div>
+      <div class="card-title"><span class="card-title-main">Контракт</span></div>
+      <div id="contract-info"><div class="empty-state">Загрузка…</div></div>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
-const CONTRACT_ADDR = "0xea1972c0727b8043597d7e0e9dc731eb5cb937ea"
+const CONTRACT_ADDR = "0xd70B9e0287cC79EE416b8F382998d6d9692D5621"
 const CHAIN_ID      = 11155111
 const RPC_URL       = "https://ethereum-sepolia.publicnode.com"
 const EXPLORER      = "https://sepolia.etherscan.io"
 const START_BLOCK   = 0
 const LOG_WINDOW    = 45000
+const DEC           = 18          // BPS: 18 знаков, не 6
 
 const ABI = [
   "function name() view returns (string)",
   "function symbol() view returns (string)",
   "function decimals() view returns (uint8)",
+  "function VERSION() view returns (string)",
   "function totalSupply() view returns (uint256)",
+  "function activeSupply() view returns (uint256)",
+  "function custodyTotal() view returns (uint256)",
+  "function totalLeasedUnits() view returns (uint256)",
+  "function totalOfferedUnits() view returns (uint256)",
   "function balanceOf(address) view returns (uint256)",
+  "function ownedUnits(address) view returns (uint256)",
   "function freeBalanceOf(address) view returns (uint256)",
   "function lockedBalanceOf(address) view returns (uint256)",
+  "function offeredBalanceOf(address) view returns (uint256)",
+  "function leasedOutOf(address) view returns (uint256)",
+  "function leasedInOf(address) view returns (uint256)",
+  "function custodyOf(address) view returns (uint256)",
   "function owner() view returns (address)",
-  "function ordersPaused() view returns (bool)",
-  "function getSupportedTokens() view returns (address[])",
-  "function isSupportedToken(address) view returns (bool)",
-  "function isDeprecated(address) view returns (bool)",
+  "function getDistributionTokens() view returns (address[])",
+  "function isDistributionToken(address) view returns (bool)",
+  "function syncPaused(address) view returns (bool)",
   "function totalOwed(address) view returns (uint256)",
   "function shortfall(address) view returns (uint256)",
+  "function unsyncedBalance(address) view returns (uint256)",
+  "function syncToken(address)",
   "function pendingDividends(address,address) view returns (uint256 earned, uint256 claimableNow)",
   "function pendingDividendsAll(address) view returns (address[] tokens, uint256[] earned, uint256[] claimableNow)",
   "function claim(address) returns (uint256)",
   "function claimAll() returns (uint256[])",
-  "function orders(address,address) view returns (uint256 shareAmount, uint256 price, address paymentToken, uint64 deadline)",
-  "function createOrder(address,uint256,uint256,address,uint64)",
-  "function cancelOrder(address)",
-  "function executeOrder(address,uint256,uint256,address)",
-  "event OrderCreated(address indexed seller, address indexed buyer, uint256 shareAmount, uint256 price, address indexed paymentToken, uint64 deadline)",
+  "function park(uint256)",
+  "function unpark(uint256)",
+  "function otcOffers(address,address) view returns (uint256 units, uint256 price, address paymentToken, uint64 deadline)",
+  "function createOTC(address,uint256,uint256,address,uint64)",
+  "function cancelOTC(address)",
+  "function cancelExpiredOTC(address,address)",
+  "function executeOTC(address,uint256,uint256,address)",
+  "function leases(address,address) view returns (uint256 units, uint256 price, address paymentToken, uint64 duration, uint64 offerDeadline, uint64 expiresAt)",
+  "function leaseInfo(address,address) view returns (uint256 units, uint256 price, address paymentToken, uint64 duration, uint64 offerDeadline, uint64 expiresAt, bool executed, bool expired)",
+  "function createLease(address,uint256,uint256,address,uint64,uint64)",
+  "function cancelLease(address)",
+  "function cancelExpiredLease(address,address)",
+  "function executeLease(address,uint256,uint256,address,uint64)",
+  "function endLease(address,address)",
+  "event OTCCreated(address indexed seller, address indexed buyer, uint256 units, uint256 price, address indexed paymentToken, uint64 deadline)",
+  "event LeaseOffered(address indexed lessor, address indexed renter, uint256 units, uint256 price, address indexed paymentToken, uint64 duration, uint64 offerDeadline)",
 ]
 const ERC20_ABI = [
   "function symbol() view returns (string)",
@@ -288,7 +363,7 @@ const ERC20_ABI = [
 ]
 
 let provider, signer, contract, userAddr
-let supportedTokens = []
+let distTokens = []
 let tokenMeta = {}
 let busy = false
 
@@ -304,36 +379,64 @@ function fmt(bn, dec, dp) {
   return n.toFixed(dp)
 }
 function exact(bn, dec) { return ethers.utils.formatUnits(bn, dec) }
-function shortAddr(a) { return a.slice(0, 6) + '...' + a.slice(-4) }
+function shortAddr(a) { return a ? a.slice(0, 6) + '...' + a.slice(-4) : '' }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])) }
 function meta(addr) { return tokenMeta[addr?.toLowerCase()] || { symbol: shortAddr(addr || ''), decimals: 18 } }
 function dateStr(sec) {
-  return new Date(sec * 1000).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(sec * 1000).toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 function setStatus(msg, type) {
   const el = document.getElementById('status-msg')
   el.textContent = msg; el.className = 'status ' + type
-  if (type === 'success') setTimeout(() => { if (el.textContent === msg) el.className = 'status' }, 5000)
+  if (type === 'success') setTimeout(() => { if (el.textContent === msg) el.className = 'status' }, 6000)
 }
 function clearStatus() { document.getElementById('status-msg').className = 'status' }
 function errText(e) {
-  return e?.error?.message || e?.data?.message || e?.reason || e?.message || String(e)
+  const raw = e?.error?.message || e?.data?.message || e?.reason || e?.message || String(e)
+  // Кастомные ошибки контракта человеческим языком
+  const map = {
+    InsufficientFreeBalance: 'Недостаточно свободных долей.',
+    OfferAlreadyExists: 'Предложение этому адресу уже существует — сначала отмените его.',
+    NoActiveOffer: 'Активного предложения нет.',
+    OfferExpired: 'Срок предложения истёк.',
+    TermsChanged: 'Условия предложения изменились — обновите страницу.',
+    SelfTrade: 'Нельзя торговать с самим собой.',
+    InvalidAmounts: 'Количество и цена должны быть больше нуля.',
+    InvalidDeadline: 'Некорректный срок.',
+    InvalidDuration: 'Некорректная длительность аренды.',
+    LeaseAlreadyExecuted: 'Аренда уже исполнена.',
+    LeaseNotExpired: 'Срок аренды ещё не истёк.',
+    InsufficientCustody: 'Столько долей не припарковано.',
+    NotDistributionToken: 'Этот токен не распределяется контрактом.',
+    TokenIsDistributed: 'Распределяемый токен нельзя вывести.',
+    NotOwner: 'Действие доступно только владельцу контракта.',
+  }
+  for (const k in map) if (raw.includes(k)) return map[k]
+  return raw
 }
 function setBusy(v) {
   busy = v
   document.getElementById('btn-refresh').disabled = v || !userAddr
-  document.getElementById('btn-create-order').disabled = v || !signer
+  ;['btn-create-otc','btn-create-lease','btn-park','btn-unpark'].forEach(id => {
+    document.getElementById(id).disabled = v || !signer
+  })
   document.getElementById('btn-claim-all').disabled = v || !signer
   document.querySelectorAll('.btn-sm, .btn-claim').forEach(b => { if (!b.dataset.keepDisabled) b.disabled = v })
 }
+function switchTab(ev, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
+  ev.currentTarget.classList.add('active')
+  document.getElementById(id).classList.add('active')
+}
 
 async function connectWallet() {
-  if (!hasAddr) { setStatus('Set CONTRACT_ADDR in the page config first.', 'error'); return }
+  if (!hasAddr) { setStatus('В настройках страницы не задан адрес контракта.', 'error'); return }
   let eth = null
   if (window.ethereum?.isMetaMask) eth = window.ethereum
   else if (window.ethereum?.providers) eth = window.ethereum.providers.find(p => p.isMetaMask)
   else if (window.ethereum) eth = window.ethereum
-  if (!eth) { setStatus('No wallet detected. Install MetaMask to continue.', 'error'); return }
+  if (!eth) { setStatus('Кошелёк не найден. Установите MetaMask.', 'error'); return }
   try {
     provider = new ethers.providers.Web3Provider(eth)
     await provider.send('eth_requestAccounts', [])
@@ -341,12 +444,10 @@ async function connectWallet() {
     if (net.chainId !== CHAIN_ID) {
       try {
         await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] })
-      } catch (e) {
-        setStatus('Switch your wallet to Sepolia and connect again.', 'error'); return
-      }
+      } catch { setStatus('Переключите кошелёк на Sepolia и подключитесь снова.', 'error'); return }
       provider = new ethers.providers.Web3Provider(eth)
       net = await provider.getNetwork()
-      if (net.chainId !== CHAIN_ID) { setStatus('Wrong network. Switch to Sepolia.', 'error'); return }
+      if (net.chainId !== CHAIN_ID) { setStatus('Неверная сеть. Нужна Sepolia.', 'error'); return }
     }
     signer = provider.getSigner()
     userAddr = await signer.getAddress()
@@ -355,16 +456,14 @@ async function connectWallet() {
     document.getElementById('btn-wallet').textContent = shortAddr(userAddr)
     document.getElementById('btn-wallet').classList.add('connected')
     document.getElementById('addr-display').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-6)
-    document.getElementById('btn-refresh').disabled = false
-    document.getElementById('btn-create-order').disabled = false
-    document.getElementById('btn-claim-all').disabled = false
+    setBusy(false)
 
     eth.on?.('accountsChanged', () => location.reload())
     eth.on?.('chainChanged', () => location.reload())
 
     await refreshAll()
     clearStatus()
-  } catch (e) { setStatus('Could not connect: ' + errText(e), 'error') }
+  } catch (e) { setStatus('Не удалось подключиться: ' + errText(e), 'error') }
 }
 
 async function refreshAll() {
@@ -376,8 +475,8 @@ async function loadTokenMeta() {
   const c = contract || contractRO
   if (!c) return
   try {
-    supportedTokens = await c.getSupportedTokens()
-    await Promise.all(supportedTokens.map(async addr => {
+    distTokens = await c.getDistributionTokens()
+    await Promise.all(distTokens.map(async addr => {
       const key = addr.toLowerCase()
       if (tokenMeta[key]) return
       try {
@@ -386,16 +485,23 @@ async function loadTokenMeta() {
         tokenMeta[key] = { symbol: sym, decimals: dec }
       } catch { tokenMeta[key] = { symbol: shortAddr(addr), decimals: 18 } }
     }))
-    const sel = document.getElementById('ord-token')
-    const prev = sel.value
-    sel.innerHTML = '<option value="">Select token</option>'
-    supportedTokens.forEach(addr => {
-      const opt = document.createElement('option')
-      opt.value = addr
-      opt.textContent = meta(addr).symbol
-      sel.appendChild(opt)
+    // Оплата возможна любым ERC20, но список распределяемых — разумный дефолт
+    ;['otc-token','lease-token'].forEach(id => {
+      const sel = document.getElementById(id)
+      const prev = sel.value
+      sel.innerHTML = '<option value="">Выберите токен</option>'
+      distTokens.forEach(addr => {
+        const opt = document.createElement('option')
+        opt.value = addr
+        opt.textContent = meta(addr).symbol
+        sel.appendChild(opt)
+      })
+      const custom = document.createElement('option')
+      custom.value = '__custom__'
+      custom.textContent = 'Другой адрес…'
+      sel.appendChild(custom)
+      if (prev) sel.value = prev
     })
-    if (prev) sel.value = prev
   } catch (e) { console.error('loadTokenMeta', e) }
 }
 
@@ -403,19 +509,19 @@ async function loadStats() {
   const c = contract || contractRO
   if (!c) return
   try {
-    const ts = await c.totalSupply()
-    document.getElementById('st-supply').textContent = fmt(ts, 6, 2)
     if (!userAddr) return
-    const [bal, free, locked] = await Promise.all([
-      c.balanceOf(userAddr),
-      c.freeBalanceOf(userAddr),
-      c.lockedBalanceOf(userAddr),
+    const [weight, free, locked, offered, out, inn, cust, active] = await Promise.all([
+      c.balanceOf(userAddr), c.freeBalanceOf(userAddr), c.lockedBalanceOf(userAddr),
+      c.offeredBalanceOf(userAddr), c.leasedOutOf(userAddr), c.leasedInOf(userAddr),
+      c.custodyOf(userAddr), c.activeSupply(),
     ])
-    document.getElementById('st-balance').textContent = fmt(bal, 6, 2)
-    document.getElementById('st-free').textContent = fmt(free, 6, 2)
-    document.getElementById('st-locked').textContent = fmt(locked, 6, 2)
-    const pct = ts.gt(0)
-      ? (parseFloat(exact(bal, 6)) / parseFloat(exact(ts, 6)) * 100).toFixed(4)
+    document.getElementById('st-weight').textContent = fmt(weight, DEC, 2)
+    document.getElementById('st-free').textContent = fmt(free, DEC, 2)
+    document.getElementById('st-locked').textContent = fmt(locked.add(offered), DEC, 2)
+    document.getElementById('st-lease').textContent = fmt(out, DEC, 0) + ' / ' + fmt(inn, DEC, 0)
+    document.getElementById('st-custody').textContent = fmt(cust, DEC, 2)
+    const pct = active.gt(0)
+      ? (parseFloat(exact(weight, DEC)) / parseFloat(exact(active, DEC)) * 100).toFixed(4)
       : '0.0000'
     document.getElementById('st-pct').textContent = pct + '%'
   } catch (e) { console.error('loadStats', e) }
@@ -425,8 +531,8 @@ async function loadDividends() {
   const el = document.getElementById('dividends-list')
   const c = contract || contractRO
   if (!c || !userAddr) return
-  if (supportedTokens.length === 0) {
-    el.innerHTML = '<div class="empty-state">No dividend tokens configured yet.</div>'; return
+  if (distTokens.length === 0) {
+    el.innerHTML = '<div class="empty-state">Распределяемые токены ещё не добавлены.</div>'; return
   }
   try {
     const res = await c.pendingDividendsAll(userAddr)
@@ -448,28 +554,25 @@ async function loadDividends() {
         </div>
         <div class="token-amounts">
           <div class="token-pending${isZero ? ' zero' : ''}">${fmt(e, m.decimals, 6)}</div>
-          ${partial ? `<div class="token-partial">${fmt(n, m.decimals, 6)} available now</div>` : ''}
+          ${partial ? `<div class="token-partial">${fmt(n, m.decimals, 6)} доступно сейчас</div>` : ''}
         </div>
-        <button class="btn-claim" onclick="doClaim('${addr}')" ${n.isZero() ? 'disabled data-keep-disabled="1"' : ''}>Claim</button>
+        <button class="btn-claim" onclick="doClaim('${addr}')" ${n.isZero() ? 'disabled data-keep-disabled="1"' : ''}>Забрать</button>
       </div>`
     })
     el.innerHTML = rows.join('')
     document.getElementById('btn-claim-all').disabled = busy || !signer || !anyClaimable
   } catch (e) {
     console.error('loadDividends', e)
-    el.innerHTML = '<div class="empty-state">Could not read dividends. Check that the contract address matches this network.</div>'
+    el.innerHTML = '<div class="empty-state">Не удалось прочитать дивиденды. Проверьте адрес контракта и сеть.</div>'
   }
 }
 
-async function queryOrderLogs(filter) {
+async function queryLogs(filter) {
   const c = contract || contractRO
   const latest = await rpc.getBlockNumber()
   const from = START_BLOCK > 0 ? START_BLOCK : Math.max(0, latest - LOG_WINDOW)
-  try {
-    return await c.queryFilter(filter, from, latest)
-  } catch {
-    return await c.queryFilter(filter, Math.max(0, latest - 9000), latest)
-  }
+  try { return await c.queryFilter(filter, from, latest) }
+  catch { return await c.queryFilter(filter, Math.max(0, latest - 9000), latest) }
 }
 
 async function loadOffers() {
@@ -478,41 +581,72 @@ async function loadOffers() {
   const c = contract || contractRO
   if (!c || !userAddr) return
   try {
-    const [inLogs, outLogs] = await Promise.all([
-      queryOrderLogs(c.filters.OrderCreated(null, userAddr)),
-      queryOrderLogs(c.filters.OrderCreated(userAddr, null)),
+    const [otcIn, otcOut, lsIn, lsOut] = await Promise.all([
+      queryLogs(c.filters.OTCCreated(null, userAddr)),
+      queryLogs(c.filters.OTCCreated(userAddr, null)),
+      queryLogs(c.filters.LeaseOffered(null, userAddr)),
+      queryLogs(c.filters.LeaseOffered(userAddr, null)),
     ])
-    const incoming = await resolvePairs(inLogs.map(l => [l.args.seller, userAddr]))
-    const outgoing = await resolvePairs(outLogs.map(l => [userAddr, l.args.buyer]))
+
+    const incoming = [
+      ...await resolveOTC(otcIn.map(l => [l.args.seller, userAddr])),
+      ...await resolveLease(lsIn.map(l => [l.args.lessor, userAddr])),
+    ]
+    const outgoing = [
+      ...await resolveOTC(otcOut.map(l => [userAddr, l.args.buyer])),
+      ...await resolveLease(lsOut.map(l => [userAddr, l.args.renter])),
+    ]
 
     incEl.innerHTML = incoming.length
       ? incoming.map(o => offerCard(o, true)).join('')
-      : '<div class="empty-state">Nobody has offered you shares yet.<br/>An offer appears here once a holder creates one for your address.</div>'
+      : '<div class="empty-state">Вам пока никто не предлагал доли.<br/>Предложение появится здесь, когда держатель создаст его на ваш адрес.</div>'
 
     outEl.innerHTML = outgoing.length
       ? outgoing.map(o => offerCard(o, false)).join('')
-      : '<div class="empty-state">No open offers.</div>'
+      : '<div class="empty-state">Открытых предложений нет.</div>'
   } catch (e) {
     console.error('loadOffers', e)
-    incEl.innerHTML = '<div class="empty-state">Could not load offers from event history.</div>'
+    incEl.innerHTML = '<div class="empty-state">Не удалось прочитать историю событий.</div>'
   }
 }
 
-async function resolvePairs(pairs) {
-  const c = contract || contractRO
+function dedupe(pairs) {
   const seen = new Set()
-  const uniq = pairs.filter(([s, b]) => {
-    const k = s.toLowerCase() + ':' + b.toLowerCase()
+  return pairs.filter(([a, b]) => {
+    const k = a.toLowerCase() + ':' + b.toLowerCase()
     if (seen.has(k)) return false
     seen.add(k); return true
   })
+}
+
+async function resolveOTC(pairs) {
+  const c = contract || contractRO
   const out = []
-  await Promise.all(uniq.map(async ([seller, buyer]) => {
+  await Promise.all(dedupe(pairs).map(async ([seller, buyer]) => {
     try {
-      const o = await c.orders(seller, buyer)
-      if (o.shareAmount.gt(0)) {
-        out.push({ seller, buyer, shareAmount: o.shareAmount, price: o.price, paymentToken: o.paymentToken, deadline: o.deadline.toNumber() })
-      }
+      const o = await c.otcOffers(seller, buyer)
+      if (o.units.gt(0)) out.push({
+        kind: 'otc', seller, buyer, counterparty: seller.toLowerCase() === userAddr.toLowerCase() ? buyer : seller,
+        units: o.units, price: o.price, paymentToken: o.paymentToken, deadline: o.deadline.toNumber(),
+      })
+    } catch {}
+  }))
+  return out.sort((a, b) => a.deadline - b.deadline)
+}
+
+async function resolveLease(pairs) {
+  const c = contract || contractRO
+  const out = []
+  await Promise.all(dedupe(pairs).map(async ([lessor, renter]) => {
+    try {
+      const l = await c.leaseInfo(lessor, renter)
+      if (l.units.gt(0)) out.push({
+        kind: 'lease', lessor, renter,
+        counterparty: lessor.toLowerCase() === userAddr.toLowerCase() ? renter : lessor,
+        units: l.units, price: l.price, paymentToken: l.paymentToken,
+        duration: l.duration.toNumber(), deadline: l.offerDeadline.toNumber(),
+        expiresAt: l.expiresAt.toNumber(), executed: l.executed, expired: l.expired,
+      })
     } catch {}
   }))
   return out.sort((a, b) => a.deadline - b.deadline)
@@ -521,24 +655,53 @@ async function resolvePairs(pairs) {
 function offerCard(o, isIncoming) {
   const m = meta(o.paymentToken)
   const now = Math.floor(Date.now() / 1000)
+
+  if (o.kind === 'lease') {
+    let badge, actions = ''
+    if (o.executed) {
+      badge = o.expired
+        ? '<span class="badge warn">Срок вышел</span>'
+        : '<span class="badge active">Аренда идёт</span>'
+      // endLease permissionless — доступна обеим сторонам
+      if (o.expired) actions = `<button class="btn-sm end" onclick="doEndLease('${o.lessor}','${o.renter}')">Завершить и вернуть доли</button>`
+    } else if (o.deadline <= now) {
+      badge = '<span class="badge dead">Предложение истекло</span>'
+      actions = `<button class="btn-sm cancel" onclick="doCancelExpiredLease('${o.lessor}','${o.renter}')">Снять истёкшее</button>`
+    } else {
+      badge = '<span class="badge ok">Предложение открыто</span>'
+      actions = isIncoming
+        ? `<button class="btn-sm buy" onclick="doExecuteLease('${o.lessor}')">Арендовать за ${esc(fmt(o.price, m.decimals, 4))} ${esc(m.symbol)}</button>`
+        : `<button class="btn-sm cancel" onclick="doCancelLease('${o.renter}')">Отменить</button>`
+    }
+    const who = isIncoming ? 'Аренда от ' + shortAddr(o.lessor) : 'Аренда для ' + shortAddr(o.renter)
+    const when = o.executed ? dateStr(o.expiresAt) : dateStr(o.deadline)
+    return `<div class="offer-item lease">
+      <div class="offer-head"><span class="offer-who">${esc(who)}</span>${badge}</div>
+      <div class="offer-grid">
+        <div><div class="offer-label">Долей</div><div class="offer-val">${fmt(o.units, DEC, 2)}</div></div>
+        <div><div class="offer-label">Платёж</div><div class="offer-val">${fmt(o.price, m.decimals, 4)} ${esc(m.symbol)}</div></div>
+        <div><div class="offer-label">${o.executed ? 'До' : 'Срок ' + Math.round(o.duration / 86400) + ' дн., принять до'}</div><div class="offer-val">${when}</div></div>
+      </div>
+      ${actions ? `<div class="offer-actions">${actions}</div>` : ''}
+    </div>`
+  }
+
   const expired = o.deadline <= now
   const soon = !expired && o.deadline - now < 86400
-  const badge = expired
-    ? '<span class="badge dead">Expired</span>'
-    : soon ? '<span class="badge warn">Expires today</span>' : '<span class="badge ok">Open</span>'
-  const who = isIncoming ? 'From ' + shortAddr(o.seller) : 'To ' + shortAddr(o.buyer)
-  const actions = isIncoming
-    ? (expired ? '' : `<button class="btn-sm buy" onclick="doExecuteOrder('${o.seller}')">Buy for ${esc(fmt(o.price, m.decimals, 4))} ${esc(m.symbol)}</button>`)
-    : `<button class="btn-sm cancel" onclick="doCancelOrder('${o.buyer}')">Cancel and unlock</button>`
+  const badge = expired ? '<span class="badge dead">Истекло</span>'
+    : soon ? '<span class="badge warn">Истекает сегодня</span>' : '<span class="badge ok">Открыто</span>'
+  const who = isIncoming ? 'Продажа от ' + shortAddr(o.seller) : 'Продажа для ' + shortAddr(o.buyer)
+  const actions = expired
+    ? `<button class="btn-sm cancel" onclick="doCancelExpiredOTC('${o.seller}','${o.buyer}')">Снять истёкшее</button>`
+    : (isIncoming
+      ? `<button class="btn-sm buy" onclick="doExecuteOTC('${o.seller}')">Купить за ${esc(fmt(o.price, m.decimals, 4))} ${esc(m.symbol)}</button>`
+      : `<button class="btn-sm cancel" onclick="doCancelOTC('${o.buyer}')">Отменить и разблокировать</button>`)
   return `<div class="offer-item${isIncoming && !expired ? ' incoming' : ''}">
-    <div class="offer-head">
-      <span class="offer-who">${esc(who)}</span>
-      ${badge}
-    </div>
+    <div class="offer-head"><span class="offer-who">${esc(who)}</span>${badge}</div>
     <div class="offer-grid">
-      <div><div class="offer-label">Shares</div><div class="offer-val">${fmt(o.shareAmount, 6, 2)}</div></div>
-      <div><div class="offer-label">Price</div><div class="offer-val">${fmt(o.price, m.decimals, 4)} ${esc(m.symbol)}</div></div>
-      <div><div class="offer-label">${expired ? 'Expired' : 'Expires'}</div><div class="offer-val">${dateStr(o.deadline)}</div></div>
+      <div><div class="offer-label">Долей</div><div class="offer-val">${fmt(o.units, DEC, 2)}</div></div>
+      <div><div class="offer-label">Цена</div><div class="offer-val">${fmt(o.price, m.decimals, 4)} ${esc(m.symbol)}</div></div>
+      <div><div class="offer-label">${expired ? 'Истекло' : 'Истекает'}</div><div class="offer-val">${dateStr(o.deadline)}</div></div>
     </div>
     ${actions ? `<div class="offer-actions">${actions}</div>` : ''}
   </div>`
@@ -547,150 +710,350 @@ function offerCard(o, isIncoming) {
 async function loadContractInfo() {
   const el = document.getElementById('contract-info')
   const c = contract || contractRO
-  if (!c) { el.innerHTML = '<div class="empty-state">No contract address configured.</div>'; return }
+  if (!c) { el.innerHTML = '<div class="empty-state">Адрес контракта не задан.</div>'; return }
   try {
-    const [owner, paused] = await Promise.all([c.owner(), c.ordersPaused()])
-    document.getElementById('paused-banner').classList.toggle('show', paused)
+    const [owner, ver, ts, active, cust, leased] = await Promise.all([
+      c.owner(), c.VERSION(), c.totalSupply(), c.activeSupply(), c.custodyTotal(), c.totalLeasedUnits(),
+    ])
 
-    const tokenRows = await Promise.all(supportedTokens.map(async addr => {
+    const warnings = []
+    const tokenRows = await Promise.all(distTokens.map(async addr => {
       const m = meta(addr)
-      const [dep, short] = await Promise.all([c.isDeprecated(addr), c.shortfall(addr)])
-      const tag = dep ? ' <span class="badge dead">Retired</span>' : ''
-      const gap = short.gt(0) ? ` <span class="badge warn">Short ${fmt(short, m.decimals, 2)}</span>` : ''
-      return `<div class="info-row"><span class="info-key">${esc(m.symbol)}${tag}${gap}</span><span class="info-val">${shortAddr(addr)}</span></div>`
+      const [paused, short, unsynced] = await Promise.all([
+        c.syncPaused(addr), c.shortfall(addr), c.unsyncedBalance(addr),
+      ])
+      if (paused) warnings.push(`Синхронизация ${m.symbol} приостановлена владельцем: новый приток не раскладывается по держателям. Начисленное ранее забрать можно.`)
+      if (short.gt(0)) warnings.push(`У контракта не хватает ${fmt(short, m.decimals, 2)} ${m.symbol} на покрытие начислений.`)
+      const tag = paused ? ' <span class="badge warn">Пауза</span>' : ''
+      const gap = short.gt(0) ? ` <span class="badge warn">Нехватка ${fmt(short, m.decimals, 2)}</span>` : ''
+      const sync = unsynced.gt(0)
+        ? `<button class="btn-claim" onclick="doSync('${addr}')" style="margin-left:8px">Разложить ${fmt(unsynced, m.decimals, 2)}</button>` : ''
+      return `<div class="info-row">
+        <span class="info-key">${esc(m.symbol)}${tag}${gap}</span>
+        <span class="info-val">${shortAddr(addr)}${sync}</span></div>`
     }))
 
+    const banner = document.getElementById('warn-banner')
+    banner.innerHTML = warnings.map(esc).join('<br/>')
+    banner.classList.toggle('show', warnings.length > 0)
+
     el.innerHTML = `
-      <div class="info-row"><span class="info-key">Address</span><span class="info-val"><a href="${EXPLORER}/address/${CONTRACT_ADDR}" target="_blank" rel="noopener">${shortAddr(CONTRACT_ADDR)}</a></span></div>
-      <div class="info-row"><span class="info-key">Owner</span><span class="info-val">${shortAddr(owner)}</span></div>
-      <div class="info-row"><span class="info-key">Trading</span><span class="info-val">${paused ? 'Paused' : 'Open'}</span></div>
-      <div class="divider">dividend tokens</div>
-      ${tokenRows.length ? tokenRows.join('') : '<div class="empty-state">None configured.</div>'}`
+      <div class="info-row"><span class="info-key">Адрес</span><span class="info-val"><a href="${EXPLORER}/address/${CONTRACT_ADDR}" target="_blank" rel="noopener">${shortAddr(CONTRACT_ADDR)}</a></span></div>
+      <div class="info-row"><span class="info-key">Версия</span><span class="info-val">${esc(ver)}</span></div>
+      <div class="info-row"><span class="info-key">Владелец</span><span class="info-val">${shortAddr(owner)}</span></div>
+      <div class="info-row"><span class="info-key">Всего долей</span><span class="info-val">${fmt(ts, DEC, 0)}</span></div>
+      <div class="info-row"><span class="info-key">В распределении</span><span class="info-val">${fmt(active, DEC, 0)}</span></div>
+      <div class="info-row"><span class="info-key">Припарковано</span><span class="info-val">${fmt(cust, DEC, 0)}</span></div>
+      <div class="info-row"><span class="info-key">В аренде</span><span class="info-val">${fmt(leased, DEC, 0)}</span></div>
+      <div class="divider">распределяемые токены</div>
+      ${tokenRows.length ? tokenRows.join('') : '<div class="empty-state">Пока не добавлены.</div>'}`
   } catch (e) {
     console.error('loadContractInfo', e)
-    el.innerHTML = '<div class="empty-state">Could not read the contract. Check the address and network.</div>'
+    el.innerHTML = '<div class="empty-state">Не удалось прочитать контракт. Проверьте адрес и сеть.</div>'
   }
 }
 
+// ---------- Действия ----------
+
+function needWallet() {
+  if (!signer) { setStatus('Сначала подключите кошелёк.', 'error'); return true }
+  return false
+}
+function pickedToken(selId) {
+  const v = document.getElementById(selId).value
+  if (v === '__custom__') {
+    const manual = prompt('Адрес токена оплаты (0x...)')
+    if (!manual || !ethers.utils.isAddress(manual)) { setStatus('Некорректный адрес токена.', 'error'); return null }
+    return manual
+  }
+  return v || null
+}
+
 async function doClaim(tokenAddr) {
-  if (!signer) { setStatus('Connect your wallet first.', 'error'); return }
+  if (needWallet()) return
   try {
-    setBusy(true)
-    setStatus('Claiming…', 'info')
+    setBusy(true); setStatus('Забираем…', 'info')
     await (await contract.claim(tokenAddr)).wait()
-    setStatus('Claimed.', 'success')
+    setStatus('Готово.', 'success')
     await Promise.all([loadDividends(), loadContractInfo()])
-  } catch (e) { setStatus('Claim failed: ' + errText(e), 'error') }
+  } catch (e) { setStatus('Не удалось забрать: ' + errText(e), 'error') }
   finally { setBusy(false) }
 }
 
 async function doClaimAll() {
-  if (!signer) { setStatus('Connect your wallet first.', 'error'); return }
+  if (needWallet()) return
   try {
-    setBusy(true)
-    setStatus('Claiming every token…', 'info')
+    setBusy(true); setStatus('Забираем по всем токенам…', 'info')
     await (await contract.claimAll()).wait()
-    setStatus('Claimed.', 'success')
+    setStatus('Готово.', 'success')
     await Promise.all([loadDividends(), loadContractInfo()])
-  } catch (e) { setStatus('Claim failed: ' + errText(e), 'error') }
+  } catch (e) { setStatus('Не удалось забрать: ' + errText(e), 'error') }
   finally { setBusy(false) }
 }
 
-async function doCreateOrder() {
-  if (!signer) { setStatus('Connect your wallet first.', 'error'); return }
-  const buyer = document.getElementById('ord-buyer').value.trim()
-  const amount = document.getElementById('ord-amount').value
-  const price = document.getElementById('ord-price').value
-  const token = document.getElementById('ord-token').value
-  const days = parseInt(document.getElementById('ord-days').value, 10)
+async function doSync(tokenAddr) {
+  if (needWallet()) return
+  try {
+    setBusy(true); setStatus('Раскладываем приток по держателям…', 'info')
+    await (await contract.syncToken(tokenAddr)).wait()
+    setStatus('Приток распределён.', 'success')
+    await Promise.all([loadDividends(), loadContractInfo()])
+  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
 
-  if (!ethers.utils.isAddress(buyer)) { setStatus('Enter a valid buyer address.', 'error'); return }
-  if (buyer.toLowerCase() === userAddr.toLowerCase()) { setStatus('You cannot sell shares to yourself.', 'error'); return }
-  if (!amount || parseFloat(amount) <= 0) { setStatus('Enter how many shares to sell.', 'error'); return }
-  if (!price || parseFloat(price) <= 0) { setStatus('Enter a total price.', 'error'); return }
-  if (!token) { setStatus('Pick the token the buyer will pay in.', 'error'); return }
-  if (!days || days < 1 || days > 364) { setStatus('Expiry must be between 1 and 364 days.', 'error'); return }
+async function doPark() {
+  if (needWallet()) return
+  const amount = document.getElementById('park-amount').value
+  if (!amount || parseFloat(amount) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
+  if (!confirm(
+    `Припарковать ${amount} долей?\n\n` +
+    `Припаркованные доли НЕ приносят дохода. Ваша часть потока будет доставаться остальным держателям. Компенсации нет.\n\n` +
+    `Вернуть их сможете только вы, в любой момент.`
+  )) return
+  try {
+    setBusy(true); setStatus('Паркуем…', 'info')
+    await (await contract.park(ethers.utils.parseUnits(amount, DEC))).wait()
+    setStatus('Доли припаркованы и исключены из распределения.', 'success')
+    document.getElementById('park-amount').value = ''
+    await Promise.all([loadStats(), loadDividends(), loadContractInfo()])
+  } catch (e) { setStatus('Не удалось припарковать: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doUnpark() {
+  if (needWallet()) return
+  const amount = document.getElementById('park-amount').value
+  if (!amount || parseFloat(amount) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
+  try {
+    setBusy(true); setStatus('Возвращаем из парковки…', 'info')
+    await (await contract.unpark(ethers.utils.parseUnits(amount, DEC))).wait()
+    setStatus('Доли снова участвуют в распределении.', 'success')
+    document.getElementById('park-amount').value = ''
+    await Promise.all([loadStats(), loadDividends(), loadContractInfo()])
+  } catch (e) { setStatus('Не удалось вернуть: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doCreateOTC() {
+  if (needWallet()) return
+  const buyer = document.getElementById('otc-buyer').value.trim()
+  const units = document.getElementById('otc-units').value
+  const price = document.getElementById('otc-price').value
+  const days = parseInt(document.getElementById('otc-days').value, 10)
+  const token = pickedToken('otc-token')
+
+  if (!ethers.utils.isAddress(buyer)) { setStatus('Введите корректный адрес покупателя.', 'error'); return }
+  if (buyer.toLowerCase() === userAddr.toLowerCase()) { setStatus('Нельзя продавать самому себе.', 'error'); return }
+  if (!units || parseFloat(units) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
+  if (!price || parseFloat(price) <= 0) { setStatus('Укажите цену.', 'error'); return }
+  if (!token) { setStatus('Выберите токен оплаты.', 'error'); return }
+  if (!days || days < 1 || days > 364) { setStatus('Срок — от 1 до 364 дней.', 'error'); return }
 
   try {
     setBusy(true)
-    const amtRaw = ethers.utils.parseUnits(amount, 6)
-    const priceRaw = ethers.utils.parseUnits(price, meta(token).decimals)
+    const unitsRaw = ethers.utils.parseUnits(units, DEC)
+    const m = tokenMeta[token.toLowerCase()] || await fetchMeta(token)
+    const priceRaw = ethers.utils.parseUnits(price, m.decimals)
 
     const free = await contract.freeBalanceOf(userAddr)
-    if (free.lt(amtRaw)) {
-      setStatus(`You only have ${exact(free, 6)} shares available. Cancel an open offer to free up more.`, 'error')
-      return
+    if (free.lt(unitsRaw)) {
+      setStatus(`Свободных долей только ${exact(free, DEC)}. Отмените открытое предложение, чтобы освободить.`, 'error'); return
     }
-    const existing = await contract.orders(userAddr, buyer)
-    if (existing.shareAmount.gt(0)) {
-      setStatus('You already have an open offer to this address. Cancel it first.', 'error')
-      return
-    }
+    const existing = await contract.otcOffers(userAddr, buyer)
+    if (existing.units.gt(0)) { setStatus('Этому адресу уже есть предложение — сначала отмените его.', 'error'); return }
 
     const deadline = Math.floor(Date.now() / 1000) + days * 86400
-    setStatus('Creating offer…', 'info')
-    await (await contract.createOrder(buyer, amtRaw, priceRaw, token, deadline)).wait()
-    setStatus(`Offer created for ${shortAddr(buyer)}.`, 'success')
-    document.getElementById('ord-buyer').value = ''
-    document.getElementById('ord-amount').value = ''
-    document.getElementById('ord-price').value = ''
+    setStatus('Создаём предложение…', 'info')
+    await (await contract.createOTC(buyer, unitsRaw, priceRaw, token, deadline)).wait()
+    setStatus(`Предложение создано для ${shortAddr(buyer)}.`, 'success')
+    document.getElementById('otc-buyer').value = ''
+    document.getElementById('otc-units').value = ''
+    document.getElementById('otc-price').value = ''
     await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Could not create the offer: ' + errText(e), 'error') }
+  } catch (e) { setStatus('Не удалось создать предложение: ' + errText(e), 'error') }
   finally { setBusy(false) }
 }
 
-async function doCancelOrder(buyer) {
-  if (!signer) { setStatus('Connect your wallet first.', 'error'); return }
+async function fetchMeta(addr) {
   try {
-    setBusy(true)
-    setStatus('Cancelling…', 'info')
-    await (await contract.cancelOrder(buyer)).wait()
-    setStatus('Offer cancelled, shares unlocked.', 'success')
+    const tok = new ethers.Contract(addr, ERC20_ABI, rpc)
+    const [sym, dec] = await Promise.all([tok.symbol(), tok.decimals()])
+    const m = { symbol: sym, decimals: dec }
+    tokenMeta[addr.toLowerCase()] = m
+    return m
+  } catch { return { symbol: shortAddr(addr), decimals: 18 } }
+}
+
+async function doCancelOTC(buyer) {
+  if (needWallet()) return
+  try {
+    setBusy(true); setStatus('Отменяем…', 'info')
+    await (await contract.cancelOTC(buyer)).wait()
+    setStatus('Предложение отменено, доли разблокированы.', 'success')
     await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Could not cancel: ' + errText(e), 'error') }
+  } catch (e) { setStatus('Не удалось отменить: ' + errText(e), 'error') }
   finally { setBusy(false) }
 }
 
-async function doExecuteOrder(seller) {
-  if (!signer) { setStatus('Connect your wallet first.', 'error'); return }
+async function doCancelExpiredOTC(seller, buyer) {
+  if (needWallet()) return
+  try {
+    setBusy(true); setStatus('Снимаем истёкшее предложение…', 'info')
+    await (await contract.cancelExpiredOTC(seller, buyer)).wait()
+    setStatus('Снято, доли вернулись продавцу.', 'success')
+    await Promise.all([loadStats(), loadOffers()])
+  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function ensureAllowance(tokenAddr, amount, m) {
+  const tok = new ethers.Contract(tokenAddr, ERC20_ABI, signer)
+  const bal = await tok.balanceOf(userAddr)
+  if (bal.lt(amount)) {
+    setStatus(`Нужно ${exact(amount, m.decimals)} ${m.symbol}, а на балансе ${exact(bal, m.decimals)}.`, 'error')
+    return false
+  }
+  const al = await tok.allowance(userAddr, CONTRACT_ADDR)
+  if (al.lt(amount)) {
+    setStatus(`Разрешаем списание ${m.symbol}…`, 'info')
+    await (await tok.approve(CONTRACT_ADDR, ethers.constants.MaxUint256)).wait()
+  }
+  return true
+}
+
+async function doExecuteOTC(seller) {
+  if (needWallet()) return
   try {
     setBusy(true)
-    const o = await contract.orders(seller, userAddr)
-    if (o.shareAmount.isZero()) { setStatus('That offer is no longer available.', 'error'); await loadOffers(); return }
-    if (o.deadline.toNumber() <= Math.floor(Date.now() / 1000)) { setStatus('That offer has expired.', 'error'); await loadOffers(); return }
+    const o = await contract.otcOffers(seller, userAddr)
+    if (o.units.isZero()) { setStatus('Это предложение больше недоступно.', 'error'); await loadOffers(); return }
+    if (o.deadline.toNumber() <= Math.floor(Date.now() / 1000)) { setStatus('Срок предложения истёк.', 'error'); await loadOffers(); return }
 
     const m = meta(o.paymentToken)
-    const ok = confirm(
-      `Buy ${exact(o.shareAmount, 6)} shares\n` +
-      `Pay ${exact(o.price, m.decimals)} ${m.symbol}\n` +
-      `Seller ${seller}`
-    )
-    if (!ok) return
+    if (!confirm(
+      `Купить ${exact(o.units, DEC)} долей\n` +
+      `Заплатить ${exact(o.price, m.decimals)} ${m.symbol}\n` +
+      `Продавец ${seller}`
+    )) return
 
-    const tok = new ethers.Contract(o.paymentToken, ERC20_ABI, signer)
-    const bal = await tok.balanceOf(userAddr)
-    if (bal.lt(o.price)) {
-      setStatus(`You need ${exact(o.price, m.decimals)} ${m.symbol} but hold ${exact(bal, m.decimals)}.`, 'error')
-      return
-    }
-    const al = await tok.allowance(userAddr, CONTRACT_ADDR)
-    if (al.lt(o.price)) {
-      setStatus(`Approving ${m.symbol}…`, 'info')
-      await (await tok.approve(CONTRACT_ADDR, ethers.constants.MaxUint256)).wait()
-    }
+    if (!await ensureAllowance(o.paymentToken, o.price, m)) return
 
-    setStatus('Buying shares…', 'info')
-    await (await contract.executeOrder(seller, o.shareAmount, o.price, o.paymentToken)).wait()
-    setStatus('Done. The shares are yours and start earning dividends now.', 'success')
+    setStatus('Покупаем доли…', 'info')
+    // expectedUnits / maxPrice / expectedToken — защита от подмены условий
+    await (await contract.executeOTC(seller, o.units, o.price, o.paymentToken)).wait()
+    setStatus('Готово. Доли ваши и уже приносят доход.', 'success')
     await refreshAll()
-  } catch (e) { setStatus('Purchase failed: ' + errText(e), 'error') }
+  } catch (e) { setStatus('Покупка не прошла: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doCreateLease() {
+  if (needWallet()) return
+  const renter = document.getElementById('lease-renter').value.trim()
+  const units = document.getElementById('lease-units').value
+  const price = document.getElementById('lease-price').value
+  const durDays = parseInt(document.getElementById('lease-duration').value, 10)
+  const offDays = parseInt(document.getElementById('lease-days').value, 10)
+  const token = pickedToken('lease-token')
+
+  if (!ethers.utils.isAddress(renter)) { setStatus('Введите корректный адрес арендатора.', 'error'); return }
+  if (renter.toLowerCase() === userAddr.toLowerCase()) { setStatus('Нельзя сдать самому себе.', 'error'); return }
+  if (!units || parseFloat(units) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
+  if (!price || parseFloat(price) <= 0) { setStatus('Укажите платёж.', 'error'); return }
+  if (!token) { setStatus('Выберите токен оплаты.', 'error'); return }
+  if (!durDays || durDays < 1 || durDays > 730) { setStatus('Срок аренды — от 1 до 730 дней.', 'error'); return }
+  if (!offDays || offDays < 1 || offDays > 364) { setStatus('Срок предложения — от 1 до 364 дней.', 'error'); return }
+
+  try {
+    setBusy(true)
+    const unitsRaw = ethers.utils.parseUnits(units, DEC)
+    const m = tokenMeta[token.toLowerCase()] || await fetchMeta(token)
+    const priceRaw = ethers.utils.parseUnits(price, m.decimals)
+
+    const free = await contract.freeBalanceOf(userAddr)
+    if (free.lt(unitsRaw)) { setStatus(`Свободных долей только ${exact(free, DEC)}.`, 'error'); return }
+    const existing = await contract.leases(userAddr, renter)
+    if (existing.units.gt(0)) { setStatus('Этому адресу уже есть предложение аренды — сначала отмените его.', 'error'); return }
+
+    const offerDeadline = Math.floor(Date.now() / 1000) + offDays * 86400
+    setStatus('Создаём предложение аренды…', 'info')
+    await (await contract.createLease(renter, unitsRaw, priceRaw, token, durDays * 86400, offerDeadline)).wait()
+    setStatus(`Предложение аренды создано для ${shortAddr(renter)}.`, 'success')
+    document.getElementById('lease-renter').value = ''
+    document.getElementById('lease-units').value = ''
+    document.getElementById('lease-price').value = ''
+    await Promise.all([loadStats(), loadOffers()])
+  } catch (e) { setStatus('Не удалось создать аренду: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doExecuteLease(lessor) {
+  if (needWallet()) return
+  try {
+    setBusy(true)
+    const l = await contract.leaseInfo(lessor, userAddr)
+    if (l.units.isZero()) { setStatus('Предложение больше недоступно.', 'error'); await loadOffers(); return }
+    if (l.executed) { setStatus('Аренда уже исполнена.', 'error'); await loadOffers(); return }
+    if (l.offerDeadline.toNumber() <= Math.floor(Date.now() / 1000)) { setStatus('Срок предложения истёк.', 'error'); await loadOffers(); return }
+
+    const m = meta(l.paymentToken)
+    const days = Math.round(l.duration.toNumber() / 86400)
+    if (!confirm(
+      `Арендовать доход по ${exact(l.units, DEC)} долям\n` +
+      `Срок ${days} дн.\n` +
+      `Заплатить сразу ${exact(l.price, m.decimals)} ${m.symbol}\n` +
+      `Арендодатель ${lessor}\n\n` +
+      `Доли остаются его собственностью. Перепродать или пересдать их нельзя.`
+    )) return
+
+    if (!await ensureAllowance(l.paymentToken, l.price, m)) return
+
+    setStatus('Оформляем аренду…', 'info')
+    await (await contract.executeLease(lessor, l.units, l.price, l.paymentToken, l.duration)).wait()
+    setStatus('Аренда оформлена. Дивиденды по этим долям идут вам до конца срока.', 'success')
+    await refreshAll()
+  } catch (e) { setStatus('Не удалось оформить аренду: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doCancelLease(renter) {
+  if (needWallet()) return
+  try {
+    setBusy(true); setStatus('Отменяем предложение…', 'info')
+    await (await contract.cancelLease(renter)).wait()
+    setStatus('Предложение отменено, доли разблокированы.', 'success')
+    await Promise.all([loadStats(), loadOffers()])
+  } catch (e) { setStatus('Не удалось отменить: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doCancelExpiredLease(lessor, renter) {
+  if (needWallet()) return
+  try {
+    setBusy(true); setStatus('Снимаем истёкшее предложение…', 'info')
+    await (await contract.cancelExpiredLease(lessor, renter)).wait()
+    setStatus('Снято, доли вернулись арендодателю.', 'success')
+    await Promise.all([loadStats(), loadOffers()])
+  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
+  finally { setBusy(false) }
+}
+
+async function doEndLease(lessor, renter) {
+  if (needWallet()) return
+  try {
+    setBusy(true); setStatus('Завершаем аренду…', 'info')
+    await (await contract.endLease(lessor, renter)).wait()
+    setStatus('Аренда завершена, доли вернулись арендодателю.', 'success')
+    await refreshAll()
+  } catch (e) { setStatus('Не удалось завершить: ' + errText(e), 'error') }
   finally { setBusy(false) }
 }
 
 if (contractRO) {
   loadTokenMeta().then(() => Promise.all([loadStats(), loadContractInfo()]))
 } else {
-  setStatus('No contract address configured on this page.', 'error')
+  setStatus('На странице не задан адрес контракта.', 'error')
 }
 </script>
 </body>
