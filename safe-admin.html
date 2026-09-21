@@ -95,7 +95,7 @@ details summary{font-size:12px;color:var(--txt3);cursor:pointer;font-weight:600}
     <span class="pill" id="net-pill">не подключено</span>
   </div>
   <div class="nav-right">
-    <a class="link" id="dash-link" href="bps-dashboard.html">← Кабинет держателя</a>
+    <a class="link" id="dash-link" href="index.html">← Кабинет держателя</a>
     <button class="btn" id="btn-wallet" onclick="connect()">Подключить кошелёк</button>
   </div>
 </nav>
@@ -411,6 +411,21 @@ async function connect() {
   } catch (e) { say('Не удалось подключиться: ' + errText(e), 'error') }
 }
 
+/// Тип адреса. Наличие кода ещё не значит «контракт»: кошелёк, обновлённый
+/// до смарт-аккаунта по EIP-7702 (MetaMask в Sepolia и основной сети это
+/// предлагает), получает код-делегат вида 0xef0100 + адрес. Мультиподписью
+/// считаем только адрес, который действительно отвечает как Safe.
+async function addressKind(a, rp) {
+  const code = await rp.getCode(a)
+  if (code === '0x') return 'wallet'
+  if (/^0xef0100[0-9a-fA-F]{40}$/.test(code)) return 'wallet7702'
+  try {
+    await new ethers.Contract(a, ['function getThreshold() view returns (uint256)'], rp).getThreshold()
+    return 'safe'
+  } catch { return 'contract' }
+}
+const KIND_RU = { wallet: 'кошелёк', wallet7702: 'кошелёк · смарт-аккаунт', safe: 'мультиподпись', contract: 'контракт' }
+
 // ---------- создание Safe ----------
 async function createSafe() {
   if (!provider) { say('Сначала подключите кошелёк.', 'error'); return }
@@ -460,7 +475,7 @@ async function loadSafe() {
       return { a, sym, paused }
     }))
     $('s-token').innerHTML = tokens.map(t => `<option value="${t.a}">${esc(t.sym)} ${short(t.a)}${t.paused ? ' — на паузе' : ''}</option>`).join('') || '<option value="">нет распределяемых токенов</option>'
-    const ownerIsContract = (await provider.getCode(bOwner)) !== '0x'
+    const ownerKind = await addressKind(bOwner, provider)
 
     // без Safe: только передача владения с кошелька
     if (!ethers.utils.isAddress(s)) {
@@ -472,7 +487,7 @@ async function loadSafe() {
     }
     safeAddr = ethers.utils.getAddress(s)
     history.replaceState(null, '', `?safe=${safeAddr}&bps=${bpsAddr}`)
-    $('dash-link').href = `bps-dashboard.html?bps=${bpsAddr}`
+    $('dash-link').href = `index.html?bps=${bpsAddr}`
     if ((await provider.getCode(safeAddr)) === '0x') throw new Error('По адресу Safe в этой сети нет контракта.')
     safe = new ethers.Contract(safeAddr, SAFE_ABI, signer)
     const [own, thr, nonce] = await Promise.all([safe.getOwners(), safe.getThreshold(), safe.nonce()])
@@ -483,7 +498,7 @@ async function loadSafe() {
       <div class="ir"><span class="ik">Safe</span><span class="iv">${short(safeAddr)}</span></div>
       <div class="ir"><span class="ik">Порог</span><span class="iv">${threshold} из ${owners.length}</span></div>
       <div class="ir"><span class="ik">Nonce Safe</span><span class="iv">${nonce}</span></div>
-      <div class="ir"><span class="ik">Владелец контракта</span><span class="iv" style="color:${safeOwns ? 'var(--green)' : 'var(--amber)'}">${short(bOwner)}${safeOwns ? ' — этот Safe' : ownerIsContract ? ' — другой контракт' : ' — кошелёк'}</span></div>
+      <div class="ir"><span class="ik">Владелец контракта</span><span class="iv" style="color:${safeOwns ? 'var(--green)' : 'var(--amber)'}">${short(bOwner)}${safeOwns ? ' — этот Safe' : ' — ' + KIND_RU[ownerKind]}</span></div>
       <div class="ir"><span class="ik">Ожидает принятия</span><span class="iv">${bPending === ZERO ? 'нет' : short(bPending) + (safePending ? ' — этот Safe' : '')}</span></div>
       <div class="ir"><span class="ik">Токенов дохода</span><span class="iv">${len} из ${max}</span></div>
       ${tokens.map(t => `<div class="ir"><span class="ik">${esc(t.sym)}</span><span class="iv">${short(t.a)} ${t.paused ? '<span class="badge warn">пауза</span>' : '<span class="badge ok">активен</span>'}</span></div>`).join('')}`
@@ -497,7 +512,7 @@ async function loadSafe() {
     $('st-thr').value = threshold
     $('st-hint').textContent = `Сейчас ${threshold} из ${owners.length}. Допустимо от 1 до ${owners.length}.`
 
-    const showDirect = !ownerIsContract && same(bOwner, me) && !safePending
+    const showDirect = same(bOwner, me) && !safePending
     $('card-direct').classList.toggle('hidden', !showDirect)
     $('direct-owner').textContent = bOwner; $('direct-safe').textContent = safeAddr
 
@@ -505,7 +520,7 @@ async function loadSafe() {
     $('card-review').classList.add('hidden')
 
     if (safePending) say('Safe назначен владельцем, но ещё не принял. Операция «Принять владение» — с неё и начните.', 'info')
-    else if (!safeOwns && !showDirect) say(`Контрактом владеет не этот Safe, а ${short(bOwner)}. Операции над контрактом отсюда не пройдут, управление самим Safe доступно.`, 'info')
+    else if (!safeOwns && !showDirect) say(`Контрактом владеет не этот Safe, а ${short(bOwner)} (${KIND_RU[ownerKind]}). Операции над контрактом отсюда не пройдут, управление самим Safe доступно.`, 'info')
     else say('', '')
   } catch (e) { say('Не удалось загрузить: ' + errText(e), 'error') }
 }
@@ -704,7 +719,7 @@ async function execute() {
 const Q = new URLSearchParams(location.search)
 $('in-bps').value = Q.get('bps') || DEFAULT_BPS
 if (Q.get('safe')) $('in-safe').value = Q.get('safe')
-$('dash-link').href = `bps-dashboard.html?bps=${$('in-bps').value}`
+$('dash-link').href = `index.html?bps=${$('in-bps').value}`
 </script>
 </body>
 </html>
