@@ -105,6 +105,13 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
 .btn-danger:hover:not(:disabled){background:var(--red);color:#fff}
 .chk{font-size:12px;padding:4px 0;line-height:1.5}
 .chk.ok{color:var(--green)}.chk.bad{color:var(--red);font-weight:600}
+.owner-line{padding:14px 20px}
+.ol-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ol-k{font-size:12px;color:var(--txt3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ol-v{font-family:var(--mono);font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ol-note{font-size:12.5px;color:var(--txt2);margin-top:8px;line-height:1.55}
+.ol-note:empty{display:none}
+.ver{font-size:10.5px;color:var(--txt3);font-family:var(--mono)}
 .hidden{display:none}
 </style>
 </head>
@@ -115,6 +122,7 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
     <div class="logo-icon">BPS</div>
     <span class="logo-name">BasisPointShare</span>
     <span class="pill" id="net-pill">сеть</span>
+    <span class="ver" title="версия интерфейса">интерфейс 2026-09-21</span>
   </div>
   <div class="nav-right">
     <a class="link hidden" id="admin-link" href="#">Панель владельца →</a>
@@ -126,6 +134,74 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
 <div class="main">
   <div class="banner" id="warn"></div>
   <div class="status" id="msg"></div>
+
+  <!-- КТО ВЛАДЕЛЕЦ: видно всем -->
+  <div class="card owner-line" id="owner-line">
+    <div class="ol-row">
+      <span class="ol-k">Владелец контракта</span>
+      <span class="ol-v" id="ol-owner">загрузка…</span>
+    </div>
+    <div class="ol-note" id="ol-note"></div>
+  </div>
+
+  <!-- ВЛАДЕЛЕЦ: кошелёк -->
+  <div class="card owner hidden" id="own-card">
+    <div class="card-t"><span>Панель владельца</span><span class="badge warn">вы владелец контракта</span></div>
+    <div class="note">Операции выполняются с вашего кошелька одной подписью. Для боевой сети владельцем должна быть мультиподпись: передайте владение Safe на вкладке «Владение».</div>
+    <div class="tabs">
+      <button class="tab active" onclick="tab(event,'o-add')">Токен дохода</button>
+      <button class="tab" onclick="tab(event,'o-pause')">Пауза учёта</button>
+      <button class="tab" onclick="tab(event,'o-rescue')">Вывод чужого</button>
+      <button class="tab" onclick="tab(event,'o-own')">Владение</button>
+    </div>
+
+    <div class="panel active" id="o-add">
+      <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен навсегда исключается из вывода через rescue. Каждый перевод долей дорожает на один внешний вызов.</div>
+      <div class="row"><label for="oa-token">Адрес токена</label><input class="mono" id="oa-token" placeholder="0x..." autocomplete="off"/>
+        <div class="hint">Fee-on-transfer и rebase-токены добавлять нельзя — программно они не определяются, проверьте токен сами.</div></div>
+      <div id="oa-check"></div>
+      <button class="btn btn-sec" onclick="ownCheckToken()">Проверить токен</button>
+      <button class="btn btn-danger" id="btn-own-add" onclick="ownAddToken()" disabled>Добавить необратимо</button>
+      <div class="hint" id="oa-slots"></div>
+    </div>
+
+    <div class="panel" id="o-pause">
+      <div class="note">Аварийный выключатель против распределяемого токена, чей <code>balanceOf</code> перестал отвечать и блокирует переводы долей. Не выключатель торговли и не заморозка выплат. Перед снятием паузы нажмите «Разложить» у токена в карточке «Контракт».</div>
+      <div id="op-list"><div class="empty">Распределяемых токенов нет.</div></div>
+    </div>
+
+    <div class="panel" id="o-rescue">
+      <div class="note">Только для токенов, которые <b>никогда</b> не были распределяемыми, — например, присланных на адрес контракта по ошибке.</div>
+      <div class="two">
+        <div class="row"><label for="or-token">Токен</label><input class="mono" id="or-token" placeholder="0x..." autocomplete="off"/></div>
+        <div class="row"><label for="or-to">Получатель</label><input class="mono" id="or-to" placeholder="0x..." autocomplete="off"/></div>
+      </div>
+      <button class="btn btn-danger" onclick="ownRescue()">Вывести</button>
+    </div>
+
+    <div class="panel" id="o-own">
+      <div class="note">Передача двухшаговая: пока новый владелец не примет, полномочия остаются у вас. Ошибку в адресе можно исправить, повторив передачу. Отказаться от владения нельзя — такой функции в контракте нет.</div>
+      <div id="oo-pending"></div>
+      <div class="row"><label for="oo-to">Новый владелец — адрес Safe или кошелька</label><input class="mono" id="oo-to" placeholder="0x..." autocomplete="off"/></div>
+      <button class="btn btn-danger" onclick="ownTransfer()">Передать владение</button>
+      <div class="hint">Если новый владелец — Safe, принять владение нужно в <a id="oo-safe-link" href="safe-admin.html">панели мультиподписи</a>.</div>
+    </div>
+  </div>
+
+  <!-- КАНДИДАТ ВО ВЛАДЕЛЬЦЫ: кошелёк -->
+  <div class="card owner hidden" id="pend-card">
+    <div class="card-t"><span>Вам передают владение контрактом</span><span class="badge warn">ожидает принятия</span></div>
+    <div class="note">Текущий владелец назначил вас кандидатом. Пока вы не примете, полномочия остаются у него.</div>
+    <button class="btn btn-primary" onclick="ownAccept()">Принять владение</button>
+  </div>
+
+  <!-- ВЛАДЕЛЕЦ: мультиподпись -->
+  <div class="card owner hidden" id="safe-card">
+    <div class="card-t"><span>Контрактом управляет мультиподпись</span><span class="badge ok">Safe</span></div>
+    <div class="note" style="margin-bottom:12px">Функции владельца выполняются только по подписям участников Safe — отсюда их вызвать нельзя.</div>
+    <a class="btn btn-primary" id="safe-card-link" href="safe-admin.html" style="display:block;text-align:center;text-decoration:none">Открыть панель мультиподписи</a>
+  </div>
+
 
   <div class="stats">
     <div class="stat"><div class="stat-l">Мои доли</div><div class="stat-v" id="st-bal" style="color:var(--purple)">—</div><div class="stat-s">свободные + в OTC</div></div>
@@ -192,63 +268,6 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
       <div class="card-t"><span>Контракт</span></div>
       <div id="info"><div class="empty">Загрузка…</div></div>
     </div>
-  </div>
-  <!-- ВЛАДЕЛЕЦ: кошелёк -->
-  <div class="card owner hidden" id="own-card">
-    <div class="card-t"><span>Панель владельца</span><span class="badge warn">вы владелец контракта</span></div>
-    <div class="note">Операции выполняются с вашего кошелька одной подписью. Для боевой сети владельцем должна быть мультиподпись: передайте владение Safe на вкладке «Владение».</div>
-    <div class="tabs">
-      <button class="tab active" onclick="tab(event,'o-add')">Токен дохода</button>
-      <button class="tab" onclick="tab(event,'o-pause')">Пауза учёта</button>
-      <button class="tab" onclick="tab(event,'o-rescue')">Вывод чужого</button>
-      <button class="tab" onclick="tab(event,'o-own')">Владение</button>
-    </div>
-
-    <div class="panel active" id="o-add">
-      <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен навсегда исключается из вывода через rescue. Каждый перевод долей дорожает на один внешний вызов.</div>
-      <div class="row"><label for="oa-token">Адрес токена</label><input class="mono" id="oa-token" placeholder="0x..." autocomplete="off"/>
-        <div class="hint">Fee-on-transfer и rebase-токены добавлять нельзя — программно они не определяются, проверьте токен сами.</div></div>
-      <div id="oa-check"></div>
-      <button class="btn btn-sec" onclick="ownCheckToken()">Проверить токен</button>
-      <button class="btn btn-danger" id="btn-own-add" onclick="ownAddToken()" disabled>Добавить необратимо</button>
-      <div class="hint" id="oa-slots"></div>
-    </div>
-
-    <div class="panel" id="o-pause">
-      <div class="note">Аварийный выключатель против распределяемого токена, чей <code>balanceOf</code> перестал отвечать и блокирует переводы долей. Не выключатель торговли и не заморозка выплат. Перед снятием паузы нажмите «Разложить» у токена в карточке «Контракт».</div>
-      <div id="op-list"><div class="empty">Распределяемых токенов нет.</div></div>
-    </div>
-
-    <div class="panel" id="o-rescue">
-      <div class="note">Только для токенов, которые <b>никогда</b> не были распределяемыми, — например, присланных на адрес контракта по ошибке.</div>
-      <div class="two">
-        <div class="row"><label for="or-token">Токен</label><input class="mono" id="or-token" placeholder="0x..." autocomplete="off"/></div>
-        <div class="row"><label for="or-to">Получатель</label><input class="mono" id="or-to" placeholder="0x..." autocomplete="off"/></div>
-      </div>
-      <button class="btn btn-danger" onclick="ownRescue()">Вывести</button>
-    </div>
-
-    <div class="panel" id="o-own">
-      <div class="note">Передача двухшаговая: пока новый владелец не примет, полномочия остаются у вас. Ошибку в адресе можно исправить, повторив передачу. Отказаться от владения нельзя — такой функции в контракте нет.</div>
-      <div id="oo-pending"></div>
-      <div class="row"><label for="oo-to">Новый владелец — адрес Safe или кошелька</label><input class="mono" id="oo-to" placeholder="0x..." autocomplete="off"/></div>
-      <button class="btn btn-danger" onclick="ownTransfer()">Передать владение</button>
-      <div class="hint">Если новый владелец — Safe, принять владение нужно в <a id="oo-safe-link" href="safe-admin.html">панели мультиподписи</a>.</div>
-    </div>
-  </div>
-
-  <!-- КАНДИДАТ ВО ВЛАДЕЛЬЦЫ: кошелёк -->
-  <div class="card owner hidden" id="pend-card">
-    <div class="card-t"><span>Вам передают владение контрактом</span><span class="badge warn">ожидает принятия</span></div>
-    <div class="note">Текущий владелец назначил вас кандидатом. Пока вы не примете, полномочия остаются у него.</div>
-    <button class="btn btn-primary" onclick="ownAccept()">Принять владение</button>
-  </div>
-
-  <!-- ВЛАДЕЛЕЦ: мультиподпись -->
-  <div class="card owner hidden" id="safe-card">
-    <div class="card-t"><span>Контрактом управляет мультиподпись</span><span class="badge ok">Safe</span></div>
-    <div class="note" style="margin-bottom:12px">Функции владельца выполняются только по подписям участников Safe — отсюда их вызвать нельзя.</div>
-    <a class="btn btn-primary" id="safe-card-link" href="safe-admin.html" style="display:block;text-align:center;text-decoration:none">Открыть панель мультиподписи</a>
   </div>
 </div>
 
@@ -484,7 +503,7 @@ async function connect() {
 // ---------- загрузка ----------
 async function refreshAll() {
   await loadTokens()
-  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadInfo(), loadOwner().catch(e => console.error('loadOwner', e))])
+  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadInfo(), loadOwner().catch(e => { console.error('loadOwner', e); $('ol-owner').textContent = 'не удалось прочитать' })])
 }
 
 async function tokenMeta(a) {
@@ -610,7 +629,7 @@ async function loadInfo() {
   try {
     const c = ro()
     const [owner, pending, ts, active, cust] = await Promise.all([c.owner(), c.pendingOwner(), c.totalSupply(), c.activeSupply(), c.custodyTotal()])
-    const ownerIsContract = (await reader().getCode(owner)) !== '0x'
+    const kind = await addressKind(owner, reader())
     const zero = ethers.constants.AddressZero
     const warn = []
     const rows = await Promise.all(tokens.map(async (a) => {
@@ -629,13 +648,13 @@ async function loadInfo() {
     $('warn').innerHTML = warn.map(esc).join('<br/>'); $('warn').classList.toggle('show', warn.length > 0)
 
     const lnk = $('admin-link')
-    if (ownerIsContract) { lnk.href = `safe-admin.html?safe=${owner}&bps=${BPS_ADDR}`; lnk.classList.remove('hidden') }
+    if (kind === 'safe') { lnk.href = `safe-admin.html?safe=${owner}&bps=${BPS_ADDR}`; lnk.classList.remove('hidden') }
     else if (me && owner.toLowerCase() === me.toLowerCase()) { lnk.href = `safe-admin.html?bps=${BPS_ADDR}`; lnk.classList.remove('hidden') }
     else lnk.classList.add('hidden')
 
     el.innerHTML = `
       <div class="ir"><span class="ik">Адрес</span><span class="iv"><a href="${EXPLORER}/address/${BPS_ADDR}" target="_blank" rel="noopener">${short(BPS_ADDR)}</a></span></div>
-      <div class="ir"><span class="ik">Владелец</span><span class="iv">${short(owner)} ${ownerIsContract ? '<span class="badge ok">мультиподпись</span>' : '<span class="badge warn">кошелёк</span>'}</span></div>
+      <div class="ir"><span class="ik">Владелец</span><span class="iv">${short(owner)} <span class="badge ${kind === 'safe' ? 'ok' : 'warn'}">${KIND_RU[kind]}</span></span></div>
       ${pending !== zero ? `<div class="ir"><span class="ik">Ожидает принятия</span><span class="iv">${short(pending)}</span></div>` : ''}
       <div class="ir"><span class="ik">Всего долей</span><span class="iv">${fmt(ts, DEC, 0)}</span></div>
       <div class="ir"><span class="ik">В распределении</span><span class="iv">${fmt(active, DEC, 0)}</span></div>
@@ -644,6 +663,21 @@ async function loadInfo() {
       ${rows.length ? rows.join('') : '<div class="empty">Пока не добавлены.</div>'}`
   } catch (e) { console.error('loadInfo', e); el.innerHTML = '<div class="empty">Не удалось прочитать контракт. Проверьте адрес и сеть.</div>' }
 }
+
+/// Тип адреса. Наличие кода ещё не значит «контракт»: кошелёк, обновлённый
+/// до смарт-аккаунта по EIP-7702 (MetaMask в Sepolia и основной сети это
+/// предлагает), получает код-делегат вида 0xef0100 + адрес. Мультиподписью
+/// считаем только адрес, который действительно отвечает как Safe.
+async function addressKind(a, rp) {
+  const code = await rp.getCode(a)
+  if (code === '0x') return 'wallet'
+  if (/^0xef0100[0-9a-fA-F]{40}$/.test(code)) return 'wallet7702'
+  try {
+    await new ethers.Contract(a, ['function getThreshold() view returns (uint256)'], rp).getThreshold()
+    return 'safe'
+  } catch { return 'contract' }
+}
+const KIND_RU = { wallet: 'кошелёк', wallet7702: 'кошелёк · смарт-аккаунт', safe: 'мультиподпись', contract: 'контракт' }
 
 // ---------- действия ----------
 const doClaim = (a) => run('Забираем доход', async () => { await (await bps.claim(a)).wait(); say('Готово.', 'success') })
@@ -735,18 +769,30 @@ const doUnpark = () => run('Возвращаем', async () => {
 })
 
 // ---------- владелец ----------
-let ownerAddr = null, pendingAddr = null, ownerIsContract = false
+let ownerAddr = null, pendingAddr = null, ownerKind = 'wallet'
 
 async function loadOwner() {
   const c = ro()
   ;[ownerAddr, pendingAddr] = await Promise.all([c.owner(), c.pendingOwner()])
-  ownerIsContract = (await reader().getCode(ownerAddr)) !== '0x'
+  ownerKind = await addressKind(ownerAddr, reader())
   const isMe = (a) => me && a && a.toLowerCase() === me.toLowerCase()
-  const amOwner = isMe(ownerAddr) && !ownerIsContract
+  // Если подключённый кошелёк и есть владелец — он может подписывать сам,
+  // даже если это смарт-аккаунт EIP-7702. Safe подключиться кошельком не может.
+  const amOwner = isMe(ownerAddr)
 
   $('own-card').classList.toggle('hidden', !amOwner)
   $('pend-card').classList.toggle('hidden', !isMe(pendingAddr))
-  $('safe-card').classList.toggle('hidden', !ownerIsContract || !me)
+  $('safe-card').classList.toggle('hidden', ownerKind !== 'safe' || !me)
+
+  const kindBadge = `<span class="badge ${ownerKind === 'safe' ? 'ok' : 'warn'}">${KIND_RU[ownerKind]}</span>`
+  $('ol-owner').innerHTML = `<a href="${EXPLORER}/address/${ownerAddr}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${short(ownerAddr)}</a> ${kindBadge}${isMe(ownerAddr) ? ' <span class="badge ok">это вы</span>' : ''}`
+  let note = ''
+  if (ownerKind === 'safe') note = 'Функции владельца выполняются подписями участников Safe — в панели мультиподписи.'
+  else if (!me) note = 'Подключите кошелёк владельца, чтобы открыть панель управления.'
+  else if (isMe(ownerAddr)) note = ''
+  else if (isMe(pendingAddr)) note = 'Вам передают владение — примите его в карточке ниже.'
+  else note = `Панель управления открывается только владельцу. Вы подключены как ${short(me)} — переключите аккаунт в MetaMask на ${short(ownerAddr)}.`
+  $('ol-note').textContent = note
   $('safe-card-link').href = `safe-admin.html?safe=${ownerAddr}&bps=${BPS_ADDR}`
   $('oo-safe-link').href = `safe-admin.html?bps=${BPS_ADDR}`
   if (!amOwner) return
@@ -824,8 +870,10 @@ const ownTransfer = () => run('Передаём владение', async () => {
   const to = addr('oo-to', 'новый владелец')
   if (to.toLowerCase() === me.toLowerCase()) throw new Error('Вы уже владелец.')
   if (to.toLowerCase() === BPS_ADDR.toLowerCase()) throw new Error('Контракт не может владеть сам собой.')
-  const isContract = (await reader().getCode(to)) !== '0x'
-  if (!confirm(`Назначить ${to} кандидатом во владельцы${isContract ? ' (это контракт — вероятно, Safe)' : ''}?\n\nПолномочия останутся у вас, пока новый владелец не примет.`)) return false
+  const toKind = await addressKind(to, reader())
+  const isContract = toKind === 'safe'
+  if (toKind === 'contract' && !confirm(`${to} — контракт, но не Safe. Если он не умеет вызывать acceptOwnership, владение просто не перейдёт. Продолжить?`)) return false
+  if (!confirm(`Назначить ${to} (${KIND_RU[toKind]}) кандидатом во владельцы?\n\nПолномочия останутся у вас, пока новый владелец не примет.`)) return false
   await (await bps.transferOwnership(to)).wait()
   $('oo-to').value = ''
   say(isContract ? 'Готово. Теперь подписанты Safe должны провести «Принять владение» в панели мультиподписи.' : 'Готово. Новый владелец должен принять владение.', 'success')
@@ -845,7 +893,7 @@ const ownAccept = () => run('Принимаем владение', async () => {
     pill.textContent = net.chainId === 1 ? 'MAINNET' : net.chainId === 11155111 ? 'Sepolia' : 'chain ' + net.chainId
     if (net.chainId === 1) pill.classList.add('main')
   } catch {}
-  try { await loadTokens(); await loadInfo() } catch {}
+  try { await loadTokens(); await Promise.all([loadInfo(), loadOwner()]) } catch (e) { console.error(e) }
 })()
 </script>
 </body>
