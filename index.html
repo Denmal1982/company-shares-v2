@@ -3,1414 +3,671 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>BasisPointShare — Dashboard</title>
+<title>BasisPointShare — кабинет держателя</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg0:#f4f5f9;--bg1:#ffffff;--bg2:#f8f9fc;--bg3:#eef0f6;
-  --border:#e2e5ef;--border2:#d0d4e8;
+  --bg0:#f4f5f9;--bg1:#fff;--bg2:#f8f9fc;--bg3:#eef0f6;--border:#e2e5ef;--border2:#d0d4e8;
   --txt:#1a1d2e;--txt2:#5a6080;--txt3:#9299b8;
-  --purple:#6355d4;--purple2:#8678e8;--purple-bg:#eeecfc;--purple-light:#f5f3ff;
-  --green:#0ea86a;--green-bg:#e8f8f2;--green-light:#f0fdf8;
-  --red:#e03e3e;--red-bg:#fdf0f0;
-  --amber:#d97706;--amber-bg:#fffbeb;
-  --blue:#2563eb;--blue-bg:#eff6ff;
-  --teal:#0d9488;--teal-bg:#f0fdfa;
+  --purple:#6355d4;--purple-bg:#eeecfc;--green:#0ea86a;--green-bg:#e8f8f2;--green-light:#f0fdf8;
+  --red:#e03e3e;--red-bg:#fdf0f0;--amber:#d97706;--amber-bg:#fffbeb;--blue:#2563eb;
   --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
-  --font:Inter,-apple-system,sans-serif;
-  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  --font:Inter,-apple-system,'Segoe UI',sans-serif;--mono:'SF Mono',Consolas,monospace;
+  --r:12px;--rs:8px;--rl:16px;
 }
-body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh}
-
-.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:var(--bg1);border-bottom:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
-.nav-left{display:flex;align-items:center;gap:16px}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;letter-spacing:-.5px}
+body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh;font-size:14px}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--bg1);border-bottom:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
+.nav-left,.nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
 .logo-name{font-size:15px;font-weight:700}
-.net-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid #d6d0f8;font-weight:600}
-.btn-wallet{font-size:13px;padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg1);color:var(--txt);cursor:pointer;transition:all .15s;font-weight:600;box-shadow:var(--shadow)}
-.btn-wallet:hover{border-color:var(--purple);color:var(--purple)}
-.btn-wallet.connected{border-color:var(--green);color:var(--green);background:var(--green-bg)}
-.btn-refresh{font-size:13px;padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg1);color:var(--txt3);cursor:pointer;font-weight:600}
-.btn-refresh:hover:not([disabled]){color:var(--purple);border-color:var(--border2)}
-.btn-refresh[disabled]{opacity:.4;cursor:not-allowed}
-.addr-mono{font-family:monospace;font-size:11px;color:var(--txt3)}
-
-.main{padding:24px 28px;max-width:1200px;margin:0 auto}
+.pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid #d6d0f8;font-weight:600}
+.pill.main{background:var(--red);color:#fff;border-color:var(--red)}
+.pill.bad{background:var(--amber-bg);color:var(--amber);border-color:#fde68a}
+.link{font-size:13px;color:var(--txt3);text-decoration:none;padding:6px 12px;border-radius:var(--rs);border:1px solid var(--border);font-weight:500}
+.link:hover{color:var(--purple);border-color:var(--border2)}
+.btn{font-size:13px;padding:8px 14px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--bg1);color:var(--txt);cursor:pointer;font-weight:600;font-family:var(--font)}
+.btn:hover:not(:disabled){border-color:var(--purple);color:var(--purple)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.connected{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.btn-primary{width:100%;padding:12px;font-size:14px;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;border:none;margin-top:6px;box-shadow:0 2px 8px rgba(99,85,212,.3)}
+.btn-primary:hover:not(:disabled){opacity:.92;color:#fff}
+.btn-sec{width:100%;padding:11px}
+.btn-sm{font-size:12px;padding:6px 12px}
+.btn-ok{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.btn-ok:hover:not(:disabled){background:var(--green);color:#fff}
+.btn-bad{border-color:#fca5a5;color:var(--red)}
+.btn-bad:hover:not(:disabled){background:var(--red-bg);color:var(--red)}
+.main{padding:22px 24px;max-width:1180px;margin:0 auto}
 @media(max-width:800px){.main{padding:14px}}
-
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
-.stat-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
-.stat-label{font-size:11px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
-.stat-val{font-size:24px;font-weight:800;letter-spacing:-.5px}
-.stat-sub{font-size:11px;color:var(--txt3);margin-top:4px}
-
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:700px){.grid-2{grid-template-columns:1fr}}
-
-.card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
-.card-title{font-size:12px;font-weight:700;color:var(--txt3);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.card-title-main{font-size:14px;font-weight:700;color:var(--txt)}
-
-.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.tab{font-size:13px;padding:8px 14px;border:none;background:none;color:var(--txt3);cursor:pointer;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font)}
-.tab:hover{color:var(--txt2)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);padding:15px 17px;box-shadow:var(--shadow)}
+.stat-l{font-size:11px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.stat-v{font-size:23px;font-weight:800;letter-spacing:-.5px}
+.stat-s{font-size:11px;color:var(--txt3);margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);padding:19px 21px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-t{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tabs{display:flex;gap:6px;margin-bottom:15px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{font-size:13px;padding:8px 13px;border:none;background:none;color:var(--txt3);cursor:pointer;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font)}
 .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-
-.token-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
-.token-row:last-child{border-bottom:none}
-.token-icon{width:36px;height:36px;border-radius:10px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--purple);flex-shrink:0}
-.token-info{flex:1;min-width:0}
-.token-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
-.token-addr{font-size:11px;color:var(--txt3);font-family:monospace;margin-top:1px}
-.token-amounts{text-align:right;margin:0 12px}
-.token-pending{font-size:16px;font-weight:800;color:var(--green)}
-.token-pending.zero{color:var(--txt3);font-weight:600}
-.token-partial{font-size:11px;color:var(--amber);font-weight:600;margin-top:2px}
-.btn-claim{font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;font-weight:600;flex-shrink:0}
-.btn-claim:hover:not([disabled]){border-color:var(--green);color:var(--green);background:var(--green-bg)}
-.btn-claim[disabled]{opacity:.4;cursor:not-allowed}
-.btn-claim-all{font-size:12px;padding:5px 14px;border-radius:var(--radius-sm);border:1px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;font-weight:700}
-.btn-claim-all:hover:not([disabled]){background:var(--green);color:#fff}
-.btn-claim-all[disabled]{opacity:.4;cursor:not-allowed}
-
-.form-row{margin-bottom:12px}
-.form-label{font-size:12px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:600}
-.form-hint{font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.5}
-.form-inp,.form-select{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg1);color:var(--txt);outline:none;font-family:var(--font)}
-.form-inp:focus,.form-select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-bg)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-.btn-primary{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;cursor:pointer;margin-top:6px;box-shadow:0 2px 8px rgba(99,85,212,.3);font-family:var(--font)}
-.btn-primary:hover:not(:disabled){opacity:.92}
-.btn-primary:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
-.btn-secondary{width:100%;padding:11px;font-size:13px;font-weight:700;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;font-family:var(--font)}
-.btn-secondary:hover:not(:disabled){border-color:var(--purple);color:var(--purple)}
-.btn-secondary:disabled{opacity:.35;cursor:not-allowed}
-
-.offer-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
-.offer-item.incoming{background:linear-gradient(135deg,var(--green-light),#f0fff8);border-color:#a7f3d0}
-.offer-item.lease{background:var(--teal-bg);border-color:#99f6e4}
-.offer-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
-.offer-who{font-size:11px;color:var(--txt3);font-weight:600;font-family:monospace}
+.panel{display:none}.panel.active{display:block}
+label{font-size:12px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:600}
+input,select{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--rs);background:var(--bg1);color:var(--txt);outline:none;font-family:var(--font)}
+input.mono{font-family:var(--mono);font-size:13px}
+input:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-bg)}
+.row{margin-bottom:11px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:11.5px;color:var(--txt3);margin-top:6px;line-height:1.5}
+.tok{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.tok:last-child{border-bottom:none}
+.tok-i{width:36px;height:36px;border-radius:10px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--purple);flex-shrink:0}
+.tok-n{flex:1;min-width:0}
+.tok-name{font-size:13px;font-weight:700}
+.tok-a{font-size:11px;color:var(--txt3);font-family:var(--mono)}
+.tok-v{text-align:right;margin-right:8px}
+.tok-p{font-size:16px;font-weight:800;color:var(--green)}
+.tok-p.zero{color:var(--txt3);font-weight:600}
+.tok-w{font-size:11px;color:var(--amber);font-weight:600}
+.offer{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:10px}
+.offer.in{background:linear-gradient(135deg,var(--green-light),#f0fff8);border-color:#a7f3d0}
+.offer-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.offer-w{font-size:11px;color:var(--txt3);font-weight:600;font-family:var(--mono)}
+.offer-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.offer-l{font-size:11px;color:var(--txt3);margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.offer-v{font-size:14px;font-weight:700}
+.offer-a{display:flex;gap:8px;margin-top:11px}
+.offer-a .btn{flex:1}
 .badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
 .badge.ok{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0}
 .badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid #fde68a}
 .badge.dead{background:var(--bg3);color:var(--txt3);border:1px solid var(--border)}
-.badge.active{background:var(--teal-bg);color:var(--teal);border:1px solid #99f6e4}
-.offer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-@media(max-width:480px){.offer-grid{grid-template-columns:1fr 1fr}}
-.offer-label{font-size:11px;color:var(--txt3);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.offer-val{font-size:15px;font-weight:700}
-.offer-actions{display:flex;gap:8px;margin-top:12px}
-.btn-sm{font-size:12px;padding:7px 14px;border-radius:6px;border:1px solid;background:transparent;cursor:pointer;font-weight:700;flex:1;font-family:var(--font)}
-.btn-sm.buy{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--purple),var(--blue))}
-.btn-sm.buy:hover:not([disabled]){opacity:.92}
-.btn-sm.cancel{color:var(--red);border-color:#fca5a5}
-.btn-sm.cancel:hover:not([disabled]){background:var(--red-bg)}
-.btn-sm.end{color:var(--teal);border-color:#99f6e4}
-.btn-sm.end:hover:not([disabled]){background:var(--teal-bg)}
-.btn-sm[disabled]{opacity:.4;cursor:not-allowed}
-
-.info-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
-.info-row:last-child{border-bottom:none}
-.info-key{color:var(--txt3);font-weight:600}
-.info-val{color:var(--txt);font-weight:700;font-family:monospace;font-size:12px;text-align:right;word-break:break-all}
-.info-val a{color:var(--purple);text-decoration:none}
-.info-val a:hover{text-decoration:underline}
-
-.status{font-size:13px;padding:12px 16px;border-radius:var(--radius);margin-bottom:16px;display:none;line-height:1.5;font-weight:500;border:1px solid}
+.ir{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.ir:last-child{border-bottom:none}
+.ik{color:var(--txt3);font-weight:600}
+.iv{font-family:var(--mono);font-size:12px;font-weight:700;text-align:right;word-break:break-all}
+.iv a{color:var(--purple);text-decoration:none}
+.div{display:flex;align-items:center;gap:8px;margin:16px 0 12px;font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.div::before,.div::after{content:'';flex:1;height:1px;background:var(--border)}
+.status{font-size:13px;padding:12px 15px;border-radius:var(--r);margin-bottom:16px;display:none;line-height:1.5;font-weight:500;border:1px solid}
 .status.info{background:var(--purple-bg);color:var(--purple);border-color:#d6d0f8;display:block}
 .status.success{background:var(--green-bg);color:var(--green);border-color:#a7f3d0;display:block}
 .status.error{background:var(--red-bg);color:var(--red);border-color:#fca5a5;display:block}
-.banner{font-size:13px;padding:12px 16px;border-radius:var(--radius);margin-bottom:16px;font-weight:600;border:1px solid #fde68a;background:var(--amber-bg);color:var(--amber);display:none;line-height:1.5}
+.banner{font-size:13px;padding:12px 15px;border-radius:var(--r);margin-bottom:16px;font-weight:600;border:1px solid #fde68a;background:var(--amber-bg);color:var(--amber);display:none;line-height:1.55}
 .banner.show{display:block}
-
-.divider{display:flex;align-items:center;gap:8px;margin:18px 0 14px;font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.empty-state{font-size:13px;color:var(--txt3);text-align:center;padding:24px 0;font-weight:500;line-height:1.6}
-
-/* ADMIN */
-.admin-card{display:none;border-color:#fcd9a5;background:linear-gradient(180deg,#fffdf7,var(--bg1))}
-.admin-card.show{display:block}
-.danger-box{font-size:12px;line-height:1.6;padding:12px 14px;border-radius:var(--radius-sm);background:var(--red-bg);border:1px solid #fca5a5;color:#8c2020;margin-bottom:14px}
-.danger-box strong{display:block;margin-bottom:4px;color:var(--red)}
-.btn-danger{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:1px solid var(--red);background:var(--red-bg);color:var(--red);cursor:pointer;font-family:var(--font)}
-.btn-danger:hover:not(:disabled){background:var(--red);color:#fff}
-.btn-danger:disabled{opacity:.35;cursor:not-allowed}
-.check-list{margin:10px 0}
-.check-item{font-size:12px;padding:6px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
-.check-item.pass{color:var(--green)}
-.check-item.fail{color:var(--red);font-weight:600}
-.pause-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.pause-row:last-child{border-bottom:none}
-code{font-family:monospace;font-size:.92em;background:var(--bg3);padding:1px 5px;border-radius:4px}
-*:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.note{font-size:12.5px;line-height:1.6;padding:11px 13px;border-radius:var(--rs);background:var(--amber-bg);border:1px solid #fde68a;color:#7c4a06;margin-bottom:12px}
+.empty{font-size:13px;color:var(--txt3);text-align:center;padding:22px 0;line-height:1.6}
+code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5px;border-radius:4px}
+.hidden{display:none}
 </style>
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-left">
-    <div class="logo">
-      <div class="logo-icon">BPS</div>
-      <span class="logo-name">BasisPointShare</span>
-      <span class="net-pill">Sepolia</span>
-    </div>
+    <div class="logo-icon">BPS</div>
+    <span class="logo-name">BasisPointShare</span>
+    <span class="pill" id="net-pill">сеть</span>
   </div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <span class="addr-mono" id="addr-display"></span>
-    <button class="btn-refresh" id="btn-refresh" onclick="refreshAll()" disabled>Обновить</button>
-    <button class="btn-wallet" id="btn-wallet" onclick="connectWallet()">Подключить кошелёк</button>
+  <div class="nav-right">
+    <a class="link hidden" id="admin-link" href="#">Панель владельца →</a>
+    <button class="btn" id="btn-refresh" onclick="refreshAll()" disabled>Обновить</button>
+    <button class="btn" id="btn-wallet" onclick="connect()">Подключить кошелёк</button>
   </div>
 </nav>
 
 <div class="main">
-  <div class="banner" id="warn-banner"></div>
-  <div class="status" id="status-msg"></div>
+  <div class="banner" id="warn"></div>
+  <div class="status" id="msg"></div>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Мой вес</div>
-      <div class="stat-val" id="st-weight" style="color:var(--purple)">—</div>
-      <div class="stat-sub">участвует в доходе</div>
+  <div class="stats">
+    <div class="stat"><div class="stat-l">Мои доли</div><div class="stat-v" id="st-bal" style="color:var(--purple)">—</div><div class="stat-s">свободные + в OTC</div></div>
+    <div class="stat"><div class="stat-l">Свободно</div><div class="stat-v" id="st-free" style="color:var(--green)">—</div><div class="stat-s">можно распорядиться</div></div>
+    <div class="stat"><div class="stat-l">В OTC</div><div class="stat-v" id="st-locked" style="color:var(--amber)">—</div><div class="stat-s">заперто в предложениях</div></div>
+    <div class="stat"><div class="stat-l">Припарковано</div><div class="stat-v" id="st-cust" style="color:var(--txt3)">—</div><div class="stat-s">дохода не приносит</div></div>
+    <div class="stat"><div class="stat-l">Моя доля дохода</div><div class="stat-v" id="st-pct" style="color:var(--blue)">—</div><div class="stat-s">от долей в распределении</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-t"><span>Доход</span><button class="btn btn-sm btn-ok" id="btn-claim-all" onclick="doClaimAll()" disabled>Забрать всё</button></div>
+      <div id="div-list"><div class="empty">Подключите кошелёк, чтобы увидеть накопленное.</div></div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Свободно</div>
-      <div class="stat-val" id="st-free" style="color:var(--green)">—</div>
-      <div class="stat-sub">можно распорядиться</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">В сделках</div>
-      <div class="stat-val" id="st-locked" style="color:var(--amber)">—</div>
-      <div class="stat-sub">OTC + предложения аренды</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Сдано / арендовано</div>
-      <div class="stat-val" id="st-lease" style="color:var(--teal)">—</div>
-      <div class="stat-sub">out / in</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Припарковано</div>
-      <div class="stat-val" id="st-custody" style="color:var(--txt3)">—</div>
-      <div class="stat-sub">вне распределения</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Моя доля</div>
-      <div class="stat-val" id="st-pct" style="color:var(--blue)">—</div>
-      <div class="stat-sub">от activeSupply</div>
+    <div class="card">
+      <div class="card-t"><span>Предложения вам</span></div>
+      <div id="in-list"><div class="empty">Подключите кошелёк, чтобы увидеть адресованные вам предложения.</div></div>
     </div>
   </div>
 
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title">
-        <span class="card-title-main">Дивиденды</span>
-        <button class="btn-claim-all" id="btn-claim-all" onclick="doClaimAll()" disabled>Забрать всё</button>
-      </div>
-      <div id="dividends-list"><div class="empty-state">Подключите кошелёк, чтобы увидеть накопленное.</div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span class="card-title-main">Предложения вам</span></div>
-      <div id="incoming-list"><div class="empty-state">Подключите кошелёк, чтобы увидеть адресованные вам предложения.</div></div>
-    </div>
-  </div>
-
-  <div class="grid-2">
+  <div class="grid">
     <div class="card">
       <div class="tabs">
-        <button class="tab active" onclick="switchTab(event,'tab-otc')">Продать</button>
-        <button class="tab" onclick="switchTab(event,'tab-lease')">Сдать в аренду</button>
-        <button class="tab" onclick="switchTab(event,'tab-park')">Парковка</button>
+        <button class="tab active" onclick="tab(event,'t-otc')">Продать</button>
+        <button class="tab" onclick="tab(event,'t-send')">Перевести</button>
+        <button class="tab" onclick="tab(event,'t-park')">Парковка</button>
       </div>
 
-      <div class="tab-panel active" id="tab-otc">
-        <div class="form-row">
-          <label class="form-label" for="otc-buyer">Адрес покупателя</label>
-          <input class="form-inp" id="otc-buyer" placeholder="0x..." autocomplete="off"/>
+      <div class="panel active" id="t-otc">
+        <div class="row"><label for="o-buyer">Адрес покупателя</label><input class="mono" id="o-buyer" placeholder="0x..." autocomplete="off"/></div>
+        <div class="two">
+          <div class="row"><label for="o-units">Долей</label><input id="o-units" type="number" min="0" step="any" placeholder="0"/></div>
+          <div class="row"><label for="o-price">Цена за весь объём</label><input id="o-price" type="number" min="0" step="any" placeholder="0"/></div>
         </div>
-        <div class="form-grid">
-          <div class="form-row">
-            <label class="form-label" for="otc-units">Долей</label>
-            <input class="form-inp" id="otc-units" type="number" placeholder="0" min="0" step="any"/>
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="otc-price">Цена целиком</label>
-            <input class="form-inp" id="otc-price" type="number" placeholder="0" min="0" step="any"/>
-          </div>
+        <div class="two">
+          <div class="row"><label for="o-token">Оплата в</label><select id="o-token"><option value="">Выберите токен</option></select></div>
+          <div class="row"><label for="o-days">Действует, дней</label><input id="o-days" type="number" min="1" max="365" value="7"/></div>
         </div>
-        <div class="form-grid">
-          <div class="form-row">
-            <label class="form-label" for="otc-token">Оплата в</label>
-            <select class="form-select" id="otc-token"><option value="">Выберите токен</option></select>
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="otc-days">Действует, дней</label>
-            <input class="form-inp" id="otc-days" type="number" placeholder="7" min="1" max="364" value="7"/>
-          </div>
-        </div>
-        <button class="btn-primary" id="btn-create-otc" onclick="doCreateOTC()" disabled>Создать предложение</button>
-        <div class="form-hint">Доли остаются вашими и продолжают приносить доход до самого исполнения. Они переходят в «В сделках» и их нельзя отправить в другое место.</div>
+        <button class="btn btn-primary" id="btn-otc" onclick="doCreateOTC()" disabled>Создать предложение</button>
+        <div class="hint">Продажа конкретному адресу. Доли остаются вашими и приносят доход до исполнения, но распорядиться ими до отмены нельзя. На один адрес — одно предложение.</div>
       </div>
 
-      <div class="tab-panel" id="tab-lease">
-        <div class="form-row">
-          <label class="form-label" for="lease-renter">Адрес арендатора</label>
-          <input class="form-inp" id="lease-renter" placeholder="0x..." autocomplete="off"/>
-        </div>
-        <div class="form-grid">
-          <div class="form-row">
-            <label class="form-label" for="lease-units">Долей</label>
-            <input class="form-inp" id="lease-units" type="number" placeholder="0" min="0" step="any"/>
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="lease-price">Платёж вперёд</label>
-            <input class="form-inp" id="lease-price" type="number" placeholder="0" min="0" step="any"/>
-          </div>
-        </div>
-        <div class="form-grid">
-          <div class="form-row">
-            <label class="form-label" for="lease-token">Оплата в</label>
-            <select class="form-select" id="lease-token"><option value="">Выберите токен</option></select>
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="lease-duration">Срок аренды, дней</label>
-            <input class="form-inp" id="lease-duration" type="number" placeholder="30" min="1" max="730" value="30"/>
-          </div>
-        </div>
-        <div class="form-row">
-          <label class="form-label" for="lease-days">Предложение действует, дней</label>
-          <input class="form-inp" id="lease-days" type="number" placeholder="7" min="1" max="364" value="7"/>
-        </div>
-        <button class="btn-primary" id="btn-create-lease" onclick="doCreateLease()" disabled>Предложить аренду</button>
-        <div class="form-hint">Собственность остаётся у вас, арендатор получает только доход на срок. Платёж приходит сразу и целиком. Вернуть доли после истечения может кто угодно.</div>
+      <div class="panel" id="t-send">
+        <div class="row"><label for="s-to">Получатель</label><input class="mono" id="s-to" placeholder="0x..." autocomplete="off"/></div>
+        <div class="row"><label for="s-amt">Долей</label><input id="s-amt" type="number" min="0" step="any" placeholder="0"/></div>
+        <button class="btn btn-primary" id="btn-send" onclick="doSend()" disabled>Перевести</button>
+        <div class="hint">Доход, накопленный до перевода, остаётся у вас. Перевод на адрес самого контракта не теряет доли, а паркует их на ваше имя.</div>
       </div>
 
-      <div class="tab-panel" id="tab-park">
-        <div class="form-row">
-          <label class="form-label" for="park-amount">Долей</label>
-          <input class="form-inp" id="park-amount" type="number" placeholder="0" min="0" step="any"/>
+      <div class="panel" id="t-park">
+        <div class="note"><b>Парковка — безвозмездный отказ от дохода.</b> Пока доли припаркованы, вы не получаете ничего, а ваша часть потока достаётся остальным держателям. Компенсации нет. Вернуть может только тот, кто припарковал.</div>
+        <div class="row"><label for="p-amt">Долей</label><input id="p-amt" type="number" min="0" step="any" placeholder="0"/></div>
+        <div class="two">
+          <button class="btn btn-sec" id="btn-park" onclick="doPark()" disabled>Припарковать</button>
+          <button class="btn btn-sec" id="btn-unpark" onclick="doUnpark()" disabled>Вернуть</button>
         </div>
-        <div class="form-grid">
-          <button class="btn-primary" id="btn-park" onclick="doPark()" disabled style="margin-top:0">Припарковать</button>
-          <button class="btn-secondary" id="btn-unpark" onclick="doUnpark()" disabled>Вернуть</button>
-        </div>
-        <div class="form-hint"><strong style="color:var(--amber)">Парковка — безвозмездный отказ от дохода.</strong> Припаркованные доли исключаются из распределения: вы не получаете ничего, а ваша часть потока достаётся остальным держателям. Компенсации нет. Механизм задуман для контрактов-обёрток и пулов ликвидности. Вернуть доли может только тот, кто их припарковал.</div>
       </div>
 
-      <div class="divider">мои открытые предложения</div>
-      <div id="outgoing-list"><div class="empty-state">Открытых предложений нет.</div></div>
+      <div class="div">мои открытые предложения</div>
+      <div id="out-list"><div class="empty">Открытых предложений нет.</div></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="card-title-main">Контракт</span></div>
-      <div id="contract-info"><div class="empty-state">Загрузка…</div></div>
-    </div>
-  </div>
-
-  <div class="card admin-card" id="pending-owner-card">
-    <div class="card-title">
-      <span class="card-title-main">Вам предложено владение контрактом</span>
-      <span class="badge warn">Ожидает принятия</span>
-    </div>
-    <div class="form-hint" style="margin-bottom:12px">
-      Текущий владелец передаёт вам управление. Пока вы не примете, полномочия остаются у него.
-      После принятия вы получите право добавлять распределяемые токены (необратимо),
-      ставить паузу синхронизации и выводить посторонние токены.
-    </div>
-    <button class="btn-primary" id="btn-accept-owner" onclick="doAcceptOwnership()">Принять владение</button>
-  </div>
-
-  <div class="card admin-card" id="admin-card">
-    <div class="card-title">
-      <span class="card-title-main">Панель владельца</span>
-      <span class="badge warn">Только для owner</span>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab(event,'adm-token')">Токен дохода</button>
-      <button class="tab" onclick="switchTab(event,'adm-pause')">Пауза</button>
-      <button class="tab" onclick="switchTab(event,'adm-rescue')">Вывод чужого</button>
-      <button class="tab" onclick="switchTab(event,'adm-owner')">Владение</button>
-    </div>
-
-    <div class="tab-panel active" id="adm-token">
-      <div class="danger-box">
-        <strong>Действие необратимо по трём осям сразу.</strong>
-        Слот занимается навсегда (освободить нельзя), токен навсегда исключается из <code>rescue</code>,
-        и каждый перевод долей дорожает на один внешний вызов.
-        Держите список коротким: 2–3 токена, не 10.
-      </div>
-      <div class="form-row">
-        <label class="form-label" for="adm-token-addr">Адрес токена</label>
-        <input class="form-inp" id="adm-token-addr" placeholder="0x..." autocomplete="off"/>
-        <div class="form-hint">
-          Не подходят: fee-on-transfer (разница ляжет на держателей), rebase (при отрицательном
-          ребейзе последние не доберут), токены с дорогим или ненадёжным <code>balanceOf</code> —
-          он вызывается в горячем пути каждого перевода.
-        </div>
-      </div>
-      <div id="adm-token-check" class="check-list"></div>
-      <button class="btn-secondary" onclick="checkTokenBeforeAdd()" style="margin-bottom:8px">Проверить токен</button>
-      <button class="btn-danger" id="btn-add-token" onclick="doAddDistToken()" disabled>Добавить необратимо</button>
-      <div class="form-hint" id="adm-slots"></div>
-    </div>
-
-    <div class="tab-panel" id="adm-pause">
-      <div class="form-hint" style="margin-bottom:12px">
-        Аварийный выключатель против сломанного токена: если его <code>balanceOf</code> начал жечь газ,
-        переводы долей становятся невозможны для всех. Пауза убирает внешний вызов из горячего пути.
-        Прав на вывод средств не даёт, начисленное за время паузы не теряется.
-        <strong>Перед снятием паузы вызовите «Разложить» по этому токену.</strong>
-      </div>
-      <div id="adm-pause-list"><div class="empty-state">Распределяемых токенов нет.</div></div>
-    </div>
-
-    <div class="tab-panel" id="adm-rescue">
-      <div class="form-hint" style="margin-bottom:12px">
-        Только для токенов, которые <strong>никогда</strong> не добавлялись в распределение —
-        случайные переводы на адрес контракта. Распределяемые токены и припаркованные доли
-        защищены навсегда.
-      </div>
-      <div class="form-row">
-        <label class="form-label" for="adm-rescue-token">Адрес токена</label>
-        <input class="form-inp" id="adm-rescue-token" placeholder="0x..." autocomplete="off"/>
-      </div>
-      <div class="form-row">
-        <label class="form-label" for="adm-rescue-to">Получатель</label>
-        <input class="form-inp" id="adm-rescue-to" placeholder="0x..." autocomplete="off"/>
-        <div class="form-hint">Рекомендация из руководства: фиксированный адрес сейфа, а не произвольный.</div>
-      </div>
-      <button class="btn-danger" id="btn-rescue" onclick="doRescue()">Вывести</button>
-    </div>
-
-    <div class="tab-panel" id="adm-owner">
-      <div class="form-hint" style="margin-bottom:12px">
-        Передача двухшаговая: пока новый владелец не вызовет «Принять», полномочия остаются у вас.
-        Отказаться от владения нельзя — функции <code>renounceOwnership</code> в контракте нет.
-      </div>
-      <div id="adm-pending"></div>
-      <div class="form-row">
-        <label class="form-label" for="adm-new-owner">Новый владелец</label>
-        <input class="form-inp" id="adm-new-owner" placeholder="0x..." autocomplete="off"/>
-        <div class="form-hint">Для мейннета — мультисиг 2 из 3. Ключ не может забрать средства, но может необратимо засорить список токенов.</div>
-      </div>
-      <button class="btn-danger" id="btn-transfer-owner" onclick="doTransferOwnership()">Передать владение</button>
+      <div class="card-t"><span>Контракт</span></div>
+      <div id="info"><div class="empty">Загрузка…</div></div>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
-const CONTRACT_ADDR = "0xd70B9e0287cC79EE416b8F382998d6d9692D5621"
-const CHAIN_ID      = 11155111
-const RPC_URL       = "https://ethereum-sepolia.publicnode.com"
-const EXPLORER      = "https://sepolia.etherscan.io"
-const START_BLOCK   = 0
-const LOG_WINDOW    = 45000
-const DEC           = 18          // BPS: 18 знаков, не 6
+// ---------- настройки ----------
+const DEFAULT_BPS = "0x74cBff3b44931186133394f27A451F6Dd3Bfc4D4"
+const CHAIN_ID    = 11155111
+const RPC_URL     = "https://ethereum-sepolia-rpc.publicnode.com"
+const EXPLORER    = "https://sepolia.etherscan.io"
+const START_BLOCK = 0          // блок деплоя — ускоряет поиск предложений
+const LOG_WINDOW  = 45000
+const DEC         = 18
+
+const Q = new URLSearchParams(location.search)
+const BPS_ADDR = (Q.get('bps') && ethers.utils.isAddress(Q.get('bps'))) ? ethers.utils.getAddress(Q.get('bps')) : DEFAULT_BPS
 
 const ABI = [
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
-  "function decimals() view returns (uint8)",
-  "function VERSION() view returns (string)",
-  "function totalSupply() view returns (uint256)",
-  "function activeSupply() view returns (uint256)",
-  "function custodyTotal() view returns (uint256)",
-  "function totalLeasedUnits() view returns (uint256)",
-  "function totalOfferedUnits() view returns (uint256)",
-  "function balanceOf(address) view returns (uint256)",
-  "function ownedUnits(address) view returns (uint256)",
-  "function freeBalanceOf(address) view returns (uint256)",
-  "function lockedBalanceOf(address) view returns (uint256)",
-  "function offeredBalanceOf(address) view returns (uint256)",
-  "function leasedOutOf(address) view returns (uint256)",
-  "function leasedInOf(address) view returns (uint256)",
-  "function custodyOf(address) view returns (uint256)",
-  "function owner() view returns (address)",
-  "function pendingOwner() view returns (address)",
-  "function MAX_DISTRIBUTION_TOKENS() view returns (uint256)",
-  "function distributionTokensLength() view returns (uint256)",
-  "function wasDistributionToken(address) view returns (bool)",
-  "function addDistributionToken(address)",
-  "function setTokenSyncPaused(address,bool)",
-  "function rescue(address,address)",
-  "function transferOwnership(address)",
-  "function acceptOwnership()",
-  "function getDistributionTokens() view returns (address[])",
-  "function isDistributionToken(address) view returns (bool)",
-  "function syncPaused(address) view returns (bool)",
-  "function totalOwed(address) view returns (uint256)",
-  "function shortfall(address) view returns (uint256)",
-  "function unsyncedBalance(address) view returns (uint256)",
-  "function syncToken(address)",
-  "function pendingDividends(address,address) view returns (uint256 earned, uint256 claimableNow)",
-  "function pendingDividendsAll(address) view returns (address[] tokens, uint256[] earned, uint256[] claimableNow)",
-  "function claim(address) returns (uint256)",
-  "function claimAll() returns (uint256[])",
-  "function park(uint256)",
-  "function unpark(uint256)",
-  "function otcOffers(address,address) view returns (uint256 units, uint256 price, address paymentToken, uint64 deadline)",
-  "function createOTC(address,uint256,uint256,address,uint64)",
-  "function cancelOTC(address)",
-  "function cancelExpiredOTC(address,address)",
-  "function executeOTC(address,uint256,uint256,address)",
-  "function leases(address,address) view returns (uint256 units, uint256 price, address paymentToken, uint64 duration, uint64 offerDeadline, uint64 expiresAt)",
-  "function leaseInfo(address,address) view returns (uint256 units, uint256 price, address paymentToken, uint64 duration, uint64 offerDeadline, uint64 expiresAt, bool executed, bool expired)",
-  "function createLease(address,uint256,uint256,address,uint64,uint64)",
-  "function cancelLease(address)",
-  "function cancelExpiredLease(address,address)",
-  "function executeLease(address,uint256,uint256,address,uint64)",
-  "function endLease(address,address)",
   "event OTCCreated(address indexed seller, address indexed buyer, uint256 units, uint256 price, address indexed paymentToken, uint64 deadline)",
-  "event LeaseOffered(address indexed lessor, address indexed renter, uint256 units, uint256 price, address indexed paymentToken, uint64 duration, uint64 offerDeadline)",
+  "function MAX_OTC_DURATION() view returns (uint64)",
+  "function activeSupply() view returns (uint256)",
+  "function balanceOf(address a) view returns (uint256)",
+  "function cancelExpiredOTC(address seller, address buyer)",
+  "function cancelOTC(address buyer)",
+  "function claim(address token) returns (uint256)",
+  "function claimAll() returns (uint256[])",
+  "function claimAllFor(address user) returns (uint256[])",
+  "function createOTC(address buyer, uint256 units, uint256 price, address paymentToken, uint64 deadline)",
+  "function custodyOf(address a) view returns (uint256)",
+  "function custodyTotal() view returns (uint256)",
+  "function executeOTC(address seller, uint256 expectedUnits, uint256 maxPrice, address expectedToken, uint256 expectedNonce)",
+  "function freeBalanceOf(address a) view returns (uint256)",
+  "function getDistributionTokens() view returns (address[])",
+  "function lockedBalanceOf(address a) view returns (uint256)",
+  "function name() view returns (string)",
+  "function otcOffers(address, address) view returns (uint256 units, uint256 price, address paymentToken, uint64 deadline, uint256 nonce)",
+  "function ownedUnits(address a) view returns (uint256)",
+  "function owner() view returns (address)",
+  "function park(uint256 amount)",
+  "function pendingDividendsAll(address user) view returns (address[] tokens, uint256[] earned, uint256[] claimableNow)",
+  "function pendingOwner() view returns (address)",
+  "function shortfall(address token) view returns (uint256)",
+  "function symbol() view returns (string)",
+  "function syncPaused(address) view returns (bool)",
+  "function syncToken(address token)",
+  "function totalOwed(address) view returns (uint256)",
+  "function totalSupply() view returns (uint256)",
+  "function transfer(address to, uint256 value) returns (bool)",
+  "function unpark(uint256 amount)",
+  "function unsyncedBalance(address token) view returns (uint256)",
+  "function pendingDividends(address user, address token) view returns (uint256 earned, uint256 claimableNow)",
+  "error AllowanceExceeded()",
+  "error AlreadyDistributionToken()",
+  "error CannotUseSelf()",
+  "error EmptyArray()",
+  "error InsufficientCustody()",
+  "error InsufficientFreeBalance()",
+  "error InvalidAmounts()",
+  "error InvalidDeadline()",
+  "error InvalidToken()",
+  "error LengthMismatch()",
+  "error MulDivOverflow()",
+  "error NoActiveOffer()",
+  "error NotDistributionToken()",
+  "error NotOwner()",
+  "error NotPendingOwner()",
+  "error NothingToRescue()",
+  "error OfferAlreadyExists()",
+  "error OfferExpired()",
+  "error OfferNotExpired()",
+  "error Reentrancy()",
+  "error SelfTrade()",
+  "error SyncPaused()",
+  "error TermsChanged()",
+  "error TokenIsDistributed()",
+  "error TooManyTokens()",
+  "error TransferFailed()",
+  "error ZeroAddress()",
+  "error ZeroAmount()"
 ]
 const ERC20_ABI = [
   "function symbol() view returns (string)",
   "function decimals() view returns (uint8)",
   "function balanceOf(address) view returns (uint256)",
-  "function approve(address,uint256) returns (bool)",
   "function allowance(address,address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
 ]
 
-let provider, signer, contract, userAddr
-let distTokens = []
-let tokenMeta = {}
-let busy = false
-
+let provider, signer, me, bps
+let tokens = [], meta = {}, busy = false
 const rpc = new ethers.providers.JsonRpcProvider(RPC_URL)
-const hasAddr = CONTRACT_ADDR && ethers.utils.isAddress(CONTRACT_ADDR)
-const contractRO = hasAddr ? new ethers.Contract(CONTRACT_ADDR, ABI, rpc) : null
+const IFACE = new ethers.utils.Interface(ABI)
+const reader = () => provider || rpc
+const ro = () => new ethers.Contract(BPS_ADDR, ABI, reader())
 
-function fmt(bn, dec, dp) {
-  const n = parseFloat(ethers.utils.formatUnits(bn, dec))
-  dp = dp ?? 2
+// ---------- утилиты ----------
+const $ = (id) => document.getElementById(id)
+const short = (a) => a ? a.slice(0, 6) + '…' + a.slice(-4) : ''
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+const exact = (bn, d) => ethers.utils.formatUnits(bn, d)
+function fmt(bn, d, dp = 2) {
+  const n = parseFloat(ethers.utils.formatUnits(bn, d))
   if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M'
   if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K'
   return n.toFixed(dp)
 }
-function exact(bn, dec) { return ethers.utils.formatUnits(bn, dec) }
-function shortAddr(a) { return a ? a.slice(0, 6) + '...' + a.slice(-4) : '' }
-function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])) }
-function meta(addr) { return tokenMeta[addr?.toLowerCase()] || { symbol: shortAddr(addr || ''), decimals: 18 } }
-function dateStr(sec) {
-  return new Date(sec * 1000).toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' })
+const m = (a) => meta[a?.toLowerCase()] || { symbol: short(a || ''), decimals: 18 }
+const date = (s) => new Date(s * 1000).toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' })
+
+function say(t, type) {
+  const el = $('msg'); el.textContent = t; el.className = 'status ' + (t ? type : '')
+  if (type === 'success') setTimeout(() => { if (el.textContent === t) el.className = 'status' }, 6000)
 }
-function setStatus(msg, type) {
-  const el = document.getElementById('status-msg')
-  el.textContent = msg; el.className = 'status ' + type
-  if (type === 'success') setTimeout(() => { if (el.textContent === msg) el.className = 'status' }, 6000)
+const ERR_RU = {
+  InsufficientFreeBalance: 'Недостаточно свободных долей — часть заперта в OTC или припаркована.',
+  OfferAlreadyExists: 'Этому адресу уже есть предложение — сначала отмените его.',
+  NoActiveOffer: 'Предложения нет или оно уже исполнено.',
+  OfferExpired: 'Срок предложения истёк.',
+  OfferNotExpired: 'Срок предложения ещё не истёк.',
+  TermsChanged: 'Условия предложения изменились — обновите страницу и проверьте заново.',
+  SelfTrade: 'Нельзя торговать с самим собой.',
+  InvalidAmounts: 'Количество и цена должны быть больше нуля.',
+  InvalidDeadline: 'Некорректный срок.',
+  InsufficientCustody: 'Столько долей не припарковано.',
+  CannotUseSelf: 'Адрес самого контракта здесь использовать нельзя.',
+  NotDistributionToken: 'Этот токен не распределяется контрактом.',
+  SyncPaused: 'Учёт этого токена приостановлен владельцем.',
+  InvalidToken: 'Некорректный токен.',
+  ZeroAddress: 'Нулевой адрес.',
+  ZeroAmount: 'Нулевое количество.',
+  AllowanceExceeded: 'Недостаточно разрешения на списание.',
+  TransferFailed: 'Перевод токена не прошёл.',
+  Reentrancy: 'Повторный вход запрещён.',
 }
-function clearStatus() { document.getElementById('status-msg').className = 'status' }
-function errText(e) {
-  const raw = e?.error?.message || e?.data?.message || e?.reason || e?.message || String(e)
-  // Кастомные ошибки контракта человеческим языком
-  const map = {
-    InsufficientFreeBalance: 'Недостаточно свободных долей.',
-    OfferAlreadyExists: 'Предложение этому адресу уже существует — сначала отмените его.',
-    NoActiveOffer: 'Активного предложения нет.',
-    OfferExpired: 'Срок предложения истёк.',
-    TermsChanged: 'Условия предложения изменились — обновите страницу.',
-    SelfTrade: 'Нельзя торговать с самим собой.',
-    InvalidAmounts: 'Количество и цена должны быть больше нуля.',
-    InvalidDeadline: 'Некорректный срок.',
-    InvalidDuration: 'Некорректная длительность аренды.',
-    LeaseAlreadyExecuted: 'Аренда уже исполнена.',
-    LeaseNotExpired: 'Срок аренды ещё не истёк.',
-    InsufficientCustody: 'Столько долей не припарковано.',
-    NotDistributionToken: 'Этот токен не распределяется контрактом.',
-    TokenIsDistributed: 'Распределяемый токен нельзя вывести.',
-    NotOwner: 'Действие доступно только владельцу контракта.',
+/// Код ошибки контракта может лежать глубоко во вложенных объектах исключения
+/// (в MetaMask — в error.data.data). Обходим всё дерево, включая неперечисляемые
+/// поля Error, и собираем все hex-строки — среди них будет и код ошибки.
+function hexesIn(e) {
+  const out = [], seen = new Set()
+  const walk = (v, d) => {
+    if (d > 7 || v == null) return
+    if (typeof v === 'string') { for (const h of v.match(/0x[0-9a-fA-F]{8,}/g) || []) out.push(h); return }
+    if (typeof v !== 'object' || seen.has(v)) return
+    seen.add(v)
+    for (const k of Object.getOwnPropertyNames(v)) { try { walk(v[k], d + 1) } catch {} }
   }
-  for (const k in map) if (raw.includes(k)) return map[k]
+  walk(e, 0)
+  return out
+}
+function errText(e) {
+  for (const h of hexesIn(e)) {
+    try { const n = IFACE.parseError(h).name; return ERR_RU[n] || n } catch {}
+  }
+  const raw = e?.error?.message || e?.data?.message || e?.reason || e?.message || String(e)
+  if (/user rejected|User denied/i.test(raw)) return 'Отклонено в кошельке.'
+  for (const k in ERR_RU) if (raw.includes(k)) return ERR_RU[k]
   return raw
 }
 function setBusy(v) {
   busy = v
-  document.getElementById('btn-refresh').disabled = v || !userAddr
-  ;['btn-create-otc','btn-create-lease','btn-park','btn-unpark'].forEach(id => {
-    document.getElementById(id).disabled = v || !signer
-  })
-  document.getElementById('btn-claim-all').disabled = v || !signer
-  ;['btn-add-token','btn-rescue','btn-transfer-owner','btn-accept-owner'].forEach(id => {
-    const el = document.getElementById(id)
-    if (!el) return
-    // btn-add-token разблокируется только успешной проверкой токена
-    if (id === 'btn-add-token') { if (v) el.disabled = true }
-    else el.disabled = v || !signer
-  })
-  document.querySelectorAll('.btn-sm, .btn-claim').forEach(b => { if (!b.dataset.keepDisabled) b.disabled = v })
+  ;['btn-otc','btn-send','btn-park','btn-unpark'].forEach(id => $(id).disabled = v || !signer)
+  $('btn-refresh').disabled = v || !signer
+  document.querySelectorAll('[data-act]').forEach(b => { if (!b.dataset.lock) b.disabled = v })
+  if (v) $('btn-claim-all').disabled = true
 }
-function switchTab(ev, id) {
+function tab(ev, id) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
-  ev.currentTarget.classList.add('active')
-  document.getElementById(id).classList.add('active')
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  ev.currentTarget.classList.add('active'); $(id).classList.add('active')
+}
+async function run(label, fn) {
+  if (!signer) { say('Сначала подключите кошелёк.', 'error'); return }
+  try { setBusy(true); say(label + '…', 'info'); const r = await fn(); if (r !== false) await refreshAll(); return r }
+  catch (e) { say('Не удалось: ' + errText(e), 'error') }
+  finally { setBusy(false) }
 }
 
-async function connectWallet() {
-  if (!hasAddr) { setStatus('В настройках страницы не задан адрес контракта.', 'error'); return }
-  let eth = null
-  if (window.ethereum?.isMetaMask) eth = window.ethereum
-  else if (window.ethereum?.providers) eth = window.ethereum.providers.find(p => p.isMetaMask)
-  else if (window.ethereum) eth = window.ethereum
-  if (!eth) { setStatus('Кошелёк не найден. Установите MetaMask.', 'error'); return }
+// ---------- кошелёк ----------
+const announced = []
+window.addEventListener('eip6963:announceProvider', (e) => announced.push(e.detail))
+window.dispatchEvent(new Event('eip6963:requestProvider'))
+async function findWallet() {
+  for (let i = 0; i < 20; i++) {
+    const mm = announced.find(d => /metamask/i.test(d.info?.name || d.info?.rdns || ''))
+    if (mm) return mm.provider
+    if (announced.length) return announced[0].provider
+    if (window.ethereum) return window.ethereum.providers?.find(p => p.isMetaMask) || window.ethereum
+    await new Promise(r => setTimeout(r, 100))
+  }
+  return null
+}
+
+async function connect() {
+  const eth = await findWallet()
+  if (!eth) {
+    say(location.protocol === 'file:'
+      ? 'Страница открыта как локальный файл, а MetaMask в такие страницы не встраивается. Откройте её через GitHub Pages или http://localhost.'
+      : 'Кошелёк не найден. Проверьте, что MetaMask включён, и перезагрузите страницу.', 'error')
+    return
+  }
   try {
-    provider = new ethers.providers.Web3Provider(eth)
-    await provider.send('eth_requestAccounts', [])
-    let net = await provider.getNetwork()
+    let p = new ethers.providers.Web3Provider(eth)
+    await p.send('eth_requestAccounts', [])
+    let net = await p.getNetwork()
     if (net.chainId !== CHAIN_ID) {
-      try {
-        await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] })
-      } catch { setStatus('Переключите кошелёк на Sepolia и подключитесь снова.', 'error'); return }
-      provider = new ethers.providers.Web3Provider(eth)
-      net = await provider.getNetwork()
-      if (net.chainId !== CHAIN_ID) { setStatus('Неверная сеть. Нужна Sepolia.', 'error'); return }
+      try { await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] }) }
+      catch { say('Переключите кошелёк на нужную сеть и подключитесь снова.', 'error'); return }
+      p = new ethers.providers.Web3Provider(eth); net = await p.getNetwork()
+      if (net.chainId !== CHAIN_ID) { say('Неверная сеть.', 'error'); return }
     }
-    signer = provider.getSigner()
-    userAddr = await signer.getAddress()
-    contract = new ethers.Contract(CONTRACT_ADDR, ABI, signer)
-
-    document.getElementById('btn-wallet').textContent = shortAddr(userAddr)
-    document.getElementById('btn-wallet').classList.add('connected')
-    document.getElementById('addr-display').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-6)
-    setBusy(false)
-
+    provider = p; signer = p.getSigner(); me = await signer.getAddress()
+    bps = new ethers.Contract(BPS_ADDR, ABI, signer)
+    $('btn-wallet').textContent = short(me); $('btn-wallet').classList.add('connected')
     eth.on?.('accountsChanged', () => location.reload())
     eth.on?.('chainChanged', () => location.reload())
-
-    await refreshAll()
-    clearStatus()
-  } catch (e) { setStatus('Не удалось подключиться: ' + errText(e), 'error') }
+    setBusy(false)
+    await refreshAll(); say('', '')
+  } catch (e) { say('Не удалось подключиться: ' + errText(e), 'error') }
 }
 
+// ---------- загрузка ----------
 async function refreshAll() {
-  await loadTokenMeta()
-  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadContractInfo(), loadAdmin()])
+  await loadTokens()
+  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadInfo()])
 }
 
-async function loadTokenMeta() {
-  const c = contract || contractRO
-  if (!c) return
+async function tokenMeta(a) {
+  const k = a.toLowerCase(); if (meta[k]) return meta[k]
   try {
-    distTokens = await c.getDistributionTokens()
-    await Promise.all(distTokens.map(async addr => {
-      const key = addr.toLowerCase()
-      if (tokenMeta[key]) return
-      try {
-        const tok = new ethers.Contract(addr, ERC20_ABI, rpc)
-        const [sym, dec] = await Promise.all([tok.symbol(), tok.decimals()])
-        tokenMeta[key] = { symbol: sym, decimals: dec }
-      } catch { tokenMeta[key] = { symbol: shortAddr(addr), decimals: 18 } }
-    }))
-    // Оплата возможна любым ERC20, но список распределяемых — разумный дефолт
-    ;['otc-token','lease-token'].forEach(id => {
-      const sel = document.getElementById(id)
-      const prev = sel.value
-      sel.innerHTML = '<option value="">Выберите токен</option>'
-      distTokens.forEach(addr => {
-        const opt = document.createElement('option')
-        opt.value = addr
-        opt.textContent = meta(addr).symbol
-        sel.appendChild(opt)
-      })
-      const custom = document.createElement('option')
-      custom.value = '__custom__'
-      custom.textContent = 'Другой адрес…'
-      sel.appendChild(custom)
-      if (prev) sel.value = prev
-    })
-  } catch (e) { console.error('loadTokenMeta', e) }
+    const t = new ethers.Contract(a, ERC20_ABI, reader())
+    const [s, d] = await Promise.all([t.symbol(), t.decimals()])
+    meta[k] = { symbol: s, decimals: d }
+  } catch { meta[k] = { symbol: short(a), decimals: 18 } }
+  return meta[k]
+}
+
+async function loadTokens() {
+  try {
+    tokens = await ro().getDistributionTokens()
+    await Promise.all(tokens.map(tokenMeta))
+    const sel = $('o-token'), prev = sel.value
+    sel.innerHTML = '<option value="">Выберите токен</option>' +
+      tokens.map(a => `<option value="${a}">${esc(m(a).symbol)}</option>`).join('') +
+      '<option value="__custom">Другой адрес…</option>'
+    if (prev) sel.value = prev
+  } catch (e) { console.error('loadTokens', e) }
 }
 
 async function loadStats() {
-  const c = contract || contractRO
-  if (!c) return
+  if (!me) return
   try {
-    if (!userAddr) return
-    const [weight, free, locked, offered, out, inn, cust, active] = await Promise.all([
-      c.balanceOf(userAddr), c.freeBalanceOf(userAddr), c.lockedBalanceOf(userAddr),
-      c.offeredBalanceOf(userAddr), c.leasedOutOf(userAddr), c.leasedInOf(userAddr),
-      c.custodyOf(userAddr), c.activeSupply(),
-    ])
-    document.getElementById('st-weight').textContent = fmt(weight, DEC, 2)
-    document.getElementById('st-free').textContent = fmt(free, DEC, 2)
-    document.getElementById('st-locked').textContent = fmt(locked.add(offered), DEC, 2)
-    document.getElementById('st-lease').textContent = fmt(out, DEC, 0) + ' / ' + fmt(inn, DEC, 0)
-    document.getElementById('st-custody').textContent = fmt(cust, DEC, 2)
-    const pct = active.gt(0)
-      ? (parseFloat(exact(weight, DEC)) / parseFloat(exact(active, DEC)) * 100).toFixed(4)
-      : '0.0000'
-    document.getElementById('st-pct').textContent = pct + '%'
+    const c = ro()
+    const [bal, free, locked, cust, active] = await Promise.all([
+      c.balanceOf(me), c.freeBalanceOf(me), c.lockedBalanceOf(me), c.custodyOf(me), c.activeSupply()])
+    $('st-bal').textContent = fmt(bal, DEC)
+    $('st-free').textContent = fmt(free, DEC)
+    $('st-locked').textContent = fmt(locked, DEC)
+    $('st-cust').textContent = fmt(cust, DEC)
+    $('st-pct').textContent = active.gt(0)
+      ? (parseFloat(exact(bal, DEC)) / parseFloat(exact(active, DEC)) * 100).toFixed(3) + '%' : '—'
   } catch (e) { console.error('loadStats', e) }
 }
 
 async function loadDividends() {
-  const el = document.getElementById('dividends-list')
-  const c = contract || contractRO
-  if (!c || !userAddr) return
-  if (distTokens.length === 0) {
-    el.innerHTML = '<div class="empty-state">Распределяемые токены ещё не добавлены.</div>'; return
-  }
-  try {
-    const res = await c.pendingDividendsAll(userAddr)
-    const tokens = res.tokens || res[0]
-    const earned = res.earned || res[1]
-    const now = res.claimableNow || res[2]
-    let anyClaimable = false
-    const rows = tokens.map((addr, i) => {
-      const m = meta(addr)
-      const e = earned[i], n = now[i]
-      const isZero = e.isZero()
-      if (!n.isZero()) anyClaimable = true
-      const partial = !isZero && n.lt(e)
-      return `<div class="token-row">
-        <div class="token-icon">${esc(m.symbol.slice(0, 3).toUpperCase())}</div>
-        <div class="token-info">
-          <div class="token-name">${esc(m.symbol)}</div>
-          <div class="token-addr">${shortAddr(addr)}</div>
-        </div>
-        <div class="token-amounts">
-          <div class="token-pending${isZero ? ' zero' : ''}">${fmt(e, m.decimals, 6)}</div>
-          ${partial ? `<div class="token-partial">${fmt(n, m.decimals, 6)} доступно сейчас</div>` : ''}
-        </div>
-        <button class="btn-claim" onclick="doClaim('${addr}')" ${n.isZero() ? 'disabled data-keep-disabled="1"' : ''}>Забрать</button>
+  const el = $('div-list'); if (!me) return
+  if (!tokens.length) { el.innerHTML = '<div class="empty">Распределяемые токены ещё не добавлены.</div>'; $('btn-claim-all').disabled = true; return }
+  const c = ro(); let any = false
+  // по токену отдельно: сломанный токен не должен гасить весь список
+  const rows = await Promise.all(tokens.map(async (a) => {
+    const t = m(a)
+    let paused = false
+    try { paused = await c.syncPaused(a) } catch {}
+    try {
+      const [e, n] = await c.pendingDividends(me, a)
+      if (!n.isZero() && !paused) any = true
+      const part = !e.isZero() && n.lt(e)
+      return `<div class="tok">
+        <div class="tok-i">${esc(t.symbol.slice(0, 3).toUpperCase())}</div>
+        <div class="tok-n"><div class="tok-name">${esc(t.symbol)} ${paused ? '<span class="badge warn">пауза</span>' : ''}</div><div class="tok-a">${short(a)}</div></div>
+        <div class="tok-v"><div class="tok-p${e.isZero() ? ' zero' : ''}">${fmt(e, t.decimals, 6)}</div>
+          ${part ? `<div class="tok-w">сейчас доступно ${fmt(n, t.decimals, 6)}</div>` : ''}</div>
+        <button class="btn btn-sm btn-ok" data-act onclick="doClaim('${a}')" ${n.isZero() ? 'disabled data-lock="1"' : ''}>Забрать</button>
       </div>`
-    })
-    el.innerHTML = rows.join('')
-    document.getElementById('btn-claim-all').disabled = busy || !signer || !anyClaimable
-  } catch (e) {
-    console.error('loadDividends', e)
-    el.innerHTML = '<div class="empty-state">Не удалось прочитать дивиденды. Проверьте адрес контракта и сеть.</div>'
-  }
+    } catch {
+      return `<div class="tok"><div class="tok-i">!</div><div class="tok-n"><div class="tok-name">${esc(t.symbol)}</div>
+        <div class="tok-a">баланс токена не читается — возможно, токен сломан</div></div></div>`
+    }
+  }))
+  el.innerHTML = rows.join('')
+  $('btn-claim-all').disabled = busy || !signer || !any
 }
 
-async function queryLogs(filter) {
-  const c = contract || contractRO
-  const latest = await rpc.getBlockNumber()
+async function logs(filter) {
+  const c = ro(), latest = await reader().getBlockNumber()
   const from = START_BLOCK > 0 ? START_BLOCK : Math.max(0, latest - LOG_WINDOW)
   try { return await c.queryFilter(filter, from, latest) }
   catch { return await c.queryFilter(filter, Math.max(0, latest - 9000), latest) }
 }
-
-async function loadOffers() {
-  const incEl = document.getElementById('incoming-list')
-  const outEl = document.getElementById('outgoing-list')
-  const c = contract || contractRO
-  if (!c || !userAddr) return
-  try {
-    const [otcIn, otcOut, lsIn, lsOut] = await Promise.all([
-      queryLogs(c.filters.OTCCreated(null, userAddr)),
-      queryLogs(c.filters.OTCCreated(userAddr, null)),
-      queryLogs(c.filters.LeaseOffered(null, userAddr)),
-      queryLogs(c.filters.LeaseOffered(userAddr, null)),
-    ])
-
-    const incoming = [
-      ...await resolveOTC(otcIn.map(l => [l.args.seller, userAddr])),
-      ...await resolveLease(lsIn.map(l => [l.args.lessor, userAddr])),
-    ]
-    const outgoing = [
-      ...await resolveOTC(otcOut.map(l => [userAddr, l.args.buyer])),
-      ...await resolveLease(lsOut.map(l => [userAddr, l.args.renter])),
-    ]
-
-    incEl.innerHTML = incoming.length
-      ? incoming.map(o => offerCard(o, true)).join('')
-      : '<div class="empty-state">Вам пока никто не предлагал доли.<br/>Предложение появится здесь, когда держатель создаст его на ваш адрес.</div>'
-
-    outEl.innerHTML = outgoing.length
-      ? outgoing.map(o => offerCard(o, false)).join('')
-      : '<div class="empty-state">Открытых предложений нет.</div>'
-  } catch (e) {
-    console.error('loadOffers', e)
-    incEl.innerHTML = '<div class="empty-state">Не удалось прочитать историю событий.</div>'
-  }
+function uniq(pairs) {
+  const s = new Set()
+  return pairs.filter(([a, b]) => { const k = (a + b).toLowerCase(); if (s.has(k)) return false; s.add(k); return true })
 }
-
-function dedupe(pairs) {
-  const seen = new Set()
-  return pairs.filter(([a, b]) => {
-    const k = a.toLowerCase() + ':' + b.toLowerCase()
-    if (seen.has(k)) return false
-    seen.add(k); return true
-  })
-}
-
-async function resolveOTC(pairs) {
-  const c = contract || contractRO
-  const out = []
-  await Promise.all(dedupe(pairs).map(async ([seller, buyer]) => {
+async function resolve(pairs) {
+  const c = ro(), out = []
+  await Promise.all(uniq(pairs).map(async ([seller, buyer]) => {
     try {
       const o = await c.otcOffers(seller, buyer)
-      if (o.units.gt(0)) out.push({
-        kind: 'otc', seller, buyer, counterparty: seller.toLowerCase() === userAddr.toLowerCase() ? buyer : seller,
-        units: o.units, price: o.price, paymentToken: o.paymentToken, deadline: o.deadline.toNumber(),
-      })
+      if (o.units.gt(0)) { await tokenMeta(o.paymentToken); out.push({ seller, buyer, units: o.units, price: o.price, token: o.paymentToken, deadline: o.deadline.toNumber() }) }
     } catch {}
   }))
   return out.sort((a, b) => a.deadline - b.deadline)
 }
 
-async function resolveLease(pairs) {
-  const c = contract || contractRO
-  const out = []
-  await Promise.all(dedupe(pairs).map(async ([lessor, renter]) => {
-    try {
-      const l = await c.leaseInfo(lessor, renter)
-      if (l.units.gt(0)) out.push({
-        kind: 'lease', lessor, renter,
-        counterparty: lessor.toLowerCase() === userAddr.toLowerCase() ? renter : lessor,
-        units: l.units, price: l.price, paymentToken: l.paymentToken,
-        duration: l.duration.toNumber(), deadline: l.offerDeadline.toNumber(),
-        expiresAt: l.expiresAt.toNumber(), executed: l.executed, expired: l.expired,
-      })
-    } catch {}
-  }))
-  return out.sort((a, b) => a.deadline - b.deadline)
-}
-
-function offerCard(o, isIncoming) {
-  const m = meta(o.paymentToken)
-  const now = Math.floor(Date.now() / 1000)
-
-  if (o.kind === 'lease') {
-    let badge, actions = ''
-    if (o.executed) {
-      badge = o.expired
-        ? '<span class="badge warn">Срок вышел</span>'
-        : '<span class="badge active">Аренда идёт</span>'
-      // endLease permissionless — доступна обеим сторонам
-      if (o.expired) actions = `<button class="btn-sm end" onclick="doEndLease('${o.lessor}','${o.renter}')">Завершить и вернуть доли</button>`
-    } else if (o.deadline <= now) {
-      badge = '<span class="badge dead">Предложение истекло</span>'
-      actions = `<button class="btn-sm cancel" onclick="doCancelExpiredLease('${o.lessor}','${o.renter}')">Снять истёкшее</button>`
-    } else {
-      badge = '<span class="badge ok">Предложение открыто</span>'
-      actions = isIncoming
-        ? `<button class="btn-sm buy" onclick="doExecuteLease('${o.lessor}')">Арендовать за ${esc(fmt(o.price, m.decimals, 4))} ${esc(m.symbol)}</button>`
-        : `<button class="btn-sm cancel" onclick="doCancelLease('${o.renter}')">Отменить</button>`
-    }
-    const who = isIncoming ? 'Аренда от ' + shortAddr(o.lessor) : 'Аренда для ' + shortAddr(o.renter)
-    const when = o.executed ? dateStr(o.expiresAt) : dateStr(o.deadline)
-    return `<div class="offer-item lease">
-      <div class="offer-head"><span class="offer-who">${esc(who)}</span>${badge}</div>
-      <div class="offer-grid">
-        <div><div class="offer-label">Долей</div><div class="offer-val">${fmt(o.units, DEC, 2)}</div></div>
-        <div><div class="offer-label">Платёж</div><div class="offer-val">${fmt(o.price, m.decimals, 4)} ${esc(m.symbol)}</div></div>
-        <div><div class="offer-label">${o.executed ? 'До' : 'Срок ' + Math.round(o.duration / 86400) + ' дн., принять до'}</div><div class="offer-val">${when}</div></div>
-      </div>
-      ${actions ? `<div class="offer-actions">${actions}</div>` : ''}
-    </div>`
-  }
-
-  const expired = o.deadline <= now
-  const soon = !expired && o.deadline - now < 86400
-  const badge = expired ? '<span class="badge dead">Истекло</span>'
-    : soon ? '<span class="badge warn">Истекает сегодня</span>' : '<span class="badge ok">Открыто</span>'
-  const who = isIncoming ? 'Продажа от ' + shortAddr(o.seller) : 'Продажа для ' + shortAddr(o.buyer)
-  const actions = expired
-    ? `<button class="btn-sm cancel" onclick="doCancelExpiredOTC('${o.seller}','${o.buyer}')">Снять истёкшее</button>`
-    : (isIncoming
-      ? `<button class="btn-sm buy" onclick="doExecuteOTC('${o.seller}')">Купить за ${esc(fmt(o.price, m.decimals, 4))} ${esc(m.symbol)}</button>`
-      : `<button class="btn-sm cancel" onclick="doCancelOTC('${o.buyer}')">Отменить и разблокировать</button>`)
-  return `<div class="offer-item${isIncoming && !expired ? ' incoming' : ''}">
-    <div class="offer-head"><span class="offer-who">${esc(who)}</span>${badge}</div>
-    <div class="offer-grid">
-      <div><div class="offer-label">Долей</div><div class="offer-val">${fmt(o.units, DEC, 2)}</div></div>
-      <div><div class="offer-label">Цена</div><div class="offer-val">${fmt(o.price, m.decimals, 4)} ${esc(m.symbol)}</div></div>
-      <div><div class="offer-label">${expired ? 'Истекло' : 'Истекает'}</div><div class="offer-val">${dateStr(o.deadline)}</div></div>
-    </div>
-    ${actions ? `<div class="offer-actions">${actions}</div>` : ''}
-  </div>`
-}
-
-async function loadContractInfo() {
-  const el = document.getElementById('contract-info')
-  const c = contract || contractRO
-  if (!c) { el.innerHTML = '<div class="empty-state">Адрес контракта не задан.</div>'; return }
+async function loadOffers() {
+  if (!me) return
   try {
-    const [owner, ver, ts, active, cust, leased] = await Promise.all([
-      c.owner(), c.VERSION(), c.totalSupply(), c.activeSupply(), c.custodyTotal(), c.totalLeasedUnits(),
-    ])
+    const c = ro()
+    const [inL, outL] = await Promise.all([logs(c.filters.OTCCreated(null, me)), logs(c.filters.OTCCreated(me, null))])
+    const inc = await resolve(inL.map(l => [l.args.seller, me]))
+    const out = await resolve(outL.map(l => [me, l.args.buyer]))
+    $('in-list').innerHTML = inc.length ? inc.map(o => card(o, true)).join('')
+      : '<div class="empty">Вам пока никто не предлагал доли.<br/>Предложение появится здесь, когда держатель создаст его на ваш адрес.</div>'
+    $('out-list').innerHTML = out.length ? out.map(o => card(o, false)).join('') : '<div class="empty">Открытых предложений нет.</div>'
+  } catch (e) { console.error('loadOffers', e); $('in-list').innerHTML = '<div class="empty">Не удалось прочитать историю событий.</div>' }
+}
 
-    const warnings = []
-    const tokenRows = await Promise.all(distTokens.map(async addr => {
-      const m = meta(addr)
-      const [paused, short, unsynced] = await Promise.all([
-        c.syncPaused(addr), c.shortfall(addr), c.unsyncedBalance(addr),
-      ])
-      if (paused) warnings.push(`Синхронизация ${m.symbol} приостановлена владельцем: новый приток не раскладывается по держателям. Начисленное ранее забрать можно.`)
-      if (short.gt(0)) warnings.push(`У контракта не хватает ${fmt(short, m.decimals, 2)} ${m.symbol} на покрытие начислений.`)
-      const tag = paused ? ' <span class="badge warn">Пауза</span>' : ''
-      const gap = short.gt(0) ? ` <span class="badge warn">Нехватка ${fmt(short, m.decimals, 2)}</span>` : ''
-      const sync = unsynced.gt(0)
-        ? `<button class="btn-claim" onclick="doSync('${addr}')" style="margin-left:8px">Разложить ${fmt(unsynced, m.decimals, 2)}</button>` : ''
-      return `<div class="info-row">
-        <span class="info-key">${esc(m.symbol)}${tag}${gap}</span>
-        <span class="info-val">${shortAddr(addr)}${sync}</span></div>`
+function card(o, incoming) {
+  const t = m(o.token), now = Math.floor(Date.now() / 1000)
+  const dead = o.deadline <= now, soon = !dead && o.deadline - now < 86400
+  const badge = dead ? '<span class="badge dead">истекло</span>' : soon ? '<span class="badge warn">истекает сегодня</span>' : '<span class="badge ok">открыто</span>'
+  let act
+  if (dead) act = `<button class="btn btn-sm" data-act onclick="doCancelExpired('${o.seller}','${o.buyer}')">Снять истёкшее</button>`
+  else if (incoming) act = `<button class="btn btn-sm btn-ok" data-act onclick="doBuy('${o.seller}')">Купить за ${esc(fmt(o.price, t.decimals, 4))} ${esc(t.symbol)}</button>`
+  else act = `<button class="btn btn-sm btn-bad" data-act onclick="doCancel('${o.buyer}')">Отменить</button>`
+  return `<div class="offer${incoming && !dead ? ' in' : ''}">
+    <div class="offer-h"><span class="offer-w">${incoming ? 'от ' + short(o.seller) : 'для ' + short(o.buyer)}</span>${badge}</div>
+    <div class="offer-g">
+      <div><div class="offer-l">Долей</div><div class="offer-v">${fmt(o.units, DEC)}</div></div>
+      <div><div class="offer-l">Цена</div><div class="offer-v">${fmt(o.price, t.decimals, 4)} ${esc(t.symbol)}</div></div>
+      <div><div class="offer-l">${dead ? 'Истекло' : 'До'}</div><div class="offer-v">${date(o.deadline)}</div></div>
+    </div>
+    <div class="offer-a">${act}</div></div>`
+}
+
+async function loadInfo() {
+  const el = $('info')
+  try {
+    const c = ro()
+    const [owner, pending, ts, active, cust] = await Promise.all([c.owner(), c.pendingOwner(), c.totalSupply(), c.activeSupply(), c.custodyTotal()])
+    const ownerIsContract = (await reader().getCode(owner)) !== '0x'
+    const zero = ethers.constants.AddressZero
+    const warn = []
+    const rows = await Promise.all(tokens.map(async (a) => {
+      const t = m(a)
+      let paused = false, short_ = null, uns = null
+      try { paused = await c.syncPaused(a) } catch {}
+      try { short_ = await c.shortfall(a) } catch {}
+      try { uns = await c.unsyncedBalance(a) } catch {}
+      if (paused) warn.push(`Учёт ${t.symbol} приостановлен владельцем: новый приток не раскладывается. Начисленное ранее забрать можно.`)
+      if (short_ && short_.gt(0)) warn.push(`Контракту не хватает ${fmt(short_, t.decimals)} ${t.symbol} на покрытие начислений.`)
+      if (short_ === null) warn.push(`Баланс ${t.symbol} не читается — возможно, токен сломан.`)
+      const sync = uns && uns.gt(0) && !paused
+        ? `<button class="btn btn-sm" data-act onclick="doSync('${a}')" style="margin-left:8px">Разложить ${fmt(uns, t.decimals)}</button>` : ''
+      return `<div class="ir"><span class="ik">${esc(t.symbol)} ${paused ? '<span class="badge warn">пауза</span>' : ''}</span><span class="iv">${short(a)}${sync}</span></div>`
     }))
+    $('warn').innerHTML = warn.map(esc).join('<br/>'); $('warn').classList.toggle('show', warn.length > 0)
 
-    const banner = document.getElementById('warn-banner')
-    banner.innerHTML = warnings.map(esc).join('<br/>')
-    banner.classList.toggle('show', warnings.length > 0)
+    const lnk = $('admin-link')
+    if (ownerIsContract) { lnk.href = `safe-admin.html?safe=${owner}&bps=${BPS_ADDR}`; lnk.classList.remove('hidden') }
+    else if (me && owner.toLowerCase() === me.toLowerCase()) { lnk.href = `safe-admin.html?bps=${BPS_ADDR}`; lnk.classList.remove('hidden') }
+    else lnk.classList.add('hidden')
 
     el.innerHTML = `
-      <div class="info-row"><span class="info-key">Адрес</span><span class="info-val"><a href="${EXPLORER}/address/${CONTRACT_ADDR}" target="_blank" rel="noopener">${shortAddr(CONTRACT_ADDR)}</a></span></div>
-      <div class="info-row"><span class="info-key">Версия</span><span class="info-val">${esc(ver)}</span></div>
-      <div class="info-row"><span class="info-key">Владелец</span><span class="info-val">${shortAddr(owner)}</span></div>
-      <div class="info-row"><span class="info-key">Всего долей</span><span class="info-val">${fmt(ts, DEC, 0)}</span></div>
-      <div class="info-row"><span class="info-key">В распределении</span><span class="info-val">${fmt(active, DEC, 0)}</span></div>
-      <div class="info-row"><span class="info-key">Припарковано</span><span class="info-val">${fmt(cust, DEC, 0)}</span></div>
-      <div class="info-row"><span class="info-key">В аренде</span><span class="info-val">${fmt(leased, DEC, 0)}</span></div>
-      <div class="divider">распределяемые токены</div>
-      ${tokenRows.length ? tokenRows.join('') : '<div class="empty-state">Пока не добавлены.</div>'}`
-  } catch (e) {
-    console.error('loadContractInfo', e)
-    el.innerHTML = '<div class="empty-state">Не удалось прочитать контракт. Проверьте адрес и сеть.</div>'
+      <div class="ir"><span class="ik">Адрес</span><span class="iv"><a href="${EXPLORER}/address/${BPS_ADDR}" target="_blank" rel="noopener">${short(BPS_ADDR)}</a></span></div>
+      <div class="ir"><span class="ik">Владелец</span><span class="iv">${short(owner)} ${ownerIsContract ? '<span class="badge ok">мультиподпись</span>' : '<span class="badge warn">кошелёк</span>'}</span></div>
+      ${pending !== zero ? `<div class="ir"><span class="ik">Ожидает принятия</span><span class="iv">${short(pending)}</span></div>` : ''}
+      <div class="ir"><span class="ik">Всего долей</span><span class="iv">${fmt(ts, DEC, 0)}</span></div>
+      <div class="ir"><span class="ik">В распределении</span><span class="iv">${fmt(active, DEC, 0)}</span></div>
+      <div class="ir"><span class="ik">Припарковано</span><span class="iv">${fmt(cust, DEC, 0)}</span></div>
+      <div class="div">распределяемые токены</div>
+      ${rows.length ? rows.join('') : '<div class="empty">Пока не добавлены.</div>'}`
+  } catch (e) { console.error('loadInfo', e); el.innerHTML = '<div class="empty">Не удалось прочитать контракт. Проверьте адрес и сеть.</div>' }
+}
+
+// ---------- действия ----------
+const doClaim = (a) => run('Забираем доход', async () => { await (await bps.claim(a)).wait(); say('Готово.', 'success') })
+const doClaimAll = () => run('Забираем по всем токенам', async () => { await (await bps.claimAll()).wait(); say('Готово.', 'success') })
+const doSync = (a) => run('Раскладываем приток', async () => { await (await bps.syncToken(a)).wait(); say('Приток распределён.', 'success') })
+
+async function pickToken() {
+  const v = $('o-token').value
+  if (v === '__custom') {
+    const a = prompt('Адрес токена оплаты (0x...)')
+    if (!a || !ethers.utils.isAddress(a)) throw new Error('Некорректный адрес токена.')
+    return ethers.utils.getAddress(a)
   }
+  if (!v) throw new Error('Выберите токен оплаты.')
+  return v
+}
+const units = (id) => {
+  const v = $(id).value
+  if (!v || parseFloat(v) <= 0) throw new Error('Укажите количество долей.')
+  return ethers.utils.parseUnits(v, DEC)
+}
+const addr = (id, what) => {
+  const v = $(id).value.trim()
+  if (!ethers.utils.isAddress(v)) throw new Error('Некорректный адрес: ' + what + '.')
+  return ethers.utils.getAddress(v)
 }
 
-// ---------- Действия ----------
+const doCreateOTC = () => run('Создаём предложение', async () => {
+  const buyer = addr('o-buyer', 'покупатель')
+  if (buyer.toLowerCase() === me.toLowerCase()) throw new Error('Нельзя продавать самому себе.')
+  const u = units('o-units')
+  const tok = await pickToken(), t = await tokenMeta(tok)
+  const pv = $('o-price').value
+  if (!pv || parseFloat(pv) <= 0) throw new Error('Укажите цену.')
+  const price = ethers.utils.parseUnits(pv, t.decimals)
+  const days = parseInt($('o-days').value, 10)
+  if (!(days >= 1 && days <= 365)) throw new Error('Срок — от 1 до 365 дней.')
+  if ((await bps.freeBalanceOf(me)).lt(u)) throw new Error('Недостаточно свободных долей.')
+  if ((await bps.otcOffers(me, buyer)).units.gt(0)) throw new Error('Этому адресу уже есть предложение — сначала отмените его.')
+  const deadline = Math.floor(Date.now() / 1000) + days * 86400
+  await (await bps.createOTC(buyer, u, price, tok, deadline)).wait()
+  ;['o-buyer', 'o-units', 'o-price'].forEach(id => $(id).value = '')
+  say(`Предложение создано для ${short(buyer)}.`, 'success')
+})
 
-function needWallet() {
-  if (!signer) { setStatus('Сначала подключите кошелёк.', 'error'); return true }
-  return false
-}
-function pickedToken(selId) {
-  const v = document.getElementById(selId).value
-  if (v === '__custom__') {
-    const manual = prompt('Адрес токена оплаты (0x...)')
-    if (!manual || !ethers.utils.isAddress(manual)) { setStatus('Некорректный адрес токена.', 'error'); return null }
-    return manual
+const doCancel = (buyer) => run('Отменяем', async () => { await (await bps.cancelOTC(buyer)).wait(); say('Предложение отменено, доли свободны.', 'success') })
+const doCancelExpired = (s, b) => run('Снимаем истёкшее', async () => { await (await bps.cancelExpiredOTC(s, b)).wait(); say('Снято, доли вернулись продавцу.', 'success') })
+
+const doBuy = (seller) => run('Покупаем', async () => {
+  // условия и nonce читаются прямо перед покупкой: при подмене предложения
+  // продавцом транзакция откатится с TermsChanged, а не исполнится вслепую
+  const o = await bps.otcOffers(seller, me)
+  if (o.units.isZero()) throw new Error('Предложение больше недоступно.')
+  if (o.deadline.toNumber() <= Math.floor(Date.now() / 1000)) throw new Error('Срок предложения истёк.')
+  const t = await tokenMeta(o.paymentToken)
+  if (!confirm(`Купить ${exact(o.units, DEC)} долей\nЗаплатить ${exact(o.price, t.decimals)} ${t.symbol}\nПродавец ${seller}`)) return false
+  const tok = new ethers.Contract(o.paymentToken, ERC20_ABI, signer)
+  const bal = await tok.balanceOf(me)
+  if (bal.lt(o.price)) throw new Error(`Нужно ${exact(o.price, t.decimals)} ${t.symbol}, а на балансе ${exact(bal, t.decimals)}.`)
+  if ((await tok.allowance(me, BPS_ADDR)).lt(o.price)) {
+    say(`Разрешаем списание ${t.symbol}…`, 'info')
+    await (await tok.approve(BPS_ADDR, o.price)).wait()
   }
-  return v || null
-}
+  say('Покупаем…', 'info')
+  await (await bps.executeOTC(seller, o.units, o.price, o.paymentToken, o.nonce)).wait()
+  say('Готово. Доли ваши и уже приносят доход.', 'success')
+})
 
-async function doClaim(tokenAddr) {
-  if (needWallet()) return
+const doSend = () => run('Переводим', async () => {
+  const to = addr('s-to', 'получатель'), u = units('s-amt')
+  const msg = to.toLowerCase() === BPS_ADDR.toLowerCase()
+    ? `Это адрес самого контракта: ${exact(u, DEC)} долей будут ПРИПАРКОВАНЫ на ваше имя и перестанут приносить доход. Продолжить?`
+    : `Перевести ${exact(u, DEC)} долей на ${to}?`
+  if (!confirm(msg)) return false
+  await (await bps.transfer(to, u)).wait()
+  ;['s-to', 's-amt'].forEach(id => $(id).value = '')
+  say('Переведено.', 'success')
+})
+
+const doPark = () => run('Паркуем', async () => {
+  const u = units('p-amt')
+  if (!confirm(`Припарковать ${exact(u, DEC)} долей?\n\nОни перестанут приносить доход, ваша часть потока достанется остальным. Компенсации нет. Вернуть сможете только вы.`)) return false
+  await (await bps.park(u)).wait(); $('p-amt').value = ''
+  say('Доли припаркованы.', 'success')
+})
+const doUnpark = () => run('Возвращаем', async () => {
+  await (await bps.unpark(units('p-amt'))).wait(); $('p-amt').value = ''
+  say('Доли снова приносят доход.', 'success')
+})
+
+// ---------- старт ----------
+;(async () => {
   try {
-    setBusy(true); setStatus('Забираем…', 'info')
-    await (await contract.claim(tokenAddr)).wait()
-    setStatus('Готово.', 'success')
-    await Promise.all([loadDividends(), loadContractInfo()])
-  } catch (e) { setStatus('Не удалось забрать: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doClaimAll() {
-  if (needWallet()) return
-  try {
-    setBusy(true); setStatus('Забираем по всем токенам…', 'info')
-    await (await contract.claimAll()).wait()
-    setStatus('Готово.', 'success')
-    await Promise.all([loadDividends(), loadContractInfo()])
-  } catch (e) { setStatus('Не удалось забрать: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doSync(tokenAddr) {
-  if (needWallet()) return
-  try {
-    setBusy(true); setStatus('Раскладываем приток по держателям…', 'info')
-    await (await contract.syncToken(tokenAddr)).wait()
-    setStatus('Приток распределён.', 'success')
-    await Promise.all([loadDividends(), loadContractInfo()])
-  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doPark() {
-  if (needWallet()) return
-  const amount = document.getElementById('park-amount').value
-  if (!amount || parseFloat(amount) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
-  if (!confirm(
-    `Припарковать ${amount} долей?\n\n` +
-    `Припаркованные доли НЕ приносят дохода. Ваша часть потока будет доставаться остальным держателям. Компенсации нет.\n\n` +
-    `Вернуть их сможете только вы, в любой момент.`
-  )) return
-  try {
-    setBusy(true); setStatus('Паркуем…', 'info')
-    await (await contract.park(ethers.utils.parseUnits(amount, DEC))).wait()
-    setStatus('Доли припаркованы и исключены из распределения.', 'success')
-    document.getElementById('park-amount').value = ''
-    await Promise.all([loadStats(), loadDividends(), loadContractInfo()])
-  } catch (e) { setStatus('Не удалось припарковать: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doUnpark() {
-  if (needWallet()) return
-  const amount = document.getElementById('park-amount').value
-  if (!amount || parseFloat(amount) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
-  try {
-    setBusy(true); setStatus('Возвращаем из парковки…', 'info')
-    await (await contract.unpark(ethers.utils.parseUnits(amount, DEC))).wait()
-    setStatus('Доли снова участвуют в распределении.', 'success')
-    document.getElementById('park-amount').value = ''
-    await Promise.all([loadStats(), loadDividends(), loadContractInfo()])
-  } catch (e) { setStatus('Не удалось вернуть: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doCreateOTC() {
-  if (needWallet()) return
-  const buyer = document.getElementById('otc-buyer').value.trim()
-  const units = document.getElementById('otc-units').value
-  const price = document.getElementById('otc-price').value
-  const days = parseInt(document.getElementById('otc-days').value, 10)
-  const token = pickedToken('otc-token')
-
-  if (!ethers.utils.isAddress(buyer)) { setStatus('Введите корректный адрес покупателя.', 'error'); return }
-  if (buyer.toLowerCase() === userAddr.toLowerCase()) { setStatus('Нельзя продавать самому себе.', 'error'); return }
-  if (!units || parseFloat(units) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
-  if (!price || parseFloat(price) <= 0) { setStatus('Укажите цену.', 'error'); return }
-  if (!token) { setStatus('Выберите токен оплаты.', 'error'); return }
-  if (!days || days < 1 || days > 364) { setStatus('Срок — от 1 до 364 дней.', 'error'); return }
-
-  try {
-    setBusy(true)
-    const unitsRaw = ethers.utils.parseUnits(units, DEC)
-    const m = tokenMeta[token.toLowerCase()] || await fetchMeta(token)
-    const priceRaw = ethers.utils.parseUnits(price, m.decimals)
-
-    const free = await contract.freeBalanceOf(userAddr)
-    if (free.lt(unitsRaw)) {
-      setStatus(`Свободных долей только ${exact(free, DEC)}. Отмените открытое предложение, чтобы освободить.`, 'error'); return
-    }
-    const existing = await contract.otcOffers(userAddr, buyer)
-    if (existing.units.gt(0)) { setStatus('Этому адресу уже есть предложение — сначала отмените его.', 'error'); return }
-
-    const deadline = Math.floor(Date.now() / 1000) + days * 86400
-    setStatus('Создаём предложение…', 'info')
-    await (await contract.createOTC(buyer, unitsRaw, priceRaw, token, deadline)).wait()
-    setStatus(`Предложение создано для ${shortAddr(buyer)}.`, 'success')
-    document.getElementById('otc-buyer').value = ''
-    document.getElementById('otc-units').value = ''
-    document.getElementById('otc-price').value = ''
-    await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Не удалось создать предложение: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function fetchMeta(addr) {
-  try {
-    const tok = new ethers.Contract(addr, ERC20_ABI, rpc)
-    const [sym, dec] = await Promise.all([tok.symbol(), tok.decimals()])
-    const m = { symbol: sym, decimals: dec }
-    tokenMeta[addr.toLowerCase()] = m
-    return m
-  } catch { return { symbol: shortAddr(addr), decimals: 18 } }
-}
-
-async function doCancelOTC(buyer) {
-  if (needWallet()) return
-  try {
-    setBusy(true); setStatus('Отменяем…', 'info')
-    await (await contract.cancelOTC(buyer)).wait()
-    setStatus('Предложение отменено, доли разблокированы.', 'success')
-    await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Не удалось отменить: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doCancelExpiredOTC(seller, buyer) {
-  if (needWallet()) return
-  try {
-    setBusy(true); setStatus('Снимаем истёкшее предложение…', 'info')
-    await (await contract.cancelExpiredOTC(seller, buyer)).wait()
-    setStatus('Снято, доли вернулись продавцу.', 'success')
-    await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function ensureAllowance(tokenAddr, amount, m) {
-  const tok = new ethers.Contract(tokenAddr, ERC20_ABI, signer)
-  const bal = await tok.balanceOf(userAddr)
-  if (bal.lt(amount)) {
-    setStatus(`Нужно ${exact(amount, m.decimals)} ${m.symbol}, а на балансе ${exact(bal, m.decimals)}.`, 'error')
-    return false
-  }
-  const al = await tok.allowance(userAddr, CONTRACT_ADDR)
-  if (al.lt(amount)) {
-    setStatus(`Разрешаем списание ${m.symbol}…`, 'info')
-    await (await tok.approve(CONTRACT_ADDR, ethers.constants.MaxUint256)).wait()
-  }
-  return true
-}
-
-async function doExecuteOTC(seller) {
-  if (needWallet()) return
-  try {
-    setBusy(true)
-    const o = await contract.otcOffers(seller, userAddr)
-    if (o.units.isZero()) { setStatus('Это предложение больше недоступно.', 'error'); await loadOffers(); return }
-    if (o.deadline.toNumber() <= Math.floor(Date.now() / 1000)) { setStatus('Срок предложения истёк.', 'error'); await loadOffers(); return }
-
-    const m = meta(o.paymentToken)
-    if (!confirm(
-      `Купить ${exact(o.units, DEC)} долей\n` +
-      `Заплатить ${exact(o.price, m.decimals)} ${m.symbol}\n` +
-      `Продавец ${seller}`
-    )) return
-
-    if (!await ensureAllowance(o.paymentToken, o.price, m)) return
-
-    setStatus('Покупаем доли…', 'info')
-    // expectedUnits / maxPrice / expectedToken — защита от подмены условий
-    await (await contract.executeOTC(seller, o.units, o.price, o.paymentToken)).wait()
-    setStatus('Готово. Доли ваши и уже приносят доход.', 'success')
-    await refreshAll()
-  } catch (e) { setStatus('Покупка не прошла: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doCreateLease() {
-  if (needWallet()) return
-  const renter = document.getElementById('lease-renter').value.trim()
-  const units = document.getElementById('lease-units').value
-  const price = document.getElementById('lease-price').value
-  const durDays = parseInt(document.getElementById('lease-duration').value, 10)
-  const offDays = parseInt(document.getElementById('lease-days').value, 10)
-  const token = pickedToken('lease-token')
-
-  if (!ethers.utils.isAddress(renter)) { setStatus('Введите корректный адрес арендатора.', 'error'); return }
-  if (renter.toLowerCase() === userAddr.toLowerCase()) { setStatus('Нельзя сдать самому себе.', 'error'); return }
-  if (!units || parseFloat(units) <= 0) { setStatus('Укажите количество долей.', 'error'); return }
-  if (!price || parseFloat(price) <= 0) { setStatus('Укажите платёж.', 'error'); return }
-  if (!token) { setStatus('Выберите токен оплаты.', 'error'); return }
-  if (!durDays || durDays < 1 || durDays > 730) { setStatus('Срок аренды — от 1 до 730 дней.', 'error'); return }
-  if (!offDays || offDays < 1 || offDays > 364) { setStatus('Срок предложения — от 1 до 364 дней.', 'error'); return }
-
-  try {
-    setBusy(true)
-    const unitsRaw = ethers.utils.parseUnits(units, DEC)
-    const m = tokenMeta[token.toLowerCase()] || await fetchMeta(token)
-    const priceRaw = ethers.utils.parseUnits(price, m.decimals)
-
-    const free = await contract.freeBalanceOf(userAddr)
-    if (free.lt(unitsRaw)) { setStatus(`Свободных долей только ${exact(free, DEC)}.`, 'error'); return }
-    const existing = await contract.leases(userAddr, renter)
-    if (existing.units.gt(0)) { setStatus('Этому адресу уже есть предложение аренды — сначала отмените его.', 'error'); return }
-
-    const offerDeadline = Math.floor(Date.now() / 1000) + offDays * 86400
-    setStatus('Создаём предложение аренды…', 'info')
-    await (await contract.createLease(renter, unitsRaw, priceRaw, token, durDays * 86400, offerDeadline)).wait()
-    setStatus(`Предложение аренды создано для ${shortAddr(renter)}.`, 'success')
-    document.getElementById('lease-renter').value = ''
-    document.getElementById('lease-units').value = ''
-    document.getElementById('lease-price').value = ''
-    await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Не удалось создать аренду: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doExecuteLease(lessor) {
-  if (needWallet()) return
-  try {
-    setBusy(true)
-    const l = await contract.leaseInfo(lessor, userAddr)
-    if (l.units.isZero()) { setStatus('Предложение больше недоступно.', 'error'); await loadOffers(); return }
-    if (l.executed) { setStatus('Аренда уже исполнена.', 'error'); await loadOffers(); return }
-    if (l.offerDeadline.toNumber() <= Math.floor(Date.now() / 1000)) { setStatus('Срок предложения истёк.', 'error'); await loadOffers(); return }
-
-    const m = meta(l.paymentToken)
-    const days = Math.round(l.duration.toNumber() / 86400)
-    if (!confirm(
-      `Арендовать доход по ${exact(l.units, DEC)} долям\n` +
-      `Срок ${days} дн.\n` +
-      `Заплатить сразу ${exact(l.price, m.decimals)} ${m.symbol}\n` +
-      `Арендодатель ${lessor}\n\n` +
-      `Доли остаются его собственностью. Перепродать или пересдать их нельзя.`
-    )) return
-
-    if (!await ensureAllowance(l.paymentToken, l.price, m)) return
-
-    setStatus('Оформляем аренду…', 'info')
-    await (await contract.executeLease(lessor, l.units, l.price, l.paymentToken, l.duration)).wait()
-    setStatus('Аренда оформлена. Дивиденды по этим долям идут вам до конца срока.', 'success')
-    await refreshAll()
-  } catch (e) { setStatus('Не удалось оформить аренду: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doCancelLease(renter) {
-  if (needWallet()) return
-  try {
-    setBusy(true); setStatus('Отменяем предложение…', 'info')
-    await (await contract.cancelLease(renter)).wait()
-    setStatus('Предложение отменено, доли разблокированы.', 'success')
-    await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Не удалось отменить: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doCancelExpiredLease(lessor, renter) {
-  if (needWallet()) return
-  try {
-    setBusy(true); setStatus('Снимаем истёкшее предложение…', 'info')
-    await (await contract.cancelExpiredLease(lessor, renter)).wait()
-    setStatus('Снято, доли вернулись арендодателю.', 'success')
-    await Promise.all([loadStats(), loadOffers()])
-  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doEndLease(lessor, renter) {
-  if (needWallet()) return
-  try {
-    setBusy(true); setStatus('Завершаем аренду…', 'info')
-    await (await contract.endLease(lessor, renter)).wait()
-    setStatus('Аренда завершена, доли вернулись арендодателю.', 'success')
-    await refreshAll()
-  } catch (e) { setStatus('Не удалось завершить: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-// ---------- Панель владельца ----------
-
-let isOwner = false
-
-async function loadAdmin() {
-  const c = contract || contractRO
-  const admEl = document.getElementById('admin-card')
-  const pendEl = document.getElementById('pending-owner-card')
-  if (!c || !userAddr) { admEl.classList.remove('show'); pendEl.classList.remove('show'); return }
-
-  try {
-    const [owner, pending] = await Promise.all([c.owner(), c.pendingOwner()])
-    isOwner = owner.toLowerCase() === userAddr.toLowerCase()
-    const isPending = pending !== ethers.constants.AddressZero
-      && pending.toLowerCase() === userAddr.toLowerCase()
-
-    admEl.classList.toggle('show', isOwner)
-    pendEl.classList.toggle('show', isPending)
-    if (!isOwner) return
-
-    const [len, max] = await Promise.all([c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS()])
-    document.getElementById('adm-slots').textContent =
-      `Занято слотов: ${len.toString()} из ${max.toString()}. Освободить нельзя.`
-
-    // Ожидающая передача владения
-    const pendBox = document.getElementById('adm-pending')
-    pendBox.innerHTML = pending !== ethers.constants.AddressZero
-      ? `<div class="danger-box"><strong>Передача уже запущена</strong>
-         Ждём принятия от ${esc(shortAddr(pending))}. Пока не принято, полномочия у вас.
-         Новая передача на другой адрес заменит эту.</div>`
-      : ''
-
-    // Список токенов с переключателем паузы
-    const rows = await Promise.all(distTokens.map(async addr => {
-      const m = meta(addr)
-      const paused = await c.syncPaused(addr)
-      return `<div class="pause-row">
-        <div>
-          <div class="token-name">${esc(m.symbol)} ${paused ? '<span class="badge warn">На паузе</span>' : '<span class="badge ok">Активен</span>'}</div>
-          <div class="token-addr">${shortAddr(addr)}</div>
-        </div>
-        <button class="btn-claim" onclick="doSetPause('${addr}',${paused ? 'false' : 'true'})">
-          ${paused ? 'Снять паузу' : 'Поставить паузу'}
-        </button>
-      </div>`
-    }))
-    document.getElementById('adm-pause-list').innerHTML =
-      rows.length ? rows.join('') : '<div class="empty-state">Распределяемых токенов нет.</div>'
-  } catch (e) { console.error('loadAdmin', e) }
-}
-
-/// Всё, что можно проверить ДО необратимой транзакции.
-async function checkTokenBeforeAdd() {
-  const c = contract || contractRO
-  const el = document.getElementById('adm-token-check')
-  const btn = document.getElementById('btn-add-token')
-  const addr = document.getElementById('adm-token-addr').value.trim()
-  btn.disabled = true
-  el.innerHTML = ''
-
-  if (!ethers.utils.isAddress(addr)) {
-    el.innerHTML = '<div class="check-item fail">✕ Некорректный адрес</div>'; return
-  }
-
-  const checks = []
-  let allPass = true
-  const add = (ok, text) => { checks.push({ ok, text }); if (!ok) allPass = false }
-
-  try {
-    const code = await rpc.getCode(addr)
-    add(code !== '0x', code !== '0x' ? 'По адресу есть контракт' : 'По адресу нет контракта — это EOA или пустой адрес')
-
-    if (addr.toLowerCase() === CONTRACT_ADDR.toLowerCase()) {
-      add(false, 'Нельзя добавить сам контракт долей')
-    }
-
-    const [already, was, len, max] = await Promise.all([
-      c.isDistributionToken(addr), c.wasDistributionToken(addr),
-      c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS(),
-    ])
-    add(!already, already ? 'Токен уже добавлен' : 'Токен ещё не добавлен')
-    if (was && !already) add(false, 'Токен уже был распределяемым раньше')
-    add(len.lt(max), len.lt(max) ? `Свободных слотов: ${max.sub(len).toString()}` : 'Слоты кончились')
-
-    // balanceOf вызывается в горячем пути каждого перевода долей
-    try {
-      const tok = new ethers.Contract(addr, ERC20_ABI, rpc)
-      const bal = await tok.balanceOf(CONTRACT_ADDR)
-      add(true, `balanceOf отвечает, сейчас на контракте: ${exact(bal, 18)}`)
-      try {
-        const [sym, dec] = await Promise.all([tok.symbol(), tok.decimals()])
-        add(true, `Токен: ${sym}, знаков: ${dec}`)
-      } catch { add(true, 'symbol/decimals не читаются — не критично') }
-    } catch {
-      add(false, 'balanceOf не отвечает — добавлять нельзя, сломает переводы долей')
-    }
-  } catch (e) {
-    add(false, 'Ошибка проверки: ' + errText(e))
-  }
-
-  el.innerHTML = checks.map(ch =>
-    `<div class="check-item ${ch.ok ? 'pass' : 'fail'}">${ch.ok ? '✓' : '✕'} <span>${esc(ch.text)}</span></div>`
-  ).join('')
-
-  if (allPass) {
-    el.innerHTML += '<div class="check-item pass">✓ Автоматические проверки пройдены. Fee-on-transfer и rebase проверить программно нельзя — убедитесь вручную.</div>'
-    btn.disabled = false
-  }
-}
-
-async function doAddDistToken() {
-  if (needWallet()) return
-  const addr = document.getElementById('adm-token-addr').value.trim()
-  if (!ethers.utils.isAddress(addr)) { setStatus('Некорректный адрес токена.', 'error'); return }
-
-  const typed = prompt(
-    'НЕОБРАТИМОЕ ДЕЙСТВИЕ\n\n' +
-    'Токен ' + addr + ' будет добавлен в распределение навсегда.\n' +
-    'Убрать его из списка нельзя. Вывести через rescue — тоже нельзя, никогда.\n\n' +
-    'Для подтверждения введите: ДОБАВИТЬ'
-  )
-  if (typed !== 'ДОБАВИТЬ') { setStatus('Отменено.', 'info'); return }
-
-  try {
-    setBusy(true); setStatus('Добавляем токен…', 'info')
-    await (await contract.addDistributionToken(addr)).wait()
-    setStatus('Токен добавлен в распределение. Действие необратимо.', 'success')
-    document.getElementById('adm-token-addr').value = ''
-    document.getElementById('adm-token-check').innerHTML = ''
-    document.getElementById('btn-add-token').disabled = true
-    await refreshAll()
-  } catch (e) { setStatus('Не удалось добавить: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doSetPause(addr, pause) {
-  if (needWallet()) return
-  const m = meta(addr)
-  if (pause) {
-    if (!confirm(
-      `Поставить паузу синхронизации ${m.symbol}?\n\n` +
-      `Приток перестанет раскладываться по держателям. Начисленное ранее остаётся доступным.\n\n` +
-      `ВАЖНО: при активной паузе нарушается порядок «синхронизация до перемещения веса» — ` +
-      `покупатель долей может получить часть дохода за период продавца. Держите паузу минимально.`
-    )) return
-  } else {
-    if (!confirm(
-      `Снять паузу с ${m.symbol}?\n\n` +
-      `Сразу после снятия вызовите «Разложить» по этому токену, ` +
-      `чтобы накопленное за паузу разошлось по держателям.`
-    )) return
-  }
-  try {
-    setBusy(true); setStatus(pause ? 'Ставим паузу…' : 'Снимаем паузу…', 'info')
-    await (await contract.setTokenSyncPaused(addr, pause)).wait()
-    setStatus(pause ? 'Пауза установлена.' : 'Пауза снята. Не забудьте «Разложить».', 'success')
-    await refreshAll()
-  } catch (e) { setStatus('Не удалось: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doRescue() {
-  if (needWallet()) return
-  const token = document.getElementById('adm-rescue-token').value.trim()
-  const to = document.getElementById('adm-rescue-to').value.trim()
-  if (!ethers.utils.isAddress(token)) { setStatus('Некорректный адрес токена.', 'error'); return }
-  if (!ethers.utils.isAddress(to)) { setStatus('Некорректный адрес получателя.', 'error'); return }
-
-  try {
-    setBusy(true)
-    // Проверяем заранее, чтобы не тратить газ на заведомый revert
-    const was = await contract.wasDistributionToken(token)
-    if (was) {
-      setStatus('Этот токен распределялся контрактом — вывести его нельзя никогда.', 'error'); return
-    }
-    if (token.toLowerCase() === CONTRACT_ADDR.toLowerCase()) {
-      setStatus('Припаркованные доли защищены, вывести их нельзя.', 'error'); return
-    }
-    const tok = new ethers.Contract(token, ERC20_ABI, rpc)
-    let amountTxt = ''
-    try {
-      const [bal, sym, dec] = await Promise.all([tok.balanceOf(CONTRACT_ADDR), tok.symbol(), tok.decimals()])
-      if (bal.isZero()) { setStatus('На контракте нет этого токена.', 'error'); return }
-      amountTxt = `${exact(bal, dec)} ${sym}`
-    } catch { amountTxt = 'весь баланс' }
-
-    if (!confirm(`Вывести ${amountTxt}\nна адрес ${to}?`)) return
-
-    setStatus('Выводим…', 'info')
-    await (await contract.rescue(token, to)).wait()
-    setStatus('Выведено.', 'success')
-    document.getElementById('adm-rescue-token').value = ''
-    await loadContractInfo()
-  } catch (e) { setStatus('Не удалось вывести: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doTransferOwnership() {
-  if (needWallet()) return
-  const to = document.getElementById('adm-new-owner').value.trim()
-  if (!ethers.utils.isAddress(to)) { setStatus('Некорректный адрес.', 'error'); return }
-  if (to.toLowerCase() === userAddr.toLowerCase()) { setStatus('Вы уже владелец.', 'error'); return }
-
-  if (!confirm(
-    `Передать владение адресу ${to}?\n\n` +
-    `Передача двухшаговая: пока новый владелец не вызовет «Принять», полномочия остаются у вас. ` +
-    `Это защищает от передачи на неверный адрес.\n\n` +
-    `Убедитесь, что этот адрес контролируется вами или доверенным мультисигом ` +
-    `и способен отправлять транзакции.`
-  )) return
-
-  try {
-    setBusy(true); setStatus('Передаём владение…', 'info')
-    await (await contract.transferOwnership(to)).wait()
-    setStatus(`Передача запущена. Ждём принятия от ${shortAddr(to)}.`, 'success')
-    document.getElementById('adm-new-owner').value = ''
-    await loadAdmin()
-  } catch (e) { setStatus('Не удалось передать: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-async function doAcceptOwnership() {
-  if (needWallet()) return
-  if (!confirm('Принять владение контрактом?')) return
-  try {
-    setBusy(true); setStatus('Принимаем владение…', 'info')
-    await (await contract.acceptOwnership()).wait()
-    setStatus('Вы теперь владелец контракта.', 'success')
-    await refreshAll()
-  } catch (e) { setStatus('Не удалось принять: ' + errText(e), 'error') }
-  finally { setBusy(false) }
-}
-
-if (contractRO) {
-  loadTokenMeta().then(() => Promise.all([loadStats(), loadContractInfo()]))
-} else {
-  setStatus('На странице не задан адрес контракта.', 'error')
-}
+    const net = await rpc.getNetwork()
+    const pill = $('net-pill')
+    pill.textContent = net.chainId === 1 ? 'MAINNET' : net.chainId === 11155111 ? 'Sepolia' : 'chain ' + net.chainId
+    if (net.chainId === 1) pill.classList.add('main')
+  } catch {}
+  try { await loadTokens(); await loadInfo() } catch {}
+})()
 </script>
 </body>
 </html>
