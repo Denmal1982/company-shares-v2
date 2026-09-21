@@ -168,7 +168,6 @@ input:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--p
       <button class="tab" onclick="pick(event,'setPause')">Пауза</button>
       <button class="tab" onclick="pick(event,'rescue')">Вывод чужого</button>
       <button class="tab" onclick="pick(event,'transferOwner')">Передать владение</button>
-      <button class="tab" onclick="pick(event,'signers')">Подписанты</button>
     </div>
 
     <div class="panel active" id="p-accept">
@@ -227,35 +226,6 @@ input:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--p
       </div>
     </div>
 
-    <div class="panel" id="p-signers">
-      <div class="note-box">
-        Это операции <b>самого Safe</b>, а не BPS: транзакция уйдёт на адрес Safe.
-        Согласуются они так же — теми же подписями и тем же порогом, который действует сейчас.
-      </div>
-      <div class="row">
-        <label for="g-op">Что сделать</label>
-        <select id="g-op" onchange="signerOp()">
-          <option value="add">Добавить подписанта</option>
-          <option value="remove">Удалить подписанта</option>
-          <option value="swap">Заменить подписанта</option>
-          <option value="threshold">Изменить только порог</option>
-        </select>
-      </div>
-      <div class="row" id="g-row-new">
-        <label for="g-new">Новый подписант</label>
-        <input class="mono" id="g-new" placeholder="0x..." autocomplete="off"/>
-      </div>
-      <div class="row hidden" id="g-row-old">
-        <label for="g-old">Кого убрать или заменить</label>
-        <select id="g-old"></select>
-      </div>
-      <div class="row" id="g-row-thr">
-        <label for="g-thr">Новый порог</label>
-        <input id="g-thr" type="number" min="1" step="1" value="2"/>
-        <div class="hint" id="g-thr-hint"></div>
-      </div>
-      <div class="warn-box hidden" id="g-warn"></div>
-    </div>
 
     <button class="btn btn-primary btn-wide" onclick="prepare()">Подготовить и посчитать хеш</button>
   </div>
@@ -495,14 +465,6 @@ async function loadSafe() {
         ${o.toLowerCase() === me.toLowerCase() ? '<span class="badge ok">это вы</span>' : ''}
       </div>`).join('')
 
-    const sel = $('g-old')
-    if (sel) {
-      sel.innerHTML = owners.map(o =>
-        `<option value="${o}">${o}${o.toLowerCase() === me.toLowerCase() ? ' — это вы' : ''}</option>`).join('')
-      $('g-thr').value = threshold
-      signerOp()
-    }
-
     $('card-state').classList.remove('hidden')
     $('card-action').classList.remove('hidden')
     $('card-settings').classList.remove('hidden')
@@ -601,7 +563,8 @@ function decodeView(data, to) {
   const target = `<span class="chunk">цель: <b>${onSafe ? 'сам Safe — меняются подписанты или порог' : 'контракт BPS'}</b> ${short(to)}</span>`
   const sel = data.slice(0, 10)
   const args = parsed.args.map((a, k) => {
-    const name = parsed.functionFragment.inputs[k].name
+    const inp = parsed.functionFragment.inputs[k]
+    const name = inp.name || `${inp.type} #${k + 1}`
     return `<span class="chunk"><span class="arg">${esc(name)} = ${esc(String(a))}</span></span>`
   }).join('')
   return target + `<span class="chunk"><span class="sel">${sel}</span> → ${esc(parsed.name)}</span>${args}`
@@ -649,11 +612,12 @@ async function refreshApprovals() {
 }
 
 async function approve() {
-  if (action === 'signers') {
+  if (action.startsWith('safe:')) {
     if (!confirm(
       'Операция изменит состав подписантов или порог Safe.\n\n' +
-      'Ошибка здесь может лишить доступа к управлению контрактом навсегда.\n' +
-      'Убедитесь, что новый адрес рабочий и вы контролируете его ключ.'
+      'Убедитесь, что после изменения оставшиеся подписанты смогут набрать порог, ' +
+      'а новые адреса рабочие и их ключи под контролем. Иначе Safe — и вместе с ним ' +
+      'управление BPS — станут недоступны навсегда.'
     )) return
   }
   if (action === 'addToken') {
