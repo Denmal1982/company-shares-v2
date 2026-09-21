@@ -355,6 +355,11 @@ const SAFE_ABI = [
   "function removeOwner(address prevOwner, address owner, uint256 _threshold)",
   "function swapOwner(address prevOwner, address oldOwner, address newOwner)",
   "function changeThreshold(uint256 _threshold)",
+  "function setup(address[] _owners, uint256 _threshold, address to, bytes data, address fallbackHandler, address paymentToken, uint256 payment, address paymentReceiver)",
+]
+const FACTORY_ABI = [
+  "function createProxyWithNonce(address _singleton, bytes initializer, uint256 saltNonce) returns (address proxy)",
+  "event ProxyCreation(address indexed proxy, address singleton)",
 ]
 const SENTINEL = "0x0000000000000000000000000000000000000001"
 const BPS_ABI = [
@@ -396,10 +401,38 @@ function copyText(t) {
 
 // ---------- подключение ----------
 
+// EIP-6963: современные кошельки объявляют себя событием, а не только через window.ethereum.
+// Это решает конфликт, когда установлено несколько расширений.
+const announced = []
+window.addEventListener('eip6963:announceProvider', (e) => announced.push(e.detail))
+window.dispatchEvent(new Event('eip6963:requestProvider'))
+
+/// Расширение встраивается асинхронно — даём ему немного времени.
+async function findWallet() {
+  for (let i = 0; i < 20; i++) {
+    const mm = announced.find(d => /metamask/i.test(d.info?.name || d.info?.rdns || ''))
+    if (mm) return mm.provider
+    if (announced.length) return announced[0].provider
+    if (window.ethereum) {
+      return window.ethereum.providers?.find(p => p.isMetaMask) || window.ethereum
+    }
+    await new Promise(r => setTimeout(r, 100))
+  }
+  return null
+}
+
 async function connect() {
-  const eth = window.ethereum?.isMetaMask ? window.ethereum
-    : window.ethereum?.providers?.find(p => p.isMetaMask) || window.ethereum
-  if (!eth) { say('Кошелёк не найден. Установите MetaMask.', 'error'); return }
+  const eth = await findWallet()
+  if (!eth) {
+    if (location.protocol === 'file:') {
+      say('Страница открыта как локальный файл (file://), а MetaMask в такие страницы по умолчанию не встраивается. ' +
+          'Откройте её через https (GitHub Pages) или http://localhost, либо в chrome://extensions → MetaMask → «Сведения» ' +
+          'включите «Разрешить доступ к URL файлов» и перезагрузите страницу.', 'error')
+    } else {
+      say('Кошелёк не найден. Если MetaMask установлен — проверьте, что расширение включено, и перезагрузите страницу.', 'error')
+    }
+    return
+  }
   try {
     provider = new ethers.providers.Web3Provider(eth)
     await provider.send('eth_requestAccounts', [])
@@ -740,6 +773,13 @@ async function createSafe() {
 }
 
 // ---------- старт ----------
+
+if (location.protocol === 'file:') {
+  setTimeout(async () => {
+    if (!(await findWallet())) say('Страница открыта как локальный файл — MetaMask сюда может не встроиться. ' +
+      'Надёжнее открыть через GitHub Pages или http://localhost.', 'info')
+  }, 300)
+}
 
 const q = new URLSearchParams(location.search)
 if (q.get('safe')) $('in-safe').value = q.get('safe')
