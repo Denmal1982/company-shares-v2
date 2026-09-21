@@ -304,8 +304,10 @@ input:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--p
 
     <div class="row" style="margin-top:16px">
       <label for="in-sigs">Собранные офчейн-подписи (по 65 байт, без разделителей)</label>
-      <input class="mono" id="in-sigs" placeholder="0x... необязательно" autocomplete="off"/>
-      <div class="hint">Заполняйте, только если согласовывали подписи офчейн. Порядок — по возрастанию адреса подписанта; кнопка «Исполнить» отсортирует введённые ниже подписи сама, если вы перечислите их через запятую.</div>
+      <textarea id="in-sigs" rows="3" oninput="refreshExecState()" placeholder="0x... — по одной на строку, порядок любой" style="width:100%;padding:9px 12px;font-family:var(--mono);font-size:12px;border:1px solid var(--border);border-radius:var(--radius-sm);resize:vertical"></textarea>
+      <div id="sigs-preview"></div>
+      <div id="sigs-mine"></div>
+      <div class="hint">Вставляйте подписи в любом порядке — страница сама проверит, чья каждая, отбросит чужие и повторы, отсортирует по адресу и сложит с одобрениями ончейн. Подходят подписи из кнопки «Подписать офчейн» и из <code>cast wallet sign --no-hash</code>.</div>
     </div>
   </div>
 </div>
@@ -608,7 +610,7 @@ async function refreshApprovals() {
   $('btn-approve').disabled = !amOwner || iApproved
   $('btn-approve').textContent = iApproved ? 'Вы уже одобрили' : 'Одобрить ончейн'
   $('btn-sign').disabled = !amOwner
-  $('btn-exec').disabled = approved.length < threshold && !$('in-sigs').value.trim()
+  refreshExecState()
 }
 
 async function approve() {
@@ -638,35 +640,83 @@ async function approve() {
 async function signOffchain() {
   try {
     const sig = await signer.signMessage(ethers.utils.arrayify(window._hash))
-    // personal_sign добавляет префикс — Safe узнаёт это по v > 30
+    // personal_sign добавляет префикс — Safe узнаёт такие подписи по v > 30
     const p = ethers.utils.splitSignature(sig)
     const adjusted = ethers.utils.hexConcat([p.r, p.s, ethers.utils.hexlify(p.v + 4)])
-    prompt('Ваша подпись. Передайте её сборщику:', adjusted)
+    const box = $('sigs-mine')
+    if (box) box.innerHTML = `<div class="blob-label" style="margin-top:12px">Ваша подпись <button class="copy" onclick="copyText('${adjusted}')">копировать</button></div><div class="blob">${adjusted}</div><div class="hint">Передайте её тому, кто будет нажимать «Исполнить». Действительна только для этого хеша и этого nonce.</div>`
+    const ta = $('in-sigs')
+    if (ta && !ta.value.includes(adjusted.slice(2))) { ta.value = (ta.value.trim() + '\n' + adjusted).trim(); refreshExecState() }
+    say('Подписано. Подпись добавлена в поле ниже и показана для копирования.', 'success')
   } catch (e) { say('Не удалось подписать: ' + errText(e), 'error') }
 }
 
 // ---------- исполнение ----------
 
-function approvalSignatures() {
-  const sorted = [...window._approved].sort((a, b) =>
-    ethers.BigNumber.from(a).lt(ethers.BigNumber.from(b)) ? -1 : 1)
-  return '0x' + sorted.map(a =>
-    ethers.utils.hexZeroPad(a, 32).slice(2) + '0'.repeat(64) + '01').join('')
+
+/// Собирает подписи из обоих источников и возвращает их в виде, который примет Safe.
+///   ончейн: approveHash → псевдоподпись {r = адрес, s = 0, v = 1}
+///   офчейн: v = 31/32 → personal_sign (Safe снимает префикс и вычитает 4)
+///           v = 27/28 → подпись голого хеша (cast wallet sign --no-hash)
+/// Safe требует строгий порядок по возрастанию адреса подписанта.
+function collectSignatures() {
+  const byOwner = new Map()
+  const problems = []
+  const isOwner = (a) => owners.some(o => o.toLowerCase() === a.toLowerCase())
+
+  for (const a of (window._approved || [])) {
+    byOwner.set(a.toLowerCase(), { owner: a, how: 'ончейн',
+      sig: ethers.utils.hexZeroPad(a, 32).slice(2) + '0'.repeat(64) + '01' })
+  }
+
+  const raw = ($('in-sigs')?.value || '').split(/[\s,;]+/).map(x => x.trim()).filter(Boolean)
+  for (const item of raw) {
+    const hex = item.replace(/^0x/, '')
+    if (!/^[0-9a-fA-F]{130}$/.test(hex)) { problems.push(`не 65 байт: ${item.slice(0, 14)}…`); continue }
+    const r = '0x' + hex.slice(0, 64), sPart = '0x' + hex.slice(64, 128)
+    const v = parseInt(hex.slice(128, 130), 16)
+    let signerAddr
+    try {
+      if (v === 31 || v === 32) {
+        signerAddr = ethers.utils.verifyMessage(ethers.utils.arrayify(window._hash),
+          ethers.utils.joinSignature({ r, s: sPart, v: v - 4 }))
+      } else if (v === 27 || v === 28) {
+        signerAddr = ethers.utils.recoverAddress(window._hash, { r, s: sPart, v })
+      } else { problems.push(`неизвестный формат v=${v}`); continue }
+    } catch { problems.push(`не читается: ${item.slice(0, 14)}…`); continue }
+
+    if (!isOwner(signerAddr)) {
+      problems.push(`подпись не от подписанта Safe (${short(signerAddr)}) — скорее всего, подписан другой хеш или nonce уже сменился`)
+      continue
+    }
+    if (!byOwner.has(signerAddr.toLowerCase()))
+      byOwner.set(signerAddr.toLowerCase(), { owner: signerAddr, how: 'офчейн', sig: hex })
+  }
+
+  const list = [...byOwner.values()].sort((a, b) =>
+    ethers.BigNumber.from(a.owner).lt(ethers.BigNumber.from(b.owner)) ? -1 : 1)
+  return { list, problems, packed: '0x' + list.map(x => x.sig).join('') }
+}
+
+function refreshExecState() {
+  if (!window._hash) return
+  const { list, problems } = collectSignatures()
+  const box = $('sigs-preview')
+  if (box) {
+    const rows = list.map(x => `<div class="signer"><span class="signer-addr">${x.owner}</span><span class="badge ok">${x.how}</span></div>`).join('')
+    const bad = problems.map(p => `<div class="hint" style="color:var(--red)">✕ ${esc(p)}</div>`).join('')
+    box.innerHTML = (list.length ? `<div class="blob-label" style="margin-top:10px">Будут отправлены — ${list.length} из ${threshold}</div>${rows}` : '') + bad
+  }
+  $('appr-progress').textContent = `${list.length} из ${threshold}`
+  $('btn-exec').disabled = list.length < threshold
 }
 
 async function execute() {
   try {
-    const manual = $('in-sigs').value.trim()
-    let sigs
-    if (manual) {
-      const parts = manual.split(',').map(x => x.trim().replace(/^0x/, '')).filter(Boolean)
-      if (parts.some(p => p.length !== 130)) throw new Error('Каждая подпись должна быть ровно 65 байт.')
-      sigs = '0x' + parts.join('')
-      if (parts.length < threshold) throw new Error('Подписей меньше порога.')
-    } else {
-      if (window._approved.length < threshold) throw new Error('Одобрений меньше порога.')
-      sigs = approvalSignatures()
-    }
+    const { list, problems, packed } = collectSignatures()
+    if (list.length < threshold)
+      throw new Error(`Подписей ${list.length} из ${threshold}.` + (problems.length ? ' ' + problems.join('; ') : ''))
+    const sigs = packed
 
     say('Отправляем транзакцию…', 'info')
     const tx = await safe.execTransaction(
