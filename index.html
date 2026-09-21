@@ -98,6 +98,13 @@ input:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--p
 .note{font-size:12.5px;line-height:1.6;padding:11px 13px;border-radius:var(--rs);background:var(--amber-bg);border:1px solid #fde68a;color:#7c4a06;margin-bottom:12px}
 .empty{font-size:13px;color:var(--txt3);text-align:center;padding:22px 0;line-height:1.6}
 code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5px;border-radius:4px}
+.owner{border-color:#fcd9a5;background:linear-gradient(180deg,#fffdf7,var(--bg1))}
+.danger{font-size:12.5px;line-height:1.6;padding:11px 13px;border-radius:var(--rs);background:var(--red-bg);border:1px solid #fca5a5;color:#8c2020;margin-bottom:12px}
+.danger b{display:block;margin-bottom:3px;color:var(--red)}
+.btn-danger{width:100%;padding:12px;font-size:14px;border-color:var(--red);color:var(--red);background:var(--red-bg);margin-top:6px}
+.btn-danger:hover:not(:disabled){background:var(--red);color:#fff}
+.chk{font-size:12px;padding:4px 0;line-height:1.5}
+.chk.ok{color:var(--green)}.chk.bad{color:var(--red);font-weight:600}
 .hidden{display:none}
 </style>
 </head>
@@ -186,7 +193,65 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
       <div id="info"><div class="empty">Загрузка…</div></div>
     </div>
   </div>
+  <!-- ВЛАДЕЛЕЦ: кошелёк -->
+  <div class="card owner hidden" id="own-card">
+    <div class="card-t"><span>Панель владельца</span><span class="badge warn">вы владелец контракта</span></div>
+    <div class="note">Операции выполняются с вашего кошелька одной подписью. Для боевой сети владельцем должна быть мультиподпись: передайте владение Safe на вкладке «Владение».</div>
+    <div class="tabs">
+      <button class="tab active" onclick="tab(event,'o-add')">Токен дохода</button>
+      <button class="tab" onclick="tab(event,'o-pause')">Пауза учёта</button>
+      <button class="tab" onclick="tab(event,'o-rescue')">Вывод чужого</button>
+      <button class="tab" onclick="tab(event,'o-own')">Владение</button>
+    </div>
+
+    <div class="panel active" id="o-add">
+      <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен навсегда исключается из вывода через rescue. Каждый перевод долей дорожает на один внешний вызов.</div>
+      <div class="row"><label for="oa-token">Адрес токена</label><input class="mono" id="oa-token" placeholder="0x..." autocomplete="off"/>
+        <div class="hint">Fee-on-transfer и rebase-токены добавлять нельзя — программно они не определяются, проверьте токен сами.</div></div>
+      <div id="oa-check"></div>
+      <button class="btn btn-sec" onclick="ownCheckToken()">Проверить токен</button>
+      <button class="btn btn-danger" id="btn-own-add" onclick="ownAddToken()" disabled>Добавить необратимо</button>
+      <div class="hint" id="oa-slots"></div>
+    </div>
+
+    <div class="panel" id="o-pause">
+      <div class="note">Аварийный выключатель против распределяемого токена, чей <code>balanceOf</code> перестал отвечать и блокирует переводы долей. Не выключатель торговли и не заморозка выплат. Перед снятием паузы нажмите «Разложить» у токена в карточке «Контракт».</div>
+      <div id="op-list"><div class="empty">Распределяемых токенов нет.</div></div>
+    </div>
+
+    <div class="panel" id="o-rescue">
+      <div class="note">Только для токенов, которые <b>никогда</b> не были распределяемыми, — например, присланных на адрес контракта по ошибке.</div>
+      <div class="two">
+        <div class="row"><label for="or-token">Токен</label><input class="mono" id="or-token" placeholder="0x..." autocomplete="off"/></div>
+        <div class="row"><label for="or-to">Получатель</label><input class="mono" id="or-to" placeholder="0x..." autocomplete="off"/></div>
+      </div>
+      <button class="btn btn-danger" onclick="ownRescue()">Вывести</button>
+    </div>
+
+    <div class="panel" id="o-own">
+      <div class="note">Передача двухшаговая: пока новый владелец не примет, полномочия остаются у вас. Ошибку в адресе можно исправить, повторив передачу. Отказаться от владения нельзя — такой функции в контракте нет.</div>
+      <div id="oo-pending"></div>
+      <div class="row"><label for="oo-to">Новый владелец — адрес Safe или кошелька</label><input class="mono" id="oo-to" placeholder="0x..." autocomplete="off"/></div>
+      <button class="btn btn-danger" onclick="ownTransfer()">Передать владение</button>
+      <div class="hint">Если новый владелец — Safe, принять владение нужно в <a id="oo-safe-link" href="safe-admin.html">панели мультиподписи</a>.</div>
+    </div>
+  </div>
+
+  <!-- КАНДИДАТ ВО ВЛАДЕЛЬЦЫ: кошелёк -->
+  <div class="card owner hidden" id="pend-card">
+    <div class="card-t"><span>Вам передают владение контрактом</span><span class="badge warn">ожидает принятия</span></div>
+    <div class="note">Текущий владелец назначил вас кандидатом. Пока вы не примете, полномочия остаются у него.</div>
+    <button class="btn btn-primary" onclick="ownAccept()">Принять владение</button>
+  </div>
+
+  <!-- ВЛАДЕЛЕЦ: мультиподпись -->
+  <div class="card owner hidden" id="safe-card">
+    <div class="card-t"><span>Контрактом управляет мультиподпись</span><span class="badge ok">Safe</span></div>
+    <div class="note" style="margin-bottom:12px">Функции владельца выполняются только по подписям участников Safe — отсюда их вызвать нельзя.</div>
+    <a class="btn btn-primary" id="safe-card-link" href="safe-admin.html" style="display:block;text-align:center;text-decoration:none">Открыть панель мультиподписи</a>
+  </div>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
@@ -263,7 +328,16 @@ const ABI = [
   "error TooManyTokens()",
   "error TransferFailed()",
   "error ZeroAddress()",
-  "error ZeroAmount()"
+  "error ZeroAmount()",
+  "function addDistributionToken(address token)",
+  "function setTokenSyncPaused(address token, bool paused_)",
+  "function rescue(address token, address to)",
+  "function transferOwnership(address newOwner)",
+  "function acceptOwnership()",
+  "function isDistributionToken(address) view returns (bool)",
+  "function wasDistributionToken(address) view returns (bool)",
+  "function distributionTokensLength() view returns (uint256)",
+  "function MAX_DISTRIBUTION_TOKENS() view returns (uint256)"
 ]
 const ERC20_ABI = [
   "function symbol() view returns (string)",
@@ -351,8 +425,10 @@ function setBusy(v) {
   if (v) $('btn-claim-all').disabled = true
 }
 function tab(ev, id) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  // только внутри своей карточки: на странице несколько групп вкладок
+  const card = ev.currentTarget.closest('.card')
+  card.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  card.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
   ev.currentTarget.classList.add('active'); $(id).classList.add('active')
 }
 async function run(label, fn) {
@@ -408,7 +484,7 @@ async function connect() {
 // ---------- загрузка ----------
 async function refreshAll() {
   await loadTokens()
-  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadInfo()])
+  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadInfo(), loadOwner().catch(e => console.error('loadOwner', e))])
 }
 
 async function tokenMeta(a) {
@@ -656,6 +732,109 @@ const doPark = () => run('Паркуем', async () => {
 const doUnpark = () => run('Возвращаем', async () => {
   await (await bps.unpark(units('p-amt'))).wait(); $('p-amt').value = ''
   say('Доли снова приносят доход.', 'success')
+})
+
+// ---------- владелец ----------
+let ownerAddr = null, pendingAddr = null, ownerIsContract = false
+
+async function loadOwner() {
+  const c = ro()
+  ;[ownerAddr, pendingAddr] = await Promise.all([c.owner(), c.pendingOwner()])
+  ownerIsContract = (await reader().getCode(ownerAddr)) !== '0x'
+  const isMe = (a) => me && a && a.toLowerCase() === me.toLowerCase()
+  const amOwner = isMe(ownerAddr) && !ownerIsContract
+
+  $('own-card').classList.toggle('hidden', !amOwner)
+  $('pend-card').classList.toggle('hidden', !isMe(pendingAddr))
+  $('safe-card').classList.toggle('hidden', !ownerIsContract || !me)
+  $('safe-card-link').href = `safe-admin.html?safe=${ownerAddr}&bps=${BPS_ADDR}`
+  $('oo-safe-link').href = `safe-admin.html?bps=${BPS_ADDR}`
+  if (!amOwner) return
+
+  const [len, max] = await Promise.all([c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS()])
+  $('oa-slots').textContent = `Занято слотов: ${len} из ${max}. Освободить нельзя.`
+  const zero = ethers.constants.AddressZero
+  $('oo-pending').innerHTML = pendingAddr !== zero
+    ? `<div class="danger"><b>Передача уже запущена</b>Ждём принятия от ${esc(pendingAddr)}. Новая передача на другой адрес заменит эту.</div>` : ''
+
+  const rows = await Promise.all(tokens.map(async (a) => {
+    let paused = false; try { paused = await c.syncPaused(a) } catch {}
+    return `<div class="tok"><div class="tok-n"><div class="tok-name">${esc(m(a).symbol)} ${paused ? '<span class="badge warn">пауза</span>' : '<span class="badge ok">активен</span>'}</div><div class="tok-a">${short(a)}</div></div>
+      <button class="btn btn-sm" data-act onclick="ownPause('${a}', ${!paused})">${paused ? 'Снять паузу' : 'Поставить паузу'}</button></div>`
+  }))
+  $('op-list').innerHTML = rows.length ? rows.join('') : '<div class="empty">Распределяемых токенов нет.</div>'
+}
+
+/// Всё, что можно проверить до необратимой транзакции.
+async function ownCheckToken() {
+  const box = $('oa-check'), btn = $('btn-own-add')
+  btn.disabled = true
+  const lines = [], add = (ok, t) => lines.push({ ok, t })
+  try {
+    const t = addr('oa-token', 'токен'), c = ro()
+    const code = await reader().getCode(t)
+    add(code !== '0x', code !== '0x' ? 'По адресу есть контракт' : 'По адресу нет контракта — это кошелёк или пустой адрес')
+    if (t.toLowerCase() === BPS_ADDR.toLowerCase()) add(false, 'Нельзя добавить сам контракт долей')
+    const [already, was, len, max] = await Promise.all([c.isDistributionToken(t), c.wasDistributionToken(t), c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS()])
+    add(!already, already ? 'Токен уже добавлен' : 'Токен ещё не добавлен')
+    if (was && !already) add(false, 'Токен уже был распределяемым')
+    add(len.lt(max), len.lt(max) ? `Свободных слотов: ${max.sub(len)}` : 'Слоты закончились')
+    if (code !== '0x') {
+      try {
+        const bal = await new ethers.Contract(t, ERC20_ABI, reader()).balanceOf(BPS_ADDR)
+        const mt = await tokenMeta(t)
+        add(true, `balanceOf отвечает: на контракте ${exact(bal, mt.decimals)} ${mt.symbol}`)
+      } catch { add(false, 'balanceOf не отвечает — добавлять нельзя, это заблокирует переводы долей') }
+    }
+  } catch (e) { add(false, errText(e)) }
+  box.innerHTML = lines.map(x => `<div class="chk ${x.ok ? 'ok' : 'bad'}">${x.ok ? '✓' : '✕'} ${esc(x.t)}</div>`).join('')
+  btn.disabled = lines.some(x => !x.ok)
+}
+
+const ownAddToken = () => run('Добавляем токен', async () => {
+  const t = addr('oa-token', 'токен')
+  if (prompt('НЕОБРАТИМОЕ ДЕЙСТВИЕ\n\nТокен ' + t + ' будет добавлен в распределение навсегда. Убрать его и вывести через rescue будет нельзя никогда.\n\nДля подтверждения введите: ДОБАВИТЬ') !== 'ДОБАВИТЬ') { say('Отменено.', 'info'); return false }
+  await (await bps.addDistributionToken(t)).wait()
+  $('oa-token').value = ''; $('oa-check').innerHTML = ''; $('btn-own-add').disabled = true
+  say('Токен добавлен в распределение.', 'success')
+})
+
+const ownPause = (t, pause) => run(pause ? 'Ставим паузу' : 'Снимаем паузу', async () => {
+  const msg = pause
+    ? `Поставить паузу учёта ${m(t).symbol}?\n\nНовый приток перестанет раскладываться по держателям. Начисленное ранее забрать можно.\nПри активной паузе покупатель долей может получить часть дохода за период продавца — держите паузу минимально.`
+    : `Снять паузу с ${m(t).symbol}?\n\nСначала нажмите «Разложить» у токена в карточке «Контракт», иначе накопленное распределится по новым весам.`
+  if (!confirm(msg)) return false
+  await (await bps.setTokenSyncPaused(t, pause)).wait()
+  say(pause ? 'Пауза поставлена.' : 'Пауза снята.', 'success')
+})
+
+const ownRescue = () => run('Выводим', async () => {
+  const t = addr('or-token', 'токен'), to = addr('or-to', 'получатель')
+  if (await ro().wasDistributionToken(t)) throw new Error('Этот токен распределялся контрактом — вывести его нельзя никогда.')
+  const mt = await tokenMeta(t)
+  let bal; try { bal = await new ethers.Contract(t, ERC20_ABI, reader()).balanceOf(BPS_ADDR) } catch { throw new Error('Баланс токена не читается.') }
+  if (bal.isZero()) throw new Error('На контракте нет этого токена.')
+  if (!confirm(`Вывести ${exact(bal, mt.decimals)} ${mt.symbol}\nна адрес ${to}?`)) return false
+  await (await bps.rescue(t, to)).wait()
+  $('or-token').value = ''
+  say('Выведено.', 'success')
+})
+
+const ownTransfer = () => run('Передаём владение', async () => {
+  const to = addr('oo-to', 'новый владелец')
+  if (to.toLowerCase() === me.toLowerCase()) throw new Error('Вы уже владелец.')
+  if (to.toLowerCase() === BPS_ADDR.toLowerCase()) throw new Error('Контракт не может владеть сам собой.')
+  const isContract = (await reader().getCode(to)) !== '0x'
+  if (!confirm(`Назначить ${to} кандидатом во владельцы${isContract ? ' (это контракт — вероятно, Safe)' : ''}?\n\nПолномочия останутся у вас, пока новый владелец не примет.`)) return false
+  await (await bps.transferOwnership(to)).wait()
+  $('oo-to').value = ''
+  say(isContract ? 'Готово. Теперь подписанты Safe должны провести «Принять владение» в панели мультиподписи.' : 'Готово. Новый владелец должен принять владение.', 'success')
+})
+
+const ownAccept = () => run('Принимаем владение', async () => {
+  if (!confirm('Принять владение контрактом?')) return false
+  await (await bps.acceptOwnership()).wait()
+  say('Вы теперь владелец контракта.', 'success')
 })
 
 // ---------- старт ----------
