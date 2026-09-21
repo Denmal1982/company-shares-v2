@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>BPS — панель владельца через Safe</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#f4f5f9;--bg1:#fff;--bg2:#f8f9fc;--bg3:#eef0f6;
+  --border:#e2e5ef;--border2:#d0d4e8;
+  --txt:#1a1d2e;--txt2:#5a6080;--txt3:#9299b8;
+  --purple:#6355d4;--purple-bg:#eeecfc;
+  --green:#0ea86a;--green-bg:#e8f8f2;
+  --red:#e03e3e;--red-bg:#fdf0f0;
+  --amber:#d97706;--amber-bg:#fffbeb;
+  --blue:#2563eb;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --font:Inter,-apple-system,sans-serif;--mono:'SF Mono',Consolas,monospace;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+}
+body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh;font-size:14px}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--bg1);border-bottom:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.logo-name{font-size:15px;font-weight:700}
+.pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid #d6d0f8;font-weight:600}
+.btn{font-size:13px;padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg1);color:var(--txt);cursor:pointer;font-weight:600;font-family:var(--font)}
+.btn:hover:not(:disabled){border-color:var(--purple);color:var(--purple)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.connected{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;border:none;box-shadow:0 2px 8px rgba(99,85,212,.3)}
+.btn-primary:hover:not(:disabled){opacity:.92;color:#fff}
+.btn-danger{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.btn-danger:hover:not(:disabled){background:var(--red);color:#fff}
+.btn-ok{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.btn-ok:hover:not(:disabled){background:var(--green);color:#fff}
+.btn-wide{width:100%;padding:12px}
+.main{padding:24px;max-width:960px;margin:0 auto}
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.step{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--purple);color:#fff;font-size:12px;font-weight:700;margin-right:8px}
+label{font-size:12px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:600}
+input,select{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg1);color:var(--txt);outline:none;font-family:var(--font)}
+input.mono{font-family:var(--mono);font-size:13px}
+input:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-bg)}
+.row{margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{font-size:13px;padding:8px 13px;border:none;background:none;color:var(--txt3);cursor:pointer;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font)}
+.tab:hover{color:var(--txt2)}
+.tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+.panel{display:none}.panel.active{display:block}
+.info-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-key{color:var(--txt3);font-weight:600}
+.info-val{font-family:var(--mono);font-size:12px;text-align:right;word-break:break-all;font-weight:600}
+.blob{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;word-break:break-all;line-height:1.6;margin-bottom:10px}
+.blob-label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
+.copy{font-size:11px;padding:2px 8px;border-radius:5px;border:1px solid var(--border2);background:var(--bg1);cursor:pointer;color:var(--txt3);font-weight:600}
+.copy:hover{color:var(--purple);border-color:var(--purple)}
+.chunk{display:block}
+.chunk .sel{color:var(--purple);font-weight:700}
+.chunk .arg{color:var(--txt)}
+.signer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.signer:last-child{border-bottom:none}
+.signer-addr{font-family:var(--mono);font-size:12px}
+.signer-addr.me{font-weight:700;color:var(--purple)}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
+.badge.ok{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0}
+.badge.wait{background:var(--bg3);color:var(--txt3);border:1px solid var(--border)}
+.badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid #fde68a}
+.status{font-size:13px;padding:12px 15px;border-radius:var(--radius);margin-bottom:16px;display:none;line-height:1.5;font-weight:500;border:1px solid}
+.status.info{background:var(--purple-bg);color:var(--purple);border-color:#d6d0f8;display:block}
+.status.success{background:var(--green-bg);color:var(--green);border-color:#a7f3d0;display:block}
+.status.error{background:var(--red-bg);color:var(--red);border-color:#fca5a5;display:block}
+.warn-box{font-size:12.5px;line-height:1.6;padding:12px 14px;border-radius:var(--radius-sm);background:var(--red-bg);border:1px solid #fca5a5;color:#8c2020;margin-bottom:14px}
+.warn-box b{display:block;margin-bottom:4px;color:var(--red)}
+.note-box{font-size:12.5px;line-height:1.6;padding:12px 14px;border-radius:var(--radius-sm);background:var(--amber-bg);border:1px solid #fde68a;color:#7c4a06;margin-bottom:14px}
+.hint{font-size:11.5px;color:var(--txt3);margin-top:5px;line-height:1.5}
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.actions>*{flex:1;min-width:150px}
+.hidden{display:none}
+.progress{font-size:12px;color:var(--txt3);font-weight:600}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-icon">BPS</div>
+    <span class="logo-name">Панель владельца</span>
+    <span class="pill" id="net-pill">не подключено</span>
+  </div>
+  <button class="btn" id="btn-wallet" onclick="connect()">Подключить кошелёк</button>
+</nav>
+
+<div class="main">
+  <div class="status" id="msg"></div>
+
+  <!-- СОЗДАНИЕ SAFE -->
+  <div class="card">
+    <div class="card-title"><span><span class="step">0</span>Создать Safe</span><button class="copy" onclick="toggle('create-body')">показать / скрыть</button></div>
+    <div id="create-body" class="hidden">
+      <div class="note-box">Нужно один раз. Если Safe уже есть — пропустите и переходите к шагу 1.</div>
+      <div class="row">
+        <label for="c-owners">Адреса подписантов — каждый с новой строки</label>
+        <textarea id="c-owners" rows="4" placeholder="0x...&#10;0x...&#10;0x..." style="width:100%;padding:9px 12px;font-family:var(--mono);font-size:13px;border:1px solid var(--border);border-radius:var(--radius-sm);resize:vertical"></textarea>
+        <div class="hint">Каждый должен быть отдельным адресом. Для боевой сети — аппаратные кошельки, лучше разных производителей.</div>
+      </div>
+      <div class="grid2">
+        <div class="row">
+          <label for="c-threshold">Порог подписей</label>
+          <input id="c-threshold" type="number" min="1" value="2"/>
+          <div class="hint">Сколько подписей нужно для любой операции. Рабочий минимум — 2 из 3.</div>
+        </div>
+        <div class="row">
+          <label for="c-salt">Соль</label>
+          <input class="mono" id="c-salt" value="1"/>
+          <div class="hint">Любое число. Меняйте, если хотите создать второй Safe с теми же подписантами.</div>
+        </div>
+      </div>
+      <details style="margin-bottom:12px">
+        <summary style="font-size:12px;color:var(--txt3);cursor:pointer;font-weight:600">Адреса контрактов Safe v1.4.1 (обычно менять не нужно)</summary>
+        <div style="margin-top:10px">
+          <div class="row"><label>SafeProxyFactory</label><input class="mono" id="c-factory" value="0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67"/></div>
+          <div class="row"><label>Safe singleton (SafeL2)</label><input class="mono" id="c-singleton" value="0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"/></div>
+          <div class="row"><label>Fallback handler</label><input class="mono" id="c-fallback" value="0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99"/></div>
+          <div class="hint">Канонические адреса из реестра safe-global/safe-deployments. Одинаковы в Ethereum, Sepolia и большинстве EVM-сетей. Страница проверит, что по ним есть код.</div>
+        </div>
+      </details>
+      <button class="btn btn-primary btn-wide" onclick="createSafe()">Создать Safe</button>
+      <div id="create-result"></div>
+    </div>
+  </div>
+
+  <!-- ШАГ 1 -->
+  <div class="card">
+    <div class="card-title"><span><span class="step">1</span>Адреса</span></div>
+    <div class="grid2">
+      <div class="row">
+        <label for="in-safe">Safe (владелец контракта)</label>
+        <input class="mono" id="in-safe" placeholder="0x..." autocomplete="off"/>
+      </div>
+      <div class="row">
+        <label for="in-bps">BasisPointShare</label>
+        <input class="mono" id="in-bps" placeholder="0x..." autocomplete="off"/>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-wide" onclick="loadSafe()">Загрузить</button>
+    <div class="hint">Адреса сохраняются в адресной строке — ссылку можно переслать остальным подписантам, и у них откроется та же конфигурация.</div>
+  </div>
+
+  <!-- СОСТОЯНИЕ -->
+  <div class="card hidden" id="card-state">
+    <div class="card-title"><span>Состояние</span><span class="progress" id="role-label"></span></div>
+    <div id="state-info"></div>
+    <div style="margin-top:14px"><div class="blob-label">Подписанты</div><div id="signers"></div></div>
+  </div>
+
+  <!-- ШАГ 2 -->
+  <div class="card hidden" id="card-action">
+    <div class="card-title"><span><span class="step">2</span>Операция с BPS</span></div>
+    <div class="tabs">
+      <button class="tab active" onclick="pick(event,'accept')">Принять владение</button>
+      <button class="tab" onclick="pick(event,'addToken')">Добавить токен</button>
+      <button class="tab" onclick="pick(event,'setPause')">Пауза</button>
+      <button class="tab" onclick="pick(event,'rescue')">Вывод чужого</button>
+      <button class="tab" onclick="pick(event,'transferOwner')">Передать владение</button>
+      <button class="tab" onclick="pick(event,'signers')">Подписанты</button>
+    </div>
+
+    <div class="panel active" id="p-accept">
+      <div class="note-box">Первый шаг после <code>transferOwnership</code> на адрес Safe. Пока Safe не примет владение, полномочия остаются у прежнего владельца.</div>
+    </div>
+
+    <div class="panel" id="p-addToken">
+      <div class="warn-box">
+        <b>Необратимо по трём осям</b>
+        Слот занимается навсегда — из пяти. Токен навсегда исключается из <code>rescue</code>. Каждый перевод долей дорожает на один внешний вызов.
+      </div>
+      <div class="row">
+        <label for="a-token">Адрес токена</label>
+        <input class="mono" id="a-token" placeholder="0x..." autocomplete="off"/>
+        <div class="hint">Контракт сам проверит наличие кода и что <code>balanceOf</code> отвечает. Fee-on-transfer и rebase программно не определяются — проверяйте вручную.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-setPause">
+      <div class="note-box">Аварийный выключатель против токена, чей <code>balanceOf</code> перестал отвечать. Не выключатель торговли и не заморозка выплат.</div>
+      <div class="grid2">
+        <div class="row">
+          <label for="s-token">Адрес токена</label>
+          <input class="mono" id="s-token" placeholder="0x..." autocomplete="off"/>
+        </div>
+        <div class="row">
+          <label for="s-paused">Значение</label>
+          <select id="s-paused">
+            <option value="true">Поставить паузу</option>
+            <option value="false">Снять паузу</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint">Перед снятием паузы вызовите <code>syncToken</code>, иначе накопленное разложится уже по новым весам.</div>
+    </div>
+
+    <div class="panel" id="p-rescue">
+      <div class="note-box">Только для токенов, которые <b>никогда</b> не добавлялись в распределение.</div>
+      <div class="grid2">
+        <div class="row">
+          <label for="r-token">Адрес токена</label>
+          <input class="mono" id="r-token" placeholder="0x..." autocomplete="off"/>
+        </div>
+        <div class="row">
+          <label for="r-to">Получатель</label>
+          <input class="mono" id="r-to" placeholder="0x..." autocomplete="off"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-transferOwner">
+      <div class="note-box">Передача двухшаговая: пока новый владелец не вызовет <code>acceptOwnership</code>, полномочия остаются у Safe.</div>
+      <div class="row">
+        <label for="t-to">Новый владелец</label>
+        <input class="mono" id="t-to" placeholder="0x..." autocomplete="off"/>
+      </div>
+    </div>
+
+    <div class="panel" id="p-signers">
+      <div class="note-box">
+        Это операции <b>самого Safe</b>, а не BPS: транзакция уйдёт на адрес Safe.
+        Согласуются они так же — теми же подписями и тем же порогом, который действует сейчас.
+      </div>
+      <div class="row">
+        <label for="g-op">Что сделать</label>
+        <select id="g-op" onchange="signerOp()">
+          <option value="add">Добавить подписанта</option>
+          <option value="remove">Удалить подписанта</option>
+          <option value="swap">Заменить подписанта</option>
+          <option value="threshold">Изменить только порог</option>
+        </select>
+      </div>
+      <div class="row" id="g-row-new">
+        <label for="g-new">Новый подписант</label>
+        <input class="mono" id="g-new" placeholder="0x..." autocomplete="off"/>
+      </div>
+      <div class="row hidden" id="g-row-old">
+        <label for="g-old">Кого убрать или заменить</label>
+        <select id="g-old"></select>
+      </div>
+      <div class="row" id="g-row-thr">
+        <label for="g-thr">Новый порог</label>
+        <input id="g-thr" type="number" min="1" step="1" value="2"/>
+        <div class="hint" id="g-thr-hint"></div>
+      </div>
+      <div class="warn-box hidden" id="g-warn"></div>
+    </div>
+
+    <button class="btn btn-primary btn-wide" onclick="prepare()">Подготовить и посчитать хеш</button>
+  </div>
+
+
+  <!-- НАСТРОЙКИ SAFE -->
+  <div class="card hidden" id="card-settings">
+    <div class="card-title"><span><span class="step">2</span>Подписанты и порог</span></div>
+    <div class="note-box">Эти операции меняют сам Safe, а не BPS. Проходят тем же порядком: подготовить → одобрить нужным числом подписей → исполнить.</div>
+    <div class="tabs">
+      <button class="tab" onclick="pick(event,'safe:add')">Добавить</button>
+      <button class="tab" onclick="pick(event,'safe:remove')">Удалить</button>
+      <button class="tab" onclick="pick(event,'safe:swap')">Заменить</button>
+      <button class="tab" onclick="pick(event,'safe:threshold')">Изменить порог</button>
+    </div>
+
+    <div class="panel" id="p-safe:add">
+      <div class="grid2">
+        <div class="row"><label for="sa-owner">Новый подписант</label><input class="mono" id="sa-owner" placeholder="0x..."/></div>
+        <div class="row"><label for="sa-thr">Порог после добавления</label><input id="sa-thr" type="number" min="1"/>
+          <div class="hint">Добавление и смена порога — одна операция.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-safe:remove">
+      <div class="grid2">
+        <div class="row"><label for="sr-owner">Кого удалить</label><select id="sr-owner"></select></div>
+        <div class="row"><label for="sr-thr">Порог после удаления</label><input id="sr-thr" type="number" min="1"/>
+          <div class="hint">Не больше числа оставшихся подписантов.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-safe:swap">
+      <div class="note-box">Удобно при утере или компрометации ключа: порог и число подписантов не меняются.</div>
+      <div class="grid2">
+        <div class="row"><label for="ss-old">Кого заменить</label><select id="ss-old"></select></div>
+        <div class="row"><label for="ss-new">На кого</label><input class="mono" id="ss-new" placeholder="0x..."/></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-safe:threshold">
+      <div class="row"><label for="st-thr">Новый порог</label><input id="st-thr" type="number" min="1"/>
+        <div class="hint" id="st-hint"></div></div>
+    </div>
+
+    <button class="btn btn-primary btn-wide" onclick="prepare()">Подготовить и посчитать хеш</button>
+  </div>
+
+  <!-- ШАГ 3 -->
+  <div class="card hidden" id="card-review">
+    <div class="card-title"><span><span class="step">3</span>Проверка</span><span class="progress" id="appr-progress"></span></div>
+
+    <div class="warn-box">
+      <b>Проверьте сами, не доверяя этой странице</b>
+      Сверьте calldata и хеш с тем, что видят остальные подписанты. Совпадение у всех — единственная защита от подменённого интерфейса.
+    </div>
+
+    <div class="blob-label">Calldata <button class="copy" onclick="copyText(window._data)">копировать</button></div>
+    <div class="blob" id="out-data"></div>
+
+    <div class="blob-label">Разбор</div>
+    <div class="blob" id="out-decoded"></div>
+
+    <div class="blob-label">Хеш для подписи <button class="copy" onclick="copyText(window._hash)">копировать</button></div>
+    <div class="blob" id="out-hash"></div>
+
+    <div class="blob-label">Одобрения ончейн</div>
+    <div id="approvals"></div>
+
+    <div class="actions">
+      <button class="btn btn-ok" id="btn-approve" onclick="approve()">Одобрить ончейн</button>
+      <button class="btn" id="btn-sign" onclick="signOffchain()">Подписать офчейн</button>
+      <button class="btn btn-danger" id="btn-exec" onclick="execute()" disabled>Исполнить</button>
+    </div>
+    <div class="hint">Ончейн-одобрение — своя транзакция, но ничего никому пересылать не нужно. Офчейн-подпись бесплатна, её нужно передать сборщику.</div>
+
+    <div class="row" style="margin-top:16px">
+      <label for="in-sigs">Собранные офчейн-подписи (по 65 байт, без разделителей)</label>
+      <input class="mono" id="in-sigs" placeholder="0x... необязательно" autocomplete="off"/>
+      <div class="hint">Заполняйте, только если согласовывали подписи офчейн. Порядок — по возрастанию адреса подписанта; кнопка «Исполнить» отсортирует введённые ниже подписи сама, если вы перечислите их через запятую.</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+const SAFE_ABI = [
+  "function nonce() view returns (uint256)",
+  "function getThreshold() view returns (uint256)",
+  "function getOwners() view returns (address[])",
+  "function approvedHashes(address,bytes32) view returns (uint256)",
+  "function approveHash(bytes32)",
+  "function getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256) view returns (bytes32)",
+  "function execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes) payable returns (bool)",
+  "function isOwner(address) view returns (bool)",
+  "function addOwnerWithThreshold(address owner, uint256 _threshold)",
+  "function removeOwner(address prevOwner, address owner, uint256 _threshold)",
+  "function swapOwner(address prevOwner, address oldOwner, address newOwner)",
+  "function changeThreshold(uint256 _threshold)",
+]
+const SENTINEL = "0x0000000000000000000000000000000000000001"
+const BPS_ABI = [
+  "function owner() view returns (address)",
+  "function pendingOwner() view returns (address)",
+  "function VERSION() view returns (string)",
+  "function distributionTokensLength() view returns (uint256)",
+  "function MAX_DISTRIBUTION_TOKENS() view returns (uint256)",
+  "function acceptOwnership()",
+  "function addDistributionToken(address)",
+  "function setTokenSyncPaused(address,bool)",
+  "function rescue(address,address)",
+  "function transferOwnership(address)",
+]
+
+let provider, signer, me, safe, bps, safeAddr, bpsAddr
+let owners = [], threshold = 0, action = 'accept'
+
+const $ = (id) => document.getElementById(id)
+const short = (a) => a ? a.slice(0, 6) + '…' + a.slice(-4) : ''
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+
+function say(text, type) {
+  const el = $('msg'); el.textContent = text; el.className = 'status ' + type
+  if (type === 'success') setTimeout(() => { if (el.textContent === text) el.className = 'status' }, 7000)
+}
+function errText(e) {
+  const raw = e?.error?.message || e?.data?.message || e?.reason || e?.message || String(e)
+  if (raw.includes('GS025')) return 'Недостаточно подписей или они не отсортированы по возрастанию адреса.'
+  if (raw.includes('GS026')) return 'Подпись недействительна для этого хеша.'
+  if (raw.includes('GS020')) return 'Подписей меньше порога.'
+  if (raw.includes('GS013')) return 'Транзакция отклонена контрактом BPS — проверьте параметры.'
+  if (raw.includes('user rejected')) return 'Отклонено в кошельке.'
+  return raw
+}
+function copyText(t) {
+  navigator.clipboard.writeText(t).then(() => say('Скопировано.', 'success'))
+}
+
+// ---------- подключение ----------
+
+async function connect() {
+  const eth = window.ethereum?.isMetaMask ? window.ethereum
+    : window.ethereum?.providers?.find(p => p.isMetaMask) || window.ethereum
+  if (!eth) { say('Кошелёк не найден. Установите MetaMask.', 'error'); return }
+  try {
+    provider = new ethers.providers.Web3Provider(eth)
+    await provider.send('eth_requestAccounts', [])
+    signer = provider.getSigner()
+    me = await signer.getAddress()
+    const net = await provider.getNetwork()
+
+    $('btn-wallet').textContent = short(me)
+    $('btn-wallet').classList.add('connected')
+    $('net-pill').textContent = net.name === 'homestead' ? 'mainnet' : net.name
+    eth.on?.('accountsChanged', () => location.reload())
+    eth.on?.('chainChanged', () => location.reload())
+    if (safeAddr) await loadSafe()
+  } catch (e) { say('Не удалось подключиться: ' + errText(e), 'error') }
+}
+
+// ---------- загрузка Safe ----------
+
+async function loadSafe() {
+  const s = $('in-safe').value.trim(), b = $('in-bps').value.trim()
+  if (!ethers.utils.isAddress(s)) { say('Некорректный адрес Safe.', 'error'); return }
+  if (!ethers.utils.isAddress(b)) { say('Некорректный адрес BPS.', 'error'); return }
+  if (!provider) { say('Сначала подключите кошелёк.', 'error'); return }
+
+  safeAddr = ethers.utils.getAddress(s); bpsAddr = ethers.utils.getAddress(b)
+  history.replaceState(null, '', `?safe=${safeAddr}&bps=${bpsAddr}`)
+
+  try {
+    safe = new ethers.Contract(safeAddr, SAFE_ABI, signer)
+    bps = new ethers.Contract(bpsAddr, BPS_ABI, signer)
+
+    const [own, thr, nonce] = await Promise.all([safe.getOwners(), safe.getThreshold(), safe.nonce()])
+    owners = own; threshold = thr.toNumber()
+
+    let ver = '—', curOwner = '—', pending = '—', slots = '—'
+    try { ver = await bps.VERSION() } catch {}
+    try { curOwner = await bps.owner() } catch {}
+    try { pending = await bps.pendingOwner() } catch {}
+    try {
+      const [l, m] = await Promise.all([bps.distributionTokensLength(), bps.MAX_DISTRIBUTION_TOKENS()])
+      slots = `${l} из ${m}`
+    } catch {}
+
+    const isOwnerSafe = curOwner.toLowerCase() === safeAddr.toLowerCase()
+    const zero = ethers.constants.AddressZero
+    $('state-info').innerHTML = `
+      <div class="info-row"><span class="info-key">Safe</span><span class="info-val">${short(safeAddr)}</span></div>
+      <div class="info-row"><span class="info-key">Порог</span><span class="info-val">${threshold} из ${owners.length}</span></div>
+      <div class="info-row"><span class="info-key">Nonce Safe</span><span class="info-val">${nonce}</span></div>
+      <div class="info-row"><span class="info-key">Версия BPS</span><span class="info-val">${esc(ver)}</span></div>
+      <div class="info-row"><span class="info-key">Владелец BPS</span><span class="info-val" style="color:${isOwnerSafe ? 'var(--green)' : 'var(--amber)'}">${short(curOwner)}${isOwnerSafe ? ' (Safe)' : ''}</span></div>
+      <div class="info-row"><span class="info-key">Ожидает принятия</span><span class="info-val">${pending === zero ? 'нет' : short(pending)}</span></div>
+      <div class="info-row"><span class="info-key">Слотов занято</span><span class="info-val">${slots}</span></div>`
+
+    const amOwner = owners.some(o => o.toLowerCase() === me.toLowerCase())
+    $('role-label').textContent = amOwner ? 'вы подписант' : 'вы не подписант — только просмотр'
+    $('signers').innerHTML = owners.map(o => `
+      <div class="signer">
+        <span class="signer-addr${o.toLowerCase() === me.toLowerCase() ? ' me' : ''}">${o}</span>
+        ${o.toLowerCase() === me.toLowerCase() ? '<span class="badge ok">это вы</span>' : ''}
+      </div>`).join('')
+
+    const sel = $('g-old')
+    if (sel) {
+      sel.innerHTML = owners.map(o =>
+        `<option value="${o}">${o}${o.toLowerCase() === me.toLowerCase() ? ' — это вы' : ''}</option>`).join('')
+      $('g-thr').value = threshold
+      signerOp()
+    }
+
+    $('card-state').classList.remove('hidden')
+    $('card-action').classList.remove('hidden')
+    $('card-settings').classList.remove('hidden')
+    fillOwnerLists()
+    $('card-review').classList.add('hidden')
+
+    if (pending !== zero && pending.toLowerCase() === safeAddr.toLowerCase()) {
+      say('Safe назначен владельцем, но ещё не принял. Начните с «Принять владение».', 'info')
+    } else say('', '')
+  } catch (e) {
+    say('Не удалось прочитать Safe. Проверьте адрес и сеть: ' + errText(e), 'error')
+  }
+}
+
+// ---------- выбор операции ----------
+
+function pick(ev, name) {
+  action = name
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  ev.currentTarget.classList.add('active')
+  $('p-' + name).classList.add('active')
+  $('card-review').classList.add('hidden')
+}
+
+function toggle(id) { $(id).classList.toggle('hidden') }
+
+function fillOwnerLists() {
+  const opts = owners.map(o => `<option value="${o}">${o}</option>`).join('')
+  $('sr-owner').innerHTML = opts
+  $('ss-old').innerHTML = opts
+  $('sa-thr').value = threshold
+  $('sr-thr').value = Math.min(threshold, Math.max(1, owners.length - 1))
+  $('st-thr').value = threshold
+  $('st-hint').textContent = `Сейчас ${threshold} из ${owners.length}. Допустимо от 1 до ${owners.length}.`
+}
+
+/// Safe хранит подписантов связным списком: getOwners() возвращает их по порядку,
+/// а removeOwner и swapOwner требуют адрес предыдущего элемента.
+function prevOwnerOf(addr) {
+  const i = owners.findIndex(o => o.toLowerCase() === addr.toLowerCase())
+  if (i < 0) throw new Error('Такого подписанта в Safe нет.')
+  return i === 0 ? SENTINEL : owners[i - 1]
+}
+
+function buildTx() {
+  const iBps = new ethers.utils.Interface(BPS_ABI)
+  const iSafe = new ethers.utils.Interface(SAFE_ABI)
+  const addr = (id) => {
+    const v = $(id).value.trim()
+    if (!ethers.utils.isAddress(v)) throw new Error('Некорректный адрес в форме.')
+    return ethers.utils.getAddress(v)
+  }
+  const num = (id, max) => {
+    const n = parseInt($(id).value, 10)
+    if (!Number.isInteger(n) || n < 1 || n > max) throw new Error(`Порог должен быть от 1 до ${max}.`)
+    return n
+  }
+  const isOwner = (a) => owners.some(o => o.toLowerCase() === a.toLowerCase())
+
+  switch (action) {
+    case 'accept':        return { to: bpsAddr, data: iBps.encodeFunctionData('acceptOwnership', []) }
+    case 'addToken':      return { to: bpsAddr, data: iBps.encodeFunctionData('addDistributionToken', [addr('a-token')]) }
+    case 'setPause':      return { to: bpsAddr, data: iBps.encodeFunctionData('setTokenSyncPaused', [addr('s-token'), $('s-paused').value === 'true']) }
+    case 'rescue':        return { to: bpsAddr, data: iBps.encodeFunctionData('rescue', [addr('r-token'), addr('r-to')]) }
+    case 'transferOwner': return { to: bpsAddr, data: iBps.encodeFunctionData('transferOwnership', [addr('t-to')]) }
+
+    case 'safe:add': {
+      const o = addr('sa-owner')
+      if (isOwner(o)) throw new Error('Этот адрес уже подписант.')
+      if (o.toLowerCase() === safeAddr.toLowerCase()) throw new Error('Safe не может быть своим подписантом.')
+      return { to: safeAddr, data: iSafe.encodeFunctionData('addOwnerWithThreshold', [o, num('sa-thr', owners.length + 1)]) }
+    }
+    case 'safe:remove': {
+      if (owners.length <= 1) throw new Error('Нельзя удалить последнего подписанта.')
+      const o = $('sr-owner').value
+      const t = num('sr-thr', owners.length - 1)
+      return { to: safeAddr, data: iSafe.encodeFunctionData('removeOwner', [prevOwnerOf(o), o, t]) }
+    }
+    case 'safe:swap': {
+      const oldO = $('ss-old').value, newO = addr('ss-new')
+      if (isOwner(newO)) throw new Error('Новый адрес уже подписант.')
+      return { to: safeAddr, data: iSafe.encodeFunctionData('swapOwner', [prevOwnerOf(oldO), oldO, newO]) }
+    }
+    case 'safe:threshold':
+      return { to: safeAddr, data: iSafe.encodeFunctionData('changeThreshold', [num('st-thr', owners.length)]) }
+  }
+  throw new Error('Выберите операцию.')
+}
+
+function decodeView(data, to) {
+  const onSafe = to.toLowerCase() === safeAddr.toLowerCase()
+  let parsed
+  try { parsed = new ethers.utils.Interface(onSafe ? SAFE_ABI : BPS_ABI).parseTransaction({ data }) }
+  catch { return 'не удалось разобрать' }
+  const target = `<span class="chunk">цель: <b>${onSafe ? 'сам Safe — меняются подписанты или порог' : 'контракт BPS'}</b> ${short(to)}</span>`
+  const sel = data.slice(0, 10)
+  const args = parsed.args.map((a, k) => {
+    const name = parsed.functionFragment.inputs[k].name
+    return `<span class="chunk"><span class="arg">${esc(name)} = ${esc(String(a))}</span></span>`
+  }).join('')
+  return target + `<span class="chunk"><span class="sel">${sel}</span> → ${esc(parsed.name)}</span>${args}`
+}
+
+async function prepare() {
+  try {
+    const { to, data } = buildTx()
+    const nonce = await safe.nonce()
+    const hash = await safe.getTransactionHash(
+      to, 0, data, 0, 0, 0, 0,
+      ethers.constants.AddressZero, ethers.constants.AddressZero, nonce)
+
+    window._to = to; window._data = data; window._hash = hash; window._nonce = nonce
+
+    $('out-data').textContent = data
+    $('out-decoded').innerHTML = decodeView(data, to)
+    $('out-hash').textContent = hash
+    $('card-review').classList.remove('hidden')
+    await refreshApprovals()
+    $('card-review').scrollIntoView({ behavior: 'smooth', block: 'start' })
+  } catch (e) { say(errText(e), 'error') }
+}
+
+// ---------- одобрения ----------
+
+async function refreshApprovals() {
+  const flags = await Promise.all(owners.map(o => safe.approvedHashes(o, window._hash)))
+  const approved = owners.filter((_, k) => flags[k].eq(1))
+  window._approved = approved
+
+  $('approvals').innerHTML = owners.map((o, k) => `
+    <div class="signer">
+      <span class="signer-addr${o.toLowerCase() === me.toLowerCase() ? ' me' : ''}">${o}</span>
+      <span class="badge ${flags[k].eq(1) ? 'ok' : 'wait'}">${flags[k].eq(1) ? 'одобрено' : 'ждём'}</span>
+    </div>`).join('')
+
+  $('appr-progress').textContent = `${approved.length} из ${threshold}`
+  const amOwner = owners.some(o => o.toLowerCase() === me.toLowerCase())
+  const iApproved = approved.some(o => o.toLowerCase() === me.toLowerCase())
+  $('btn-approve').disabled = !amOwner || iApproved
+  $('btn-approve').textContent = iApproved ? 'Вы уже одобрили' : 'Одобрить ончейн'
+  $('btn-sign').disabled = !amOwner
+  $('btn-exec').disabled = approved.length < threshold && !$('in-sigs').value.trim()
+}
+
+async function approve() {
+  if (action === 'signers') {
+    if (!confirm(
+      'Операция изменит состав подписантов или порог Safe.\n\n' +
+      'Ошибка здесь может лишить доступа к управлению контрактом навсегда.\n' +
+      'Убедитесь, что новый адрес рабочий и вы контролируете его ключ.'
+    )) return
+  }
+  if (action === 'addToken') {
+    const typed = prompt(
+      'НЕОБРАТИМОЕ ДЕЙСТВИЕ\n\nТокен будет добавлен в распределение навсегда.\n' +
+      'Убрать его из списка нельзя, вывести через rescue — тоже, никогда.\n\n' +
+      'Для подтверждения введите: ДОБАВИТЬ')
+    if (typed !== 'ДОБАВИТЬ') { say('Отменено.', 'info'); return }
+  }
+  try {
+    say('Одобряем хеш…', 'info')
+    await (await safe.approveHash(window._hash)).wait()
+    say('Одобрено. Остальным подписантам ничего пересылать не нужно.', 'success')
+    await refreshApprovals()
+  } catch (e) { say('Не удалось одобрить: ' + errText(e), 'error') }
+}
+
+async function signOffchain() {
+  try {
+    const sig = await signer.signMessage(ethers.utils.arrayify(window._hash))
+    // personal_sign добавляет префикс — Safe узнаёт это по v > 30
+    const p = ethers.utils.splitSignature(sig)
+    const adjusted = ethers.utils.hexConcat([p.r, p.s, ethers.utils.hexlify(p.v + 4)])
+    prompt('Ваша подпись. Передайте её сборщику:', adjusted)
+  } catch (e) { say('Не удалось подписать: ' + errText(e), 'error') }
+}
+
+// ---------- исполнение ----------
+
+function approvalSignatures() {
+  const sorted = [...window._approved].sort((a, b) =>
+    ethers.BigNumber.from(a).lt(ethers.BigNumber.from(b)) ? -1 : 1)
+  return '0x' + sorted.map(a =>
+    ethers.utils.hexZeroPad(a, 32).slice(2) + '0'.repeat(64) + '01').join('')
+}
+
+async function execute() {
+  try {
+    const manual = $('in-sigs').value.trim()
+    let sigs
+    if (manual) {
+      const parts = manual.split(',').map(x => x.trim().replace(/^0x/, '')).filter(Boolean)
+      if (parts.some(p => p.length !== 130)) throw new Error('Каждая подпись должна быть ровно 65 байт.')
+      sigs = '0x' + parts.join('')
+      if (parts.length < threshold) throw new Error('Подписей меньше порога.')
+    } else {
+      if (window._approved.length < threshold) throw new Error('Одобрений меньше порога.')
+      sigs = approvalSignatures()
+    }
+
+    say('Отправляем транзакцию…', 'info')
+    const tx = await safe.execTransaction(
+      window._to, 0, window._data, 0, 0, 0, 0,
+      ethers.constants.AddressZero, ethers.constants.AddressZero, sigs)
+    await tx.wait()
+    say('Исполнено. Nonce Safe увеличился — прежние одобрения больше недействительны.', 'success')
+    await loadSafe()
+  } catch (e) { say('Не удалось исполнить: ' + errText(e), 'error') }
+}
+
+// ---------- создание Safe ----------
+
+async function createSafe() {
+  if (!provider) { say('Сначала подключите кошелёк.', 'error'); return }
+  try {
+    const list = $('c-owners').value.split(/[\s,]+/).map(x => x.trim()).filter(Boolean)
+    if (list.length === 0) throw new Error('Добавьте хотя бы одного подписанта.')
+    const bad = list.find(a => !ethers.utils.isAddress(a))
+    if (bad) throw new Error('Некорректный адрес: ' + bad)
+    const ownersNew = list.map(a => ethers.utils.getAddress(a))
+    if (new Set(ownersNew.map(a => a.toLowerCase())).size !== ownersNew.length)
+      throw new Error('В списке есть повторяющиеся адреса.')
+
+    const thr = parseInt($('c-threshold').value, 10)
+    if (!Number.isInteger(thr) || thr < 1 || thr > ownersNew.length)
+      throw new Error(`Порог должен быть от 1 до ${ownersNew.length}.`)
+
+    const factoryAddr = ethers.utils.getAddress($('c-factory').value.trim())
+    const singleton   = ethers.utils.getAddress($('c-singleton').value.trim())
+    const fallback    = ethers.utils.getAddress($('c-fallback').value.trim())
+    const salt = ethers.BigNumber.from($('c-salt').value.trim() || '0')
+
+    // проверяем, что канонические контракты есть в этой сети
+    for (const [name, a] of [['фабрики', factoryAddr], ['синглтона', singleton], ['fallback handler', fallback]]) {
+      if ((await provider.getCode(a)) === '0x')
+        throw new Error(`По адресу ${name} нет контракта в этой сети. Сверьте с реестром safe-deployments.`)
+    }
+
+    const iSafe = new ethers.utils.Interface(SAFE_ABI)
+    const zero = ethers.constants.AddressZero
+    const initializer = iSafe.encodeFunctionData('setup',
+      [ownersNew, thr, zero, '0x', fallback, zero, 0, zero])
+
+    const factory = new ethers.Contract(factoryAddr, FACTORY_ABI, signer)
+
+    // адрес известен заранее — CREATE2
+    const predicted = await factory.callStatic.createProxyWithNonce(singleton, initializer, salt)
+    if ((await provider.getCode(predicted)) !== '0x')
+      throw new Error(`Safe с такими подписантами, порогом и солью уже существует: ${predicted}. Смените соль.`)
+
+    if (!confirm(
+      `Создать Safe?\n\nПодписантов: ${ownersNew.length}\nПорог: ${thr} из ${ownersNew.length}\n\n` +
+      `Адрес будет: ${predicted}\n\nПодписанты:\n${ownersNew.join('\n')}`
+    )) return
+
+    say('Создаём Safe…', 'info')
+    const tx = await factory.createProxyWithNonce(singleton, initializer, salt)
+    await tx.wait()
+
+    $('create-result').innerHTML = `
+      <div class="blob-label" style="margin-top:14px">Адрес вашего Safe <button class="copy" onclick="copyText('${predicted}')">копировать</button></div>
+      <div class="blob">${predicted}</div>
+      <div class="hint">Этот адрес передаётся в BPS через <code>transferOwnership</code>. Он же уже подставлен в шаг 1.</div>`
+    $('in-safe').value = predicted
+    say('Safe создан. Проверьте его: вставьте адрес BPS в шаге 1 и нажмите «Загрузить».', 'success')
+  } catch (e) { say('Не удалось создать Safe: ' + errText(e), 'error') }
+}
+
+// ---------- старт ----------
+
+const q = new URLSearchParams(location.search)
+if (q.get('safe')) $('in-safe').value = q.get('safe')
+if (q.get('bps')) $('in-bps').value = q.get('bps')
+</script>
+</body>
+</html>
