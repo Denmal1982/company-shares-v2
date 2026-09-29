@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>BasisPointShare — кабинет держателя</title>
-<style> 
+<style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg0:#f4f5f9;--bg1:#fff;--bg2:#f8f9fc;--bg3:#eef0f6;--border:#e2e5ef;--border2:#d0d4e8;
@@ -150,13 +150,12 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
     <div class="note">Операции выполняются с вашего кошелька одной подписью. Для боевой сети владельцем должна быть мультиподпись: передайте владение Safe на вкладке «Владение».</div>
     <div class="tabs">
       <button class="tab active" onclick="tab(event,'o-add')">Токен дохода</button>
-      <button class="tab" onclick="tab(event,'o-pause')">Пауза учёта</button>
-      <button class="tab" onclick="tab(event,'o-rescue')">Вывод чужого</button>
+      <button class="tab" onclick="tab(event,'o-redemption')">Вывод чужого</button>
       <button class="tab" onclick="tab(event,'o-own')">Владение</button>
     </div>
 
     <div class="panel active" id="o-add">
-      <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен навсегда исключается из вывода через rescue. Каждый перевод долей дорожает на один внешний вызов.</div>
+      <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен навсегда исключается из вывода через redemption. Каждый перевод долей дорожает на один внешний вызов.</div>
       <div class="row"><label for="oa-token">Адрес токена</label><input class="mono" id="oa-token" placeholder="0x..." autocomplete="off"/>
         <div class="hint">Fee-on-transfer и rebase-токены добавлять нельзя — программно они не определяются, проверьте токен сами.</div></div>
       <div id="oa-check"></div>
@@ -165,18 +164,13 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
       <div class="hint" id="oa-slots"></div>
     </div>
 
-    <div class="panel" id="o-pause">
-      <div class="note">Аварийный выключатель против распределяемого токена, чей <code>balanceOf</code> перестал отвечать и блокирует переводы долей. Не выключатель торговли и не заморозка выплат. Перед снятием паузы нажмите «Разложить» у токена в карточке «Контракт».</div>
-      <div id="op-list"><div class="empty">Распределяемых токенов нет.</div></div>
-    </div>
-
-    <div class="panel" id="o-rescue">
+    <div class="panel" id="o-redemption">
       <div class="note">Только для токенов, которые <b>никогда</b> не были распределяемыми, — например, присланных на адрес контракта по ошибке.</div>
       <div class="two">
         <div class="row"><label for="or-token">Токен</label><input class="mono" id="or-token" placeholder="0x..." autocomplete="off"/></div>
         <div class="row"><label for="or-to">Получатель</label><input class="mono" id="or-to" placeholder="0x..." autocomplete="off"/></div>
       </div>
-      <button class="btn btn-danger" onclick="ownRescue()">Вывести</button>
+      <button class="btn btn-danger" onclick="ownRedemption()">Вывести</button>
     </div>
 
     <div class="panel" id="o-own">
@@ -312,7 +306,6 @@ const ABI = [
   "function pendingOwner() view returns (address)",
   "function shortfall(address token) view returns (uint256)",
   "function symbol() view returns (string)",
-  "function syncPaused(address) view returns (bool)",
   "function syncToken(address token)",
   "function totalOwed(address) view returns (uint256)",
   "function totalSupply() view returns (uint256)",
@@ -335,13 +328,12 @@ const ABI = [
   "error NotDistributionToken()",
   "error NotOwner()",
   "error NotPendingOwner()",
-  "error NothingToRescue()",
+  "error NothingToRedeem()",
   "error OfferAlreadyExists()",
   "error OfferExpired()",
   "error OfferNotExpired()",
   "error Reentrancy()",
   "error SelfTrade()",
-  "error SyncPaused()",
   "error TermsChanged()",
   "error TokenIsDistributed()",
   "error TooManyTokens()",
@@ -349,8 +341,7 @@ const ABI = [
   "error ZeroAddress()",
   "error ZeroAmount()",
   "function addDistributionToken(address token)",
-  "function setTokenSyncPaused(address token, bool paused_)",
-  "function rescue(address token, address to)",
+  "function redemption(address token, address to)",
   "function transferOwnership(address newOwner)",
   "function acceptOwnership()",
   "function isDistributionToken(address) view returns (bool)",
@@ -404,7 +395,6 @@ const ERR_RU = {
   InsufficientCustody: 'Столько долей не припарковано.',
   CannotUseSelf: 'Адрес самого контракта здесь использовать нельзя.',
   NotDistributionToken: 'Этот токен не распределяется контрактом.',
-  SyncPaused: 'Учёт этого токена приостановлен владельцем.',
   InvalidToken: 'Некорректный токен.',
   ZeroAddress: 'Нулевой адрес.',
   ZeroAmount: 'Нулевое количество.',
@@ -550,15 +540,13 @@ async function loadDividends() {
   // по токену отдельно: сломанный токен не должен гасить весь список
   const rows = await Promise.all(tokens.map(async (a) => {
     const t = m(a)
-    let paused = false
-    try { paused = await c.syncPaused(a) } catch {}
     try {
       const [e, n] = await c.pendingDividends(me, a)
-      if (!n.isZero() && !paused) any = true
+      if (!n.isZero()) any = true
       const part = !e.isZero() && n.lt(e)
       return `<div class="tok">
         <div class="tok-i">${esc(t.symbol.slice(0, 3).toUpperCase())}</div>
-        <div class="tok-n"><div class="tok-name">${esc(t.symbol)} ${paused ? '<span class="badge warn">пауза</span>' : ''}</div><div class="tok-a">${short(a)}</div></div>
+        <div class="tok-n"><div class="tok-name">${esc(t.symbol)}</div><div class="tok-a">${short(a)}</div></div>
         <div class="tok-v"><div class="tok-p${e.isZero() ? ' zero' : ''}">${fmt(e, t.decimals, 6)}</div>
           ${part ? `<div class="tok-w">сейчас доступно ${fmt(n, t.decimals, 6)}</div>` : ''}</div>
         <button class="btn btn-sm btn-ok" data-act onclick="doClaim('${a}')" ${n.isZero() ? 'disabled data-lock="1"' : ''}>Забрать</button>
@@ -634,16 +622,14 @@ async function loadInfo() {
     const warn = []
     const rows = await Promise.all(tokens.map(async (a) => {
       const t = m(a)
-      let paused = false, short_ = null, uns = null
-      try { paused = await c.syncPaused(a) } catch {}
+      let short_ = null, uns = null
       try { short_ = await c.shortfall(a) } catch {}
       try { uns = await c.unsyncedBalance(a) } catch {}
-      if (paused) warn.push(`Учёт ${t.symbol} приостановлен владельцем: новый приток не раскладывается. Начисленное ранее забрать можно.`)
       if (short_ && short_.gt(0)) warn.push(`Контракту не хватает ${fmt(short_, t.decimals)} ${t.symbol} на покрытие начислений.`)
       if (short_ === null) warn.push(`Баланс ${t.symbol} не читается — возможно, токен сломан.`)
-      const sync = uns && uns.gt(0) && !paused
+      const sync = uns && uns.gt(0)
         ? `<button class="btn btn-sm" data-act onclick="doSync('${a}')" style="margin-left:8px">Разложить ${fmt(uns, t.decimals)}</button>` : ''
-      return `<div class="ir"><span class="ik">${esc(t.symbol)} ${paused ? '<span class="badge warn">пауза</span>' : ''}</span><span class="iv">${short(a)}${sync}</span></div>`
+      return `<div class="ir"><span class="ik">${esc(t.symbol)}</span><span class="iv">${short(a)}${sync}</span></div>`
     }))
     $('warn').innerHTML = warn.map(esc).join('<br/>'); $('warn').classList.toggle('show', warn.length > 0)
 
@@ -803,12 +789,6 @@ async function loadOwner() {
   $('oo-pending').innerHTML = pendingAddr !== zero
     ? `<div class="danger"><b>Передача уже запущена</b>Ждём принятия от ${esc(pendingAddr)}. Новая передача на другой адрес заменит эту.</div>` : ''
 
-  const rows = await Promise.all(tokens.map(async (a) => {
-    let paused = false; try { paused = await c.syncPaused(a) } catch {}
-    return `<div class="tok"><div class="tok-n"><div class="tok-name">${esc(m(a).symbol)} ${paused ? '<span class="badge warn">пауза</span>' : '<span class="badge ok">активен</span>'}</div><div class="tok-a">${short(a)}</div></div>
-      <button class="btn btn-sm" data-act onclick="ownPause('${a}', ${!paused})">${paused ? 'Снять паузу' : 'Поставить паузу'}</button></div>`
-  }))
-  $('op-list').innerHTML = rows.length ? rows.join('') : '<div class="empty">Распределяемых токенов нет.</div>'
 }
 
 /// Всё, что можно проверить до необратимой транзакции.
@@ -839,29 +819,20 @@ async function ownCheckToken() {
 
 const ownAddToken = () => run('Добавляем токен', async () => {
   const t = addr('oa-token', 'токен')
-  if (prompt('НЕОБРАТИМОЕ ДЕЙСТВИЕ\n\nТокен ' + t + ' будет добавлен в распределение навсегда. Убрать его и вывести через rescue будет нельзя никогда.\n\nДля подтверждения введите: ДОБАВИТЬ') !== 'ДОБАВИТЬ') { say('Отменено.', 'info'); return false }
+  if (prompt('НЕОБРАТИМОЕ ДЕЙСТВИЕ\n\nТокен ' + t + ' будет добавлен в распределение навсегда. Убрать его и вывести через redemption будет нельзя никогда.\n\nДля подтверждения введите: ДОБАВИТЬ') !== 'ДОБАВИТЬ') { say('Отменено.', 'info'); return false }
   await (await bps.addDistributionToken(t)).wait()
   $('oa-token').value = ''; $('oa-check').innerHTML = ''; $('btn-own-add').disabled = true
   say('Токен добавлен в распределение.', 'success')
 })
 
-const ownPause = (t, pause) => run(pause ? 'Ставим паузу' : 'Снимаем паузу', async () => {
-  const msg = pause
-    ? `Поставить паузу учёта ${m(t).symbol}?\n\nНовый приток перестанет раскладываться по держателям. Начисленное ранее забрать можно.\nПри активной паузе покупатель долей может получить часть дохода за период продавца — держите паузу минимально.`
-    : `Снять паузу с ${m(t).symbol}?\n\nСначала нажмите «Разложить» у токена в карточке «Контракт», иначе накопленное распределится по новым весам.`
-  if (!confirm(msg)) return false
-  await (await bps.setTokenSyncPaused(t, pause)).wait()
-  say(pause ? 'Пауза поставлена.' : 'Пауза снята.', 'success')
-})
-
-const ownRescue = () => run('Выводим', async () => {
+const ownRedemption = () => run('Выводим', async () => {
   const t = addr('or-token', 'токен'), to = addr('or-to', 'получатель')
   if (await ro().wasDistributionToken(t)) throw new Error('Этот токен распределялся контрактом — вывести его нельзя никогда.')
   const mt = await tokenMeta(t)
   let bal; try { bal = await new ethers.Contract(t, ERC20_ABI, reader()).balanceOf(BPS_ADDR) } catch { throw new Error('Баланс токена не читается.') }
   if (bal.isZero()) throw new Error('На контракте нет этого токена.')
   if (!confirm(`Вывести ${exact(bal, mt.decimals)} ${mt.symbol}\nна адрес ${to}?`)) return false
-  await (await bps.rescue(t, to)).wait()
+  await (await bps.redemption(t, to)).wait()
   $('or-token').value = ''
   say('Выведено.', 'success')
 })
