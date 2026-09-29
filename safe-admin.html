@@ -149,8 +149,7 @@ details summary{font-size:12.5px;color:var(--txt3);cursor:pointer;font-weight:60
       <div class="ops">
         <button class="op" onclick="pick(event,'accept')">Принять владение</button>
         <button class="op" onclick="pick(event,'addToken')">Добавить токен дохода</button>
-        <button class="op" onclick="pick(event,'setPause')">Пауза учёта</button>
-        <button class="op" onclick="pick(event,'rescue')">Вывести чужой токен</button>
+        <button class="op" onclick="pick(event,'redemption')">Вывести чужой токен</button>
         <button class="op" onclick="pick(event,'transferOwner')">Передать владение</button>
       </div>
       <div class="group">Сам Safe</div>
@@ -168,14 +167,7 @@ details summary{font-size:12.5px;color:var(--txt3);cursor:pointer;font-weight:60
         <div class="row"><label for="a-token">Адрес токена</label><input class="mono" id="a-token" placeholder="0x..."/>
           <div class="hint">Страница проверит адрес заранее. Токены с комиссией при переводе и с ребейзом добавлять нельзя — проверьте это сами.</div></div>
       </div>
-      <div class="panel" id="p-setPause">
-        <div class="note">Аварийный выключатель, если токен перестал отвечать и переводы долей встали. Не выключатель торговли.</div>
-        <div class="two">
-          <div class="row"><label for="s-token">Токен</label><select id="s-token"></select></div>
-          <div class="row"><label for="s-val">Действие</label><select id="s-val"><option value="true">Поставить паузу</option><option value="false">Снять паузу</option></select></div>
-        </div>
-      </div>
-      <div class="panel" id="p-rescue">
+      <div class="panel" id="p-redemption">
         <div class="note">Только для токенов, присланных на контракт по ошибке. Распределяемые токены вывести нельзя никогда.</div>
         <div class="two">
           <div class="row"><label for="r-token">Токен</label><input class="mono" id="r-token" placeholder="0x..."/></div>
@@ -334,9 +326,7 @@ const BPS_ABI = [
   "function isDistributionToken(address) view returns (bool)",
   "function owner() view returns (address)",
   "function pendingOwner() view returns (address)",
-  "function rescue(address token, address to)",
-  "function setTokenSyncPaused(address token, bool paused_)",
-  "function syncPaused(address) view returns (bool)",
+  "function redemption(address token, address to)",
   "function transferOwnership(address newOwner)",
   "function wasDistributionToken(address) view returns (bool)",
   "error AllowanceExceeded()",
@@ -354,13 +344,12 @@ const BPS_ABI = [
   "error NotDistributionToken()",
   "error NotOwner()",
   "error NotPendingOwner()",
-  "error NothingToRescue()",
+  "error NothingToRedeem()",
   "error OfferAlreadyExists()",
   "error OfferExpired()",
   "error OfferNotExpired()",
   "error Reentrancy()",
   "error SelfTrade()",
-  "error SyncPaused()",
   "error TermsChanged()",
   "error TokenIsDistributed()",
   "error TooManyTokens()",
@@ -371,7 +360,7 @@ const BPS_ABI = [
 const ERC20_ABI = ["function symbol() view returns (string)", "function decimals() view returns (uint8)", "function balanceOf(address) view returns (uint256)"]
 // Операции, которые страница вообще согласна подписывать — остальное из ссылки отвергается
 const ALLOWED = {
-  bps: ['acceptOwnership', 'addDistributionToken', 'setTokenSyncPaused', 'rescue', 'transferOwnership'],
+  bps: ['acceptOwnership', 'addDistributionToken', 'redemption', 'transferOwnership'],
   safe: ['addOwnerWithThreshold', 'removeOwner', 'swapOwner', 'changeThreshold'],
 }
 
@@ -426,7 +415,7 @@ const ERR_RU = {
   NotOwner: 'Вызов не от владельца контракта.', NotPendingOwner: 'Safe не назначен кандидатом во владельцы.',
   InvalidToken: 'Некорректный токен.', AlreadyDistributionToken: 'Токен уже добавлен.', TooManyTokens: 'Слоты для токенов закончились.',
   CannotUseSelf: 'Адрес самого контракта использовать нельзя.', TokenIsDistributed: 'Этот токен распределялся — вывести его нельзя.',
-  NothingToRescue: 'На контракте нет этого токена.', ZeroAddress: 'Нулевой адрес.',
+  NothingToRedeem: 'На контракте нет этого токена.', ZeroAddress: 'Нулевой адрес.',
 }
 function errText(e) {
   for (const h of hexesIn(e)) { try { const n = iBps.parseError(h).name; return ERR_RU[n] || n } catch {} }
@@ -506,13 +495,11 @@ async function loadAll() {
     const [bOwner, bPending, list, len, max] = await Promise.all([
       bps.owner(), bps.pendingOwner(), bps.getDistributionTokens(), bps.distributionTokensLength(), bps.MAX_DISTRIBUTION_TOKENS()])
     const toks = await Promise.all(list.map(async a => {
-      let sym = short(a), paused = false
+      let sym = short(a)
       try { sym = await new ethers.Contract(a, ERC20_ABI, provider).symbol() } catch {}
-      try { paused = await bps.syncPaused(a) } catch {}
       symbols[a.toLowerCase()] = sym
-      return { a, sym, paused }
+      return { a, sym }
     }))
-    $('s-token').innerHTML = toks.map(t => `<option value="${t.a}">${esc(t.sym)} ${short(t.a)}${t.paused ? ' — на паузе' : ''}</option>`).join('') || '<option value="">нет распределяемых токенов</option>'
     const ownerKind = await addressKind(bOwner, provider)
 
     // адрес Safe: из ссылки кабинета (?safe=), иначе сохранённый в браузере
@@ -545,7 +532,7 @@ async function loadAll() {
       <div class="ir"><span class="ik">Safe</span><span class="iv">${short(safeAddr)} · подписей нужно ${threshold} из ${owners.length}</span></div>
       <div class="ir"><span class="ik">Владелец контракта</span><span class="iv" style="color:${safeOwns ? 'var(--green)' : 'var(--amber)'}">${short(bOwner)} — ${safeOwns ? 'этот Safe' : KIND_RU[ownerKind]}</span></div>
       ${bPending !== ZERO ? `<div class="ir"><span class="ik">Ожидает принятия</span><span class="iv">${short(bPending)}${safePending ? ' — этот Safe' : ''}</span></div>` : ''}
-      <div class="ir"><span class="ik">Токены дохода</span><span class="iv">${len} из ${max}${toks.map(t => ` · ${esc(t.sym)}${t.paused ? ' (пауза)' : ''}`).join('')}</span></div>
+      <div class="ir"><span class="ik">Токены дохода</span><span class="iv">${len} из ${max}${toks.map(t => ` · ${esc(t.sym)}`).join('')}</span></div>
       <div class="ir"><span class="ik">Подписанты</span><span class="iv">${owners.map(o => same(o, me) ? `<b style="color:var(--purple)">${short(o)} — вы</b>` : short(o)).join(', ')}</span></div>`
     $('role').textContent = isOwner(me) ? 'вы подписант' : 'только просмотр'
     $('role').className = 'badge ' + (isOwner(me) ? 'ok' : 'wait')
@@ -641,9 +628,7 @@ function buildTx() {
   switch (action) {
     case 'accept':        return { to: BPS_ADDR, data: iBps.encodeFunctionData('acceptOwnership', []) }
     case 'addToken':      return { to: BPS_ADDR, data: iBps.encodeFunctionData('addDistributionToken', [addr('a-token', 'токен')]) }
-    case 'setPause': { const t = $('s-token').value; if (!t) throw new Error('Нет распределяемых токенов.')
-      return { to: BPS_ADDR, data: iBps.encodeFunctionData('setTokenSyncPaused', [t, $('s-val').value === 'true']) } }
-    case 'rescue':        return { to: BPS_ADDR, data: iBps.encodeFunctionData('rescue', [addr('r-token', 'токен'), addr('r-to', 'получатель')]) }
+    case 'redemption':    return { to: BPS_ADDR, data: iBps.encodeFunctionData('redemption', [addr('r-token', 'токен'), addr('r-to', 'получатель')]) }
     case 'transferOwner': return { to: BPS_ADDR, data: iBps.encodeFunctionData('transferOwnership', [addr('t-to', 'новый владелец')]) }
     case 'safe:add': { const o = addr('sa-owner', 'новый подписант')
       if (isOwner(o)) throw new Error('Этот адрес уже подписант.'); if (same(o, safeAddr)) throw new Error('Safe не может быть своим подписантом.')
@@ -680,8 +665,7 @@ async function describe(to, data) {
     case 'acceptOwnership': return { what: 'Safe принимает владение контрактом', sub: 'После этого все функции владельца выполняются только по подписям участников Safe.' }
     case 'addDistributionToken': return { what: `Добавить токен дохода ${await symbolOf(args[0])}`, sub: `Адрес токена: ${args[0]}`,
       danger: 'Необратимо: токен навсегда останется в распределении, вывести его будет нельзя.' }
-    case 'setTokenSyncPaused': return { what: `${args[1] ? 'Поставить паузу' : 'Снять паузу'} учёта токена ${await symbolOf(args[0])}`, sub: `Адрес токена: ${args[0]}` }
-    case 'rescue': return { what: `Вывести весь ${await symbolOf(args[0])} с контракта`, sub: `Токен: ${args[0]}\nПолучатель: ${args[1]}`,
+    case 'redemption': return { what: `Вывести весь ${await symbolOf(args[0])} с контракта`, sub: `Токен: ${args[0]}\nПолучатель: ${args[1]}`,
       danger: 'Средства уйдут наружу. Особенно внимательно сверьте получателя.' }
     case 'transferOwnership': return { what: 'Передать владение контрактом', sub: `Новый владелец: ${args[0]}\nПолномочия перейдут, только когда он сам примет владение.`,
       danger: 'После принятия этот Safe потеряет управление контрактом.' }
@@ -713,7 +697,7 @@ async function preflight(to, data) {
     if (await bps.isDistributionToken(t)) throw new Error('Токен уже добавлен.')
     if ((await bps.distributionTokensLength()).gte(await bps.MAX_DISTRIBUTION_TOKENS())) throw new Error('Слоты для токенов закончились.')
   }
-  if (name === 'rescue') {
+  if (name === 'redemption') {
     if (await bps.wasDistributionToken(args[0])) throw new Error('Этот токен распределялся — вывести его нельзя никогда.')
     let bal; try { bal = await new ethers.Contract(args[0], ERC20_ABI, provider).balanceOf(BPS_ADDR) } catch { throw new Error('Баланс токена не читается.') }
     if (bal.isZero()) throw new Error('На контракте нет этого токена.')
