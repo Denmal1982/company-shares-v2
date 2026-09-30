@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"/>
-<title>BPS — управление через мультиподпись</title>
+<title>BasisPointShare — кабинет держателя</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -31,319 +31,304 @@
 ::-webkit-scrollbar-thumb:hover{background:var(--border2)}
 body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--bg1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
-.nav-l,.nav-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.nav-left,.nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--fill2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
 .logo-name{font-size:15px;font-weight:700;letter-spacing:.2px}
-.pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd);font-weight:700}
-.pill.main{background:var(--red-fill);color:#fff;border-color:var(--red-fill);font-size:12px}
-.ver{font-size:10.5px;color:var(--txt3);font-family:var(--mono)}
+.pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd);font-weight:600}
+.pill.main{background:var(--red-fill);color:#fff;border-color:var(--red-fill)}
+.pill.bad{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-bd)}
 .link{font-size:13px;color:var(--txt3);text-decoration:none;padding:6px 12px;border-radius:var(--rs);border:1px solid var(--border2);font-weight:500}
 .link:hover{color:var(--purple);border-color:var(--brand)}
-.btn{font-size:13px;padding:8px 16px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--bg2);color:var(--txt);cursor:pointer;font-weight:600;font-family:var(--font);transition:border-color .15s,color .15s,background .15s}
+.btn{font-size:13px;padding:8px 14px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--bg2);color:var(--txt);cursor:pointer;font-weight:600;font-family:var(--font);transition:border-color .15s,color .15s,background .15s}
 .btn:hover:not(:disabled){border-color:var(--brand);color:var(--purple)}
 .btn:disabled{opacity:.38;cursor:not-allowed}
 .btn.connected{border-color:var(--green-bd);color:var(--green);background:var(--green-bg)}
-.btn-primary{background:linear-gradient(135deg,var(--fill),var(--fill2));color:#fff;border:none;font-weight:700;box-shadow:0 0 18px rgba(72,123,255,.22)}
+.btn-primary{width:100%;padding:12px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--fill),var(--fill2));color:#fff;border:none;margin-top:6px;box-shadow:0 0 18px rgba(72,123,255,.22)}
 .btn-primary:hover:not(:disabled){opacity:.92;color:#fff}
-.btn-go{background:var(--green-fill);color:#fff;border:none;font-weight:700;box-shadow:0 0 18px rgba(46,208,160,.18)}
-.btn-go:hover:not(:disabled){opacity:.92;color:#fff}
-.btn-danger{border-color:var(--red-fill);color:#fff;background:var(--red-fill);font-weight:700}
-.btn-danger:hover:not(:disabled){opacity:.9;color:#fff}
-.wide{width:100%;padding:13px;font-size:14px}
-.big{padding:14px 18px;font-size:15px}
-.main{padding:22px 24px;max-width:900px;margin:0 auto}
-.views{display:flex;gap:8px;margin-bottom:18px}
-.view-tab{flex:1;padding:12px;font-size:14px;font-weight:700;border-radius:var(--r);border:1px solid var(--border);background:var(--bg1);color:var(--txt3);cursor:pointer;font-family:var(--font)}
-.view-tab.active{color:#fff;border-color:var(--fill);background:var(--fill)}
-.view-tab small{display:block;font-size:11px;font-weight:500;margin-top:2px;opacity:.85}
-.view{display:none}.view.active{display:block}
+.btn-sec{width:100%;padding:11px}
+.btn-sm{font-size:12px;padding:6px 12px}
+.btn-ok{border-color:var(--green-bd);color:var(--green);background:var(--green-bg)}
+.btn-ok:hover:not(:disabled){background:var(--green-fill);border-color:var(--green-fill);color:#fff}
+.btn-bad{border-color:var(--red-bd);color:var(--red);background:var(--red-bg)}
+.btn-bad:hover:not(:disabled){background:var(--red-fill);border-color:var(--red-fill);color:#fff}
+.main{padding:22px 24px;max-width:1180px;margin:0 auto}
+@media(max-width:800px){.main{padding:14px}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;box-shadow:var(--shadow)}
+.stat-l{font-size:11px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.stat-v{font-size:23px;font-weight:800;letter-spacing:-.5px;color:#edeff4}
+.stat-s{font-size:11px;color:var(--txt3);margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
 .card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
-.card.accent{border-color:var(--purple-bd);background:linear-gradient(180deg,rgba(72,123,255,.07),var(--bg1));box-shadow:0 0 22px rgba(72,123,255,.09)}
-.card-t{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;color:#edeff4}
-.step{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--fill);color:#fff;font-size:12px;font-weight:700;margin-right:8px}
-label{font-size:12px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:600}
-input,select,textarea{width:100%;padding:10px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--rs);background:var(--bg2);color:var(--txt);outline:none;font-family:var(--font)}
-input::placeholder,textarea::placeholder{color:#5f6675}
-input.mono,textarea{font-family:var(--mono);font-size:12.5px}
-textarea{resize:vertical}
-input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--purple-bg)}
-.row{margin-bottom:12px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:640px){.two{grid-template-columns:1fr}}
-.group{font-size:11px;color:var(--txt3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 8px}
-.ops{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.op{font-size:13px;padding:8px 13px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);cursor:pointer;font-weight:600;font-family:var(--font)}
-.op:hover{border-color:var(--brand);color:var(--purple)}
-.op.active{background:var(--fill);border-color:var(--fill);color:#fff}
+.card-t{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;color:#edeff4}
+.tabs{display:flex;gap:6px;margin-bottom:15px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{font-size:13px;padding:8px 13px;border:none;background:none;color:var(--txt3);cursor:pointer;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font)}
+.tab:hover{color:var(--txt2)}
+.tab.active{color:var(--purple);border-bottom-color:var(--brand)}
 .panel{display:none}.panel.active{display:block}
-.ir{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-.ir:last-child{border-bottom:none}
-.ik{color:var(--txt3);font-weight:600}
-.iv{font-family:var(--mono);font-size:12px;text-align:right;word-break:break-all;font-weight:600}
+label{font-size:12px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:600}
+input,select{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--rs);background:var(--bg2);color:var(--txt);outline:none;font-family:var(--font)}
+input::placeholder{color:#5f6675}
+input.mono{font-family:var(--mono);font-size:13px}
+input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--purple-bg)}
+.row{margin-bottom:11px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:11.5px;color:var(--txt3);margin-top:6px;line-height:1.5}
+.tok{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.tok:last-child{border-bottom:none}
+.tok-i{width:36px;height:36px;border-radius:10px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--purple);flex-shrink:0}
+.tok-n{flex:1;min-width:0}
+.tok-name{font-size:13px;font-weight:700}
+.tok-a{font-size:11px;color:var(--txt3);font-family:var(--mono)}
+.tok-v{text-align:right;margin-right:8px}
+.tok-p{font-size:16px;font-weight:800;color:var(--green)}
+.tok-p.zero{color:var(--txt3);font-weight:600}
+.tok-w{font-size:11px;color:var(--amber);font-weight:600}
+.offer{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:10px}
+.offer.in{background:var(--green-light);border-color:var(--green-bd)}
+.offer-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.offer-w{font-size:11px;color:var(--txt3);font-weight:600;font-family:var(--mono)}
+.offer-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.offer-l{font-size:11px;color:var(--txt3);margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.offer-v{font-size:14px;font-weight:700}
+.offer-a{display:flex;gap:8px;margin-top:11px}
+.offer-a .btn{flex:1}
 .badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
 .badge.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
-.badge.wait{background:var(--bg3);color:var(--txt3);border:1px solid var(--border2)}
 .badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd)}
+.badge.dead{background:var(--bg3);color:var(--txt3);border:1px solid var(--border2)}
+.ir{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.ir:last-child{border-bottom:none}
+.ik{color:var(--txt3);font-weight:600}
+.iv{font-family:var(--mono);font-size:12px;font-weight:700;text-align:right;word-break:break-all}
+.iv a{color:var(--purple);text-decoration:none}
+.div{display:flex;align-items:center;gap:8px;margin:16px 0 12px;font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.div::before,.div::after{content:'';flex:1;height:1px;background:var(--border)}
 .status{font-size:13px;padding:12px 15px;border-radius:var(--r);margin-bottom:16px;display:none;line-height:1.5;font-weight:500;border:1px solid}
 .status.info{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-bd);display:block}
 .status.success{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);display:block}
 .status.error{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);display:block}
-.danger{font-size:13px;line-height:1.6;padding:12px 14px;border-radius:var(--rs);background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red-tx);margin-bottom:14px}
-.danger b{display:block;margin-bottom:3px;color:var(--red)}
-.note{font-size:13px;line-height:1.6;padding:12px 14px;border-radius:var(--rs);background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber-tx);margin-bottom:14px}
-.hint{font-size:12px;color:var(--txt3);margin-top:6px;line-height:1.5}
-.hidden{display:none}
+.banner{font-size:13px;padding:12px 15px;border-radius:var(--r);margin-bottom:16px;font-weight:600;border:1px solid var(--amber-bd);background:var(--amber-bg);color:var(--amber);display:none;line-height:1.55}
+.banner.show{display:block}
+.note{font-size:12.5px;line-height:1.6;padding:11px 13px;border-radius:var(--rs);background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber-tx);margin-bottom:12px}
+.empty{font-size:13px;color:var(--txt3);text-align:center;padding:22px 0;line-height:1.6}
 code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5px;border-radius:4px;color:var(--txt2)}
-details summary{font-size:12.5px;color:var(--txt3);cursor:pointer;font-weight:600;padding:4px 0}
-.blob{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;word-break:break-all;line-height:1.6;margin:6px 0 10px;color:var(--txt2)}
-/* операция */
-.op-what{font-size:18px;font-weight:700;line-height:1.4;margin-bottom:6px;color:#edeff4}
-.op-sub{font-size:13px;color:var(--txt2);line-height:1.6}
-.code-box{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg2);border:1px dashed var(--border2);border-radius:var(--r);padding:14px 16px;margin:16px 0}
-.code-l{font-size:12px;color:var(--txt2);line-height:1.5;max-width:340px}
-.code-v{font-family:var(--mono);font-size:22px;font-weight:800;letter-spacing:2px;color:var(--purple)}
-.people{margin:6px 0 14px}
-.person{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.person:last-child{border-bottom:none}
-.pa{font-family:var(--mono);font-size:12.5px}
-.pa.me{font-weight:700;color:var(--purple)}
-.progress{height:8px;background:var(--bg3);border-radius:10px;overflow:hidden;margin:6px 0 4px}
-.progress>div{height:100%;background:var(--green);transition:width .3s}
-.next{font-size:14px;font-weight:600;line-height:1.55;padding:13px 15px;border-radius:var(--r);background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd);margin-bottom:14px}
-.next.done{background:var(--green-bg);color:var(--green);border-color:var(--green-bd)}
-.next.stale{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
-.acts{display:flex;gap:10px;flex-wrap:wrap}
-.acts>*{flex:1;min-width:170px}
-.share{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--r);padding:14px 16px;margin-top:16px}
-.share-t{font-size:14px;font-weight:700;color:var(--green);margin-bottom:6px}
-.share-row{display:flex;gap:8px;margin-top:8px}
-.share-row input{flex:1;font-family:var(--mono);font-size:12px;background:var(--bg1)}
+.owner{border-color:var(--purple-bd);background:linear-gradient(180deg,rgba(72,123,255,.07),var(--bg1));box-shadow:0 0 22px rgba(72,123,255,.09)}
+.danger{font-size:12.5px;line-height:1.6;padding:11px 13px;border-radius:var(--rs);background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red-tx);margin-bottom:12px}
+.danger b{display:block;margin-bottom:3px;color:var(--red)}
+.btn-danger{width:100%;padding:12px;font-size:14px;font-weight:700;border-color:var(--red-bd);color:var(--red);background:var(--red-bg);margin-top:6px}
+.btn-danger:hover:not(:disabled){background:var(--red-fill);border-color:var(--red-fill);color:#fff}
+.chk{font-size:12px;padding:4px 0;line-height:1.5}
+.chk.ok{color:var(--green)}.chk.bad{color:var(--red);font-weight:600}
+.owner-line{padding:14px 20px}
+.ol-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ol-k{font-size:12px;color:var(--txt3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ol-v{font-family:var(--mono);font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ol-note{font-size:12.5px;color:var(--txt2);margin-top:8px;line-height:1.55}
+.ol-note:empty{display:none}
+.ver{font-size:10.5px;color:var(--txt3);font-family:var(--mono)}
+.hidden{display:none}
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <div class="nav-l">
+  <div class="nav-left">
     <div class="logo-icon">BPS</div>
-    <span class="logo-name">Управление контрактом</span>
-    <span class="pill" id="net-pill">не подключено</span>
-    <span class="ver">интерфейс 2026-09-29</span>
+    <span class="logo-name">BasisPointShare</span>
+    <span class="pill" id="net-pill">сеть</span>
+    <span class="ver" title="версия интерфейса">интерфейс 2026-09-29</span>
   </div>
-  <div class="nav-r">
-    <a class="link" id="dash-link" href="index.html">← Кабинет держателя</a>
+  <div class="nav-right">
+    <a class="link hidden" id="admin-link" href="#">Панель владельца →</a>
+    <button class="btn" id="btn-refresh" onclick="refreshAll()" disabled>Обновить</button>
     <button class="btn" id="btn-wallet" onclick="connect()">Подключить кошелёк</button>
   </div>
 </nav>
 
 <div class="main">
+  <div class="banner" id="warn"></div>
   <div class="status" id="msg"></div>
 
-  <div class="views">
-    <button class="view-tab active" id="vt-manage" onclick="view('manage')">Управление<small>операции и подписи</small></button>
-    <button class="view-tab" id="vt-setup" onclick="view('setup')">Настройка<small>один раз при запуске</small></button>
+  <!-- КТО ВЛАДЕЛЕЦ: видно всем -->
+  <div class="card owner-line" id="owner-line">
+    <div class="ol-row">
+      <span class="ol-k">Владелец контракта</span>
+      <span class="ol-v" id="ol-owner">загрузка…</span>
+    </div>
+    <div class="ol-note" id="ol-note"></div>
   </div>
 
-  <!-- ================= УПРАВЛЕНИЕ ================= -->
-  <div class="view active" id="v-manage">
-
-    <div class="card hidden" id="need-setup">
-      <div class="card-t">Сначала настройка</div>
-      <div class="op-sub" style="margin-bottom:14px">Эта страница ещё не знает, какой Safe управляет контрактом. Откройте вкладку «Настройка» и укажите его адрес — это нужно сделать один раз.</div>
-      <button class="btn btn-primary wide" onclick="view('setup')">Перейти к настройке</button>
+  <!-- ВЛАДЕЛЕЦ: кошелёк -->
+  <div class="card owner hidden" id="own-card">
+    <div class="card-t"><span>Панель владельца</span><span class="badge warn">вы владелец контракта</span></div>
+    <div class="note">Операции выполняются с вашего кошелька одной подписью. Для боевой сети владельцем должна быть мультиподпись: передайте владение Safe на вкладке «Владение».</div>
+    <div class="tabs">
+      <button class="tab active" onclick="tab(event,'o-add')">Токен дохода</button>
+      <button class="tab" onclick="tab(event,'o-redemption')">Вывод чужого</button>
+      <button class="tab" onclick="tab(event,'o-own')">Владение</button>
     </div>
 
-    <div class="card hidden" id="card-state">
-      <div class="card-t"><span>Состояние</span><span class="badge" id="role"></span></div>
-      <div id="state"></div>
+    <div class="panel active" id="o-add">
+      <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен навсегда исключается из вывода через redemption. Каждый перевод долей дорожает на один внешний вызов.</div>
+      <div class="row"><label for="oa-token">Адрес токена</label><input class="mono" id="oa-token" placeholder="0x..." autocomplete="off"/>
+        <div class="hint">Fee-on-transfer и rebase-токены добавлять нельзя — программно они не определяются, проверьте токен сами.</div></div>
+      <div id="oa-check"></div>
+      <button class="btn btn-sec" onclick="ownCheckToken()">Проверить токен</button>
+      <button class="btn btn-danger" id="btn-own-add" onclick="ownAddToken()" disabled>Добавить необратимо</button>
+      <div class="hint" id="oa-slots"></div>
     </div>
 
-    <div class="card hidden" id="card-new">
-      <div class="card-t">Новая операция</div>
-
-      <div class="group">Контракт</div>
-      <div class="ops">
-        <button class="op" onclick="pick(event,'accept')">Принять владение</button>
-        <button class="op" onclick="pick(event,'addToken')">Добавить токен дохода</button>
-        <button class="op" onclick="pick(event,'redemption')">Вывести чужой токен</button>
-        <button class="op" onclick="pick(event,'transferOwner')">Передать владение</button>
+    <div class="panel" id="o-redemption">
+      <div class="note">Только для токенов, которые <b>никогда</b> не были распределяемыми, — например, присланных на адрес контракта по ошибке.</div>
+      <div class="two">
+        <div class="row"><label for="or-token">Токен</label><input class="mono" id="or-token" placeholder="0x..." autocomplete="off"/></div>
+        <div class="row"><label for="or-to">Получатель</label><input class="mono" id="or-to" placeholder="0x..." autocomplete="off"/></div>
       </div>
-      <div class="group">Сам Safe</div>
-      <div class="ops">
-        <button class="op" onclick="pick(event,'safe:add')">Добавить подписанта</button>
-        <button class="op" onclick="pick(event,'safe:remove')">Удалить подписанта</button>
-        <button class="op" onclick="pick(event,'safe:swap')">Заменить подписанта</button>
-        <button class="op" onclick="pick(event,'safe:threshold')">Изменить порог</button>
-      </div>
-
-      <div class="panel" id="p-none"><div class="hint">Выберите операцию.</div></div>
-      <div class="panel" id="p-accept"><div class="note">Нужно один раз — после того как текущий владелец назначил этот Safe кандидатом.</div></div>
-      <div class="panel" id="p-addToken">
-        <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен уже никогда нельзя будет убрать из распределения или вывести.</div>
-        <div class="row"><label for="a-token">Адрес токена</label><input class="mono" id="a-token" placeholder="0x..."/>
-          <div class="hint">Страница проверит адрес заранее. Токены с комиссией при переводе и с ребейзом добавлять нельзя — проверьте это сами.</div></div>
-      </div>
-      <div class="panel" id="p-redemption">
-        <div class="note">Только для токенов, присланных на контракт по ошибке. Распределяемые токены вывести нельзя никогда.</div>
-        <div class="two">
-          <div class="row"><label for="r-token">Токен</label><input class="mono" id="r-token" placeholder="0x..."/></div>
-          <div class="row"><label for="r-to">Кому отправить</label><input class="mono" id="r-to" placeholder="0x..."/></div>
-        </div>
-      </div>
-      <div class="panel" id="p-transferOwner">
-        <div class="note">Новый владелец получит полномочия только после того, как сам примет владение.</div>
-        <div class="row"><label for="t-to">Новый владелец</label><input class="mono" id="t-to" placeholder="0x..."/></div>
-      </div>
-      <div class="panel" id="p-safe:add"><div class="two">
-        <div class="row"><label for="sa-owner">Новый подписант</label><input class="mono" id="sa-owner" placeholder="0x..."/></div>
-        <div class="row"><label for="sa-thr">Порог после добавления</label><input id="sa-thr" type="number" min="1"/></div>
-      </div></div>
-      <div class="panel" id="p-safe:remove"><div class="two">
-        <div class="row"><label for="sr-owner">Кого удалить</label><select id="sr-owner"></select></div>
-        <div class="row"><label for="sr-thr">Порог после удаления</label><input id="sr-thr" type="number" min="1"/></div>
-      </div></div>
-      <div class="panel" id="p-safe:swap">
-        <div class="note">Для утерянного или скомпрометированного ключа.</div>
-        <div class="two">
-          <div class="row"><label for="ss-old">Кого заменить</label><select id="ss-old"></select></div>
-          <div class="row"><label for="ss-new">На кого</label><input class="mono" id="ss-new" placeholder="0x..."/></div>
-        </div>
-      </div>
-      <div class="panel" id="p-safe:threshold">
-        <div class="row"><label for="st-thr">Новый порог</label><input id="st-thr" type="number" min="1"/><div class="hint" id="st-hint"></div></div>
-      </div>
-
-      <button class="btn btn-primary wide" id="btn-prepare" onclick="prepare()" disabled>Подготовить операцию</button>
+      <button class="btn btn-danger" onclick="ownRedemption()">Вывести</button>
     </div>
 
-    <!-- ОПЕРАЦИЯ -->
-    <div class="card hidden" id="card-op">
-      <div class="card-t"><span>Операция на подпись</span><button class="btn" onclick="closeOp()">Закрыть</button></div>
-      <div class="op-what" id="op-what"></div>
-      <div class="op-sub" id="op-sub"></div>
-      <div id="op-danger"></div>
-
-      <div class="code-box">
-        <div class="code-l"><b>Код проверки.</b> Сверьте его с коллегами голосом или в мессенджере: у всех, кто подписывает эту операцию, код должен совпадать.</div>
-        <div class="code-v" id="op-code"></div>
-      </div>
-
-      <div class="next" id="op-next"></div>
-
-      <div class="group" id="op-count"></div>
-      <div class="progress"><div id="op-bar" style="width:0"></div></div>
-      <div class="people" id="op-people"></div>
-
-      <div class="acts">
-        <button class="btn btn-primary big" id="btn-sign" onclick="signOp()">Подписать</button>
-        <button class="btn btn-go big" id="btn-exec" onclick="execute()" disabled>Исполнить</button>
-      </div>
-
-      <div class="share hidden" id="share">
-        <div class="share-t">Ссылка для следующего подписанта</div>
-        <div class="op-sub">В ней операция и все собранные подписи. Отправьте её коллеге — он откроет, проверит код и подпишет. Подпись бесплатна.</div>
-        <div class="share-row"><input id="share-link" readonly/><button class="btn" onclick="copyLink()">Копировать</button></div>
-      </div>
-
-      <details style="margin-top:16px">
-        <summary>Коллега прислал ссылку с подписью — добавить</summary>
-        <div class="row" style="margin-top:8px"><textarea id="import-link" rows="2" placeholder="Вставьте ссылку"></textarea></div>
-        <button class="btn" onclick="importLink()">Добавить подписи из ссылки</button>
-      </details>
-
-      <details style="margin-top:6px">
-        <summary>Другие способы и подробности</summary>
-        <div class="op-sub" style="margin:8px 0">Подтвердить в блокчейне — отдельная транзакция с комиссией, зато ссылку пересылать не нужно: подтверждение увидят все.</div>
-        <button class="btn" id="btn-approve" onclick="approveOnchain()">Подтвердить в блокчейне</button>
-        <div class="group" style="margin-top:14px">Хеш операции</div><div class="blob" id="out-hash"></div>
-        <div class="group">Данные вызова</div><div class="blob" id="out-data"></div>
-        <div class="group">Подписи вручную (например, из cast)</div>
-        <textarea id="in-sigs" rows="2" oninput="refreshOp()" placeholder="0x... по одной на строку"></textarea>
-      </details>
+    <div class="panel" id="o-own">
+      <div class="note">Передача двухшаговая: пока новый владелец не примет, полномочия остаются у вас. Ошибку в адресе можно исправить, повторив передачу. Отказаться от владения нельзя — такой функции в контракте нет.</div>
+      <div id="oo-pending"></div>
+      <div class="row"><label for="oo-to">Новый владелец — адрес Safe или кошелька</label><input class="mono" id="oo-to" placeholder="0x..." autocomplete="off"/></div>
+      <button class="btn btn-danger" onclick="ownTransfer()">Передать владение</button>
+      <div class="hint">Если новый владелец — Safe, принять владение нужно в <a id="oo-safe-link" href="safe-admin.html">панели мультиподписи</a>.</div>
     </div>
   </div>
 
-  <!-- ================= НАСТРОЙКА ================= -->
-  <div class="view" id="v-setup">
-    <div class="card">
-      <div class="card-t"><span><span class="step">1</span>Адрес Safe</span></div>
-      <div class="op-sub" style="margin-bottom:12px">Safe, который управляет контрактом. Страница запомнит его в этом браузере.</div>
-      <div class="row"><label for="in-safe">Safe</label><input class="mono" id="in-safe" placeholder="0x..." autocomplete="off"/></div>
-      <button class="btn btn-primary wide" onclick="saveSafe()">Сохранить и проверить</button>
-      <div class="hint">Контракт долей: <code id="bps-addr"></code> — задан в странице.</div>
-    </div>
+  <!-- КАНДИДАТ ВО ВЛАДЕЛЬЦЫ: кошелёк -->
+  <div class="card owner hidden" id="pend-card">
+    <div class="card-t"><span>Вам передают владение контрактом</span><span class="badge warn">ожидает принятия</span></div>
+    <div class="note">Текущий владелец назначил вас кандидатом. Пока вы не примете, полномочия остаются у него.</div>
+    <button class="btn btn-primary" onclick="ownAccept()">Принять владение</button>
+  </div>
 
-    <div class="card accent hidden" id="card-direct">
-      <div class="card-t"><span><span class="step">2</span>Передать владение Safe</span><span class="badge warn">контрактом владеет ваш кошелёк</span></div>
-      <div class="op-sub" style="margin-bottom:12px">Первый из двух шагов: назначить Safe кандидатом. Затем подписанты проводят операцию «Принять владение» во вкладке «Управление». До этого полномочия остаются у вас.</div>
-      <div class="ir"><span class="ik">Сейчас владеет</span><span class="iv" id="direct-owner"></span></div>
-      <div class="ir"><span class="ik">Передать Safe</span><span class="iv" id="direct-safe"></span></div>
-      <button class="btn btn-primary wide" style="margin-top:12px" onclick="directTransfer()">Передать владение этому Safe</button>
-    </div>
+  <!-- ВЛАДЕЛЕЦ: мультиподпись -->
+  <div class="card owner hidden" id="safe-card">
+    <div class="card-t"><span>Контрактом управляет мультиподпись</span><span class="badge ok">Safe</span></div>
+    <div class="note" style="margin-bottom:12px">Функции владельца выполняются только по подписям участников Safe — отсюда их вызвать нельзя.</div>
+    <a class="btn btn-primary" id="safe-card-link" href="safe-admin.html" style="display:block;text-align:center;text-decoration:none">Открыть панель мультиподписи</a>
+  </div>
 
+
+  <div class="stats">
+    <div class="stat"><div class="stat-l">Мои доли</div><div class="stat-v" id="st-bal" style="color:var(--purple)">—</div><div class="stat-s">свободные + в OTC</div></div>
+    <div class="stat"><div class="stat-l">Свободно</div><div class="stat-v" id="st-free" style="color:var(--green)">—</div><div class="stat-s">можно распорядиться</div></div>
+    <div class="stat"><div class="stat-l">В OTC</div><div class="stat-v" id="st-locked" style="color:var(--amber)">—</div><div class="stat-s">заперто в предложениях</div></div>
+    <div class="stat"><div class="stat-l">Припарковано</div><div class="stat-v" id="st-cust" style="color:var(--txt3)">—</div><div class="stat-s">дохода не приносит</div></div>
+    <div class="stat"><div class="stat-l">Моя доля дохода</div><div class="stat-v" id="st-pct" style="color:var(--blue)">—</div><div class="stat-s">от долей в распределении</div></div>
+  </div>
+
+  <div class="grid">
     <div class="card">
-      <div class="card-t"><span>Создать новый Safe</span><button class="btn" onclick="toggle('create-body')">показать</button></div>
-      <div id="create-body" class="hidden">
-        <div class="row">
-          <label for="c-owners">Подписанты — каждый с новой строки</label>
-          <textarea id="c-owners" rows="4" placeholder="0x...&#10;0x...&#10;0x..."></textarea>
-          <div class="hint">Для основной сети — аппаратные кошельки, лучше разных производителей.</div>
+      <div class="card-t"><span>Доход</span><button class="btn btn-sm btn-ok" id="btn-claim-all" onclick="doClaimAll()" disabled>Забрать всё</button></div>
+      <div id="div-list"><div class="empty">Подключите кошелёк, чтобы увидеть накопленное.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-t"><span>Предложения вам</span></div>
+      <div id="in-list"><div class="empty">Подключите кошелёк, чтобы увидеть адресованные вам предложения.</div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active" onclick="tab(event,'t-otc')">Продать</button>
+        <button class="tab" onclick="tab(event,'t-send')">Перевести</button>
+        <button class="tab" onclick="tab(event,'t-park')">Парковка</button>
+      </div>
+
+      <div class="panel active" id="t-otc">
+        <div class="row"><label for="o-buyer">Адрес покупателя</label><input class="mono" id="o-buyer" placeholder="0x..." autocomplete="off"/></div>
+        <div class="two">
+          <div class="row"><label for="o-units">Долей</label><input id="o-units" type="number" min="0" step="any" placeholder="0"/></div>
+          <div class="row"><label for="o-price">Цена за весь объём</label><input id="o-price" type="number" min="0" step="any" placeholder="0"/></div>
         </div>
         <div class="two">
-          <div class="row"><label for="c-thr">Сколько подписей нужно</label><input id="c-thr" type="number" min="1" value="2"/></div>
-          <div class="row"><label for="c-salt">Соль</label><input class="mono" id="c-salt" value="1"/><div class="hint">Смените, чтобы создать второй Safe с теми же подписантами.</div></div>
+          <div class="row"><label for="o-token">Оплата в</label><select id="o-token"><option value="">Выберите токен</option></select></div>
+          <div class="row"><label for="o-days">Действует, дней</label><input id="o-days" type="number" min="1" max="365" value="7"/></div>
         </div>
-        <details style="margin-bottom:12px">
-          <summary>Адреса контрактов Safe v1.4.1</summary>
-          <div style="margin-top:10px">
-            <div class="row"><label for="c-factory">SafeProxyFactory</label><input class="mono" id="c-factory" value="0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67"/></div>
-            <div class="row"><label for="c-singleton">Safe singleton (SafeL2)</label><input class="mono" id="c-singleton" value="0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"/></div>
-            <div class="row"><label for="c-fallback">Fallback handler</label><input class="mono" id="c-fallback" value="0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99"/></div>
-          </div>
-        </details>
-        <button class="btn btn-primary wide" onclick="createSafe()">Создать Safe</button>
-        <div id="create-result"></div>
+        <button class="btn btn-primary" id="btn-otc" onclick="doCreateOTC()" disabled>Создать предложение</button>
+        <div class="hint">Продажа конкретному адресу. Доли остаются вашими и приносят доход до исполнения, но распорядиться ими до отмены нельзя. На один адрес — одно предложение.</div>
       </div>
+
+      <div class="panel" id="t-send">
+        <div class="row"><label for="s-to">Получатель</label><input class="mono" id="s-to" placeholder="0x..." autocomplete="off"/></div>
+        <div class="row"><label for="s-amt">Долей</label><input id="s-amt" type="number" min="0" step="any" placeholder="0"/></div>
+        <button class="btn btn-primary" id="btn-send" onclick="doSend()" disabled>Перевести</button>
+        <div class="hint">Доход, накопленный до перевода, остаётся у вас. Перевод на адрес самого контракта не теряет доли, а паркует их на ваше имя.</div>
+      </div>
+
+      <div class="panel" id="t-park">
+        <div class="note"><b>Парковка — безвозмездный отказ от дохода.</b> Пока доли припаркованы, вы не получаете ничего, а ваша часть потока достаётся остальным держателям. Компенсации нет. Вернуть может только тот, кто припарковал.</div>
+        <div class="row"><label for="p-amt">Долей</label><input id="p-amt" type="number" min="0" step="any" placeholder="0"/></div>
+        <div class="two">
+          <button class="btn btn-sec" id="btn-park" onclick="doPark()" disabled>Припарковать</button>
+          <button class="btn btn-sec" id="btn-unpark" onclick="doUnpark()" disabled>Вернуть</button>
+        </div>
+      </div>
+
+      <div class="div">мои открытые предложения</div>
+      <div id="out-list"><div class="empty">Открытых предложений нет.</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><span>Контракт</span></div>
+      <div id="info"><div class="empty">Загрузка…</div></div>
     </div>
   </div>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
 // ---------- настройки ----------
 const DEFAULT_BPS = "0x51c8F32beaEeBAEA68286c4B76f82618A74732f1"
+const CHAIN_ID    = 11155111
+const RPC_URL     = "https://ethereum-sepolia-rpc.publicnode.com"
+const EXPLORER    = "https://sepolia.etherscan.io"
+const START_BLOCK = 0          // блок деплоя — ускоряет поиск предложений
+const LOG_WINDOW  = 45000
+const DEC         = 18
+
 const Q = new URLSearchParams(location.search)
 const BPS_ADDR = (Q.get('bps') && ethers.utils.isAddress(Q.get('bps'))) ? ethers.utils.getAddress(Q.get('bps')) : DEFAULT_BPS
-const SENTINEL = '0x0000000000000000000000000000000000000001'
-const ZERO = '0x0000000000000000000000000000000000000000'
-const STORE_KEY = 'bps-safe:' + BPS_ADDR.toLowerCase()
 
-const SAFE_ABI = [
-  "function nonce() view returns (uint256)",
-  "function getThreshold() view returns (uint256)",
-  "function getOwners() view returns (address[])",
-  "function approvedHashes(address,bytes32) view returns (uint256)",
-  "function approveHash(bytes32 hashToApprove)",
-  "function getTransactionHash(address to, uint256 value, bytes data, uint8 operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address refundReceiver, uint256 _nonce) view returns (bytes32)",
-  "function execTransaction(address to, uint256 value, bytes data, uint8 operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address refundReceiver, bytes signatures) payable returns (bool)",
-  "function addOwnerWithThreshold(address owner, uint256 _threshold)",
-  "function removeOwner(address prevOwner, address owner, uint256 _threshold)",
-  "function swapOwner(address prevOwner, address oldOwner, address newOwner)",
-  "function changeThreshold(uint256 _threshold)",
-  "function setup(address[] _owners, uint256 _threshold, address to, bytes data, address fallbackHandler, address paymentToken, uint256 payment, address paymentReceiver)",
-]
-const FACTORY_ABI = ["function createProxyWithNonce(address _singleton, bytes initializer, uint256 saltNonce) returns (address proxy)"]
-const BPS_ABI = [
-  "function MAX_DISTRIBUTION_TOKENS() view returns (uint256)",
-  "function acceptOwnership()",
-  "function addDistributionToken(address token)",
-  "function distributionTokensLength() view returns (uint256)",
+const ABI = [
+  "event OTCCreated(address indexed seller, address indexed buyer, uint256 units, uint256 price, address indexed paymentToken, uint64 deadline)",
+  "function MAX_OTC_DURATION() view returns (uint64)",
+  "function activeSupply() view returns (uint256)",
+  "function balanceOf(address a) view returns (uint256)",
+  "function cancelExpiredOTC(address seller, address buyer)",
+  "function cancelOTC(address buyer)",
+  "function claim(address token) returns (uint256)",
+  "function claimAll() returns (uint256[])",
+  "function claimAllFor(address user) returns (uint256[])",
+  "function createOTC(address buyer, uint256 units, uint256 price, address paymentToken, uint64 deadline)",
+  "function custodyOf(address a) view returns (uint256)",
+  "function custodyTotal() view returns (uint256)",
+  "function executeOTC(address seller, uint256 expectedUnits, uint256 maxPrice, address expectedToken, uint256 expectedNonce)",
+  "function freeBalanceOf(address a) view returns (uint256)",
   "function getDistributionTokens() view returns (address[])",
-  "function isDistributionToken(address) view returns (bool)",
+  "function lockedBalanceOf(address a) view returns (uint256)",
+  "function name() view returns (string)",
+  "function otcOffers(address, address) view returns (uint256 units, uint256 price, address paymentToken, uint64 deadline, uint256 nonce)",
+  "function ownedUnits(address a) view returns (uint256)",
   "function owner() view returns (address)",
+  "function park(uint256 amount)",
+  "function pendingDividendsAll(address user) view returns (address[] tokens, uint256[] earned, uint256[] claimableNow)",
   "function pendingOwner() view returns (address)",
-  "function redemption(address token, address to)",
-  "function transferOwnership(address newOwner)",
-  "function wasDistributionToken(address) view returns (bool)",
+  "function shortfall(address token) view returns (uint256)",
+  "function symbol() view returns (string)",
+  "function syncToken(address token)",
+  "function totalOwed(address) view returns (uint256)",
+  "function totalSupply() view returns (uint256)",
+  "function transfer(address to, uint256 value) returns (bool)",
+  "function unpark(uint256 amount)",
+  "function unsyncedBalance(address token) view returns (uint256)",
+  "function pendingDividends(address user, address token) view returns (uint256 earned, uint256 claimableNow)",
   "error AllowanceExceeded()",
   "error AlreadyDistributionToken()",
   "error CannotUseSelf()",
@@ -370,51 +355,72 @@ const BPS_ABI = [
   "error TooManyTokens()",
   "error TransferFailed()",
   "error ZeroAddress()",
-  "error ZeroAmount()"
+  "error ZeroAmount()",
+  "function addDistributionToken(address token)",
+  "function redemption(address token, address to)",
+  "function transferOwnership(address newOwner)",
+  "function acceptOwnership()",
+  "function isDistributionToken(address) view returns (bool)",
+  "function wasDistributionToken(address) view returns (bool)",
+  "function distributionTokensLength() view returns (uint256)",
+  "function MAX_DISTRIBUTION_TOKENS() view returns (uint256)"
 ]
-const ERC20_ABI = ["function symbol() view returns (string)", "function decimals() view returns (uint8)", "function balanceOf(address) view returns (uint256)"]
-// Операции, которые страница вообще согласна подписывать — остальное из ссылки отвергается
-const ALLOWED = {
-  bps: ['acceptOwnership', 'addDistributionToken', 'redemption', 'transferOwnership'],
-  safe: ['addOwnerWithThreshold', 'removeOwner', 'swapOwner', 'changeThreshold'],
-}
+const ERC20_ABI = [
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function balanceOf(address) view returns (uint256)",
+  "function allowance(address,address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
+]
 
-let provider, signer, me, chainId, safe, bps, safeAddr
-let owners = [], threshold = 0, action = null, symbols = {}
-let op = null      // { to, data, nonce, hash, sigs: {owner: sig} }
-let pendingLink = null
-const iSafe = new ethers.utils.Interface(SAFE_ABI), iBps = new ethers.utils.Interface(BPS_ABI)
+let provider, signer, me, bps
+let tokens = [], meta = {}, busy = false
+const rpc = new ethers.providers.JsonRpcProvider(RPC_URL)
+const IFACE = new ethers.utils.Interface(ABI)
+const reader = () => provider || rpc
+const ro = () => new ethers.Contract(BPS_ADDR, ABI, reader())
 
 // ---------- утилиты ----------
 const $ = (id) => document.getElementById(id)
 const short = (a) => a ? a.slice(0, 6) + '…' + a.slice(-4) : ''
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
-const same = (a, b) => !!a && !!b && a.toLowerCase() === b.toLowerCase()
-const isOwner = (a) => owners.some(o => same(o, a))
-function toggle(id) { $(id).classList.toggle('hidden') }
+const exact = (bn, d) => ethers.utils.formatUnits(bn, d)
+function fmt(bn, d, dp = 2) {
+  const n = parseFloat(ethers.utils.formatUnits(bn, d))
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M'
+  if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K'
+  return n.toFixed(dp)
+}
+const m = (a) => meta[a?.toLowerCase()] || { symbol: short(a || ''), decimals: 18 }
+const date = (s) => new Date(s * 1000).toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' })
+
 function say(t, type) {
   const el = $('msg'); el.textContent = t; el.className = 'status ' + (t ? type : '')
-  if (type === 'success') setTimeout(() => { if (el.textContent === t) el.className = 'status' }, 7000)
+  if (type === 'success') setTimeout(() => { if (el.textContent === t) el.className = 'status' }, 6000)
 }
-function view(name) {
-  ;['manage', 'setup'].forEach(n => { $('v-' + n).classList.toggle('active', n === name); $('vt-' + n).classList.toggle('active', n === name) })
+const ERR_RU = {
+  InsufficientFreeBalance: 'Недостаточно свободных долей — часть заперта в OTC или припаркована.',
+  OfferAlreadyExists: 'Этому адресу уже есть предложение — сначала отмените его.',
+  NoActiveOffer: 'Предложения нет или оно уже исполнено.',
+  OfferExpired: 'Срок предложения истёк.',
+  OfferNotExpired: 'Срок предложения ещё не истёк.',
+  TermsChanged: 'Условия предложения изменились — обновите страницу и проверьте заново.',
+  SelfTrade: 'Нельзя торговать с самим собой.',
+  InvalidAmounts: 'Количество и цена должны быть больше нуля.',
+  InvalidDeadline: 'Некорректный срок.',
+  InsufficientCustody: 'Столько долей не припарковано.',
+  CannotUseSelf: 'Адрес самого контракта здесь использовать нельзя.',
+  NotDistributionToken: 'Этот токен не распределяется контрактом.',
+  InvalidToken: 'Некорректный токен.',
+  ZeroAddress: 'Нулевой адрес.',
+  ZeroAmount: 'Нулевое количество.',
+  AllowanceExceeded: 'Недостаточно разрешения на списание.',
+  TransferFailed: 'Перевод токена не прошёл.',
+  Reentrancy: 'Повторный вход запрещён.',
 }
-const store = {
-  get() { try { return localStorage.getItem(STORE_KEY) } catch { return null } },
-  set(v) { try { localStorage.setItem(STORE_KEY, v) } catch {} },
-}
-
-/// Тип адреса. Кошелёк-смарт-аккаунт EIP-7702 имеет код-делегат 0xef0100…,
-/// поэтому «есть код» ещё не значит «контракт». Safe — только если отвечает как Safe.
-async function addressKind(a, rp) {
-  const code = await rp.getCode(a)
-  if (code === '0x') return 'wallet'
-  if (/^0xef0100[0-9a-fA-F]{40}$/.test(code)) return 'wallet7702'
-  try { await new ethers.Contract(a, ['function getThreshold() view returns (uint256)'], rp).getThreshold(); return 'safe' }
-  catch { return 'contract' }
-}
-const KIND_RU = { wallet: 'кошелёк', wallet7702: 'кошелёк · смарт-аккаунт', safe: 'мультиподпись', contract: 'контракт' }
-
+/// Код ошибки контракта может лежать глубоко во вложенных объектах исключения
+/// (в MetaMask — в error.data.data). Обходим всё дерево, включая неперечисляемые
+/// поля Error, и собираем все hex-строки — среди них будет и код ошибки.
 function hexesIn(e) {
   const out = [], seen = new Set()
   const walk = (v, d) => {
@@ -424,43 +430,37 @@ function hexesIn(e) {
     seen.add(v)
     for (const k of Object.getOwnPropertyNames(v)) { try { walk(v[k], d + 1) } catch {} }
   }
-  walk(e, 0); return out
-}
-const ERR_RU = {
-  NotOwner: 'Вызов не от владельца контракта.', NotPendingOwner: 'Safe не назначен кандидатом во владельцы.',
-  InvalidToken: 'Некорректный токен.', AlreadyDistributionToken: 'Токен уже добавлен.', TooManyTokens: 'Слоты для токенов закончились.',
-  CannotUseSelf: 'Адрес самого контракта использовать нельзя.', TokenIsDistributed: 'Этот токен распределялся — вывести его нельзя.',
-  NothingToRedeem: 'На контракте нет этого токена.', ZeroAddress: 'Нулевой адрес.',
+  walk(e, 0)
+  return out
 }
 function errText(e) {
-  for (const h of hexesIn(e)) { try { const n = iBps.parseError(h).name; return ERR_RU[n] || n } catch {} }
+  for (const h of hexesIn(e)) {
+    try { const n = IFACE.parseError(h).name; return ERR_RU[n] || n } catch {}
+  }
   const raw = e?.error?.message || e?.data?.message || e?.reason || e?.message || String(e)
-  const gs = { GS013: 'Контракт отклонил операцию — проверьте параметры.', GS020: 'Подписей меньше, чем нужно.',
-    GS025: 'Подтверждение не найдено.', GS026: 'Одна из подписей недействительна.' }
-  for (const k in gs) if (raw.includes(k)) return gs[k]
   if (/user rejected|User denied/i.test(raw)) return 'Отклонено в кошельке.'
+  for (const k in ERR_RU) if (raw.includes(k)) return ERR_RU[k]
   return raw
 }
-async function mainnetGuard(what) {
-  return chainId !== 1 || confirm(`ОСНОВНАЯ СЕТЬ ETHEREUM\n\n${what}\n\nЭто реальная транзакция. Продолжить?`)
+function setBusy(v) {
+  busy = v
+  ;['btn-otc','btn-send','btn-park','btn-unpark'].forEach(id => $(id).disabled = v || !signer)
+  $('btn-refresh').disabled = v || !signer
+  document.querySelectorAll('[data-act]').forEach(b => { if (!b.dataset.lock) b.disabled = v })
+  if (v) $('btn-claim-all').disabled = true
 }
-/// Короткий код для голосовой сверки: начало и конец хеша операции
-const codeOf = (h) => { const x = h.slice(2).toUpperCase(); return `${x.slice(0, 4)} ${x.slice(4, 8)} · ${x.slice(-8, -4)} ${x.slice(-4)}` }
-
-// ---------- ссылка с операцией ----------
-function b64enc(s) { return btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }
-function b64dec(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))) }
-function linkFor(o) {
-  const payload = { v: 1, chain: chainId, safe: safeAddr, to: o.to, data: o.data, nonce: o.nonce.toString(), sigs: o.sigs }
-  const q = BPS_ADDR === DEFAULT_BPS ? '' : `?bps=${BPS_ADDR}`
-  return `${location.origin}${location.pathname}${q}#op=${b64enc(JSON.stringify(payload))}`
+function tab(ev, id) {
+  // только внутри своей карточки: на странице несколько групп вкладок
+  const card = ev.currentTarget.closest('.card')
+  card.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  card.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  ev.currentTarget.classList.add('active'); $(id).classList.add('active')
 }
-function parseLink(text) {
-  const m = String(text).match(/#op=([A-Za-z0-9_-]+)/)
-  if (!m) throw new Error('В ссылке нет операции.')
-  let p; try { p = JSON.parse(b64dec(m[1])) } catch { throw new Error('Ссылка повреждена.') }
-  if (p.v !== 1 || !ethers.utils.isAddress(p.safe) || !ethers.utils.isAddress(p.to) || typeof p.data !== 'string') throw new Error('Ссылка повреждена.')
-  return p
+async function run(label, fn) {
+  if (!signer) { say('Сначала подключите кошелёк.', 'error'); return }
+  try { setBusy(true); say(label + '…', 'info'); const r = await fn(); if (r !== false) await refreshAll(); return r }
+  catch (e) { say('Не удалось: ' + errText(e), 'error') }
+  finally { setBusy(false) }
 }
 
 // ---------- кошелёк ----------
@@ -477,6 +477,7 @@ async function findWallet() {
   }
   return null
 }
+
 async function connect() {
   const eth = await findWallet()
   if (!eth) {
@@ -486,408 +487,401 @@ async function connect() {
     return
   }
   try {
-    provider = new ethers.providers.Web3Provider(eth)
-    await provider.send('eth_requestAccounts', [])
-    signer = provider.getSigner(); me = await signer.getAddress()
-    chainId = (await provider.getNetwork()).chainId
+    let p = new ethers.providers.Web3Provider(eth)
+    await p.send('eth_requestAccounts', [])
+    let net = await p.getNetwork()
+    if (net.chainId !== CHAIN_ID) {
+      try { await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] }) }
+      catch { say('Переключите кошелёк на нужную сеть и подключитесь снова.', 'error'); return }
+      p = new ethers.providers.Web3Provider(eth); net = await p.getNetwork()
+      if (net.chainId !== CHAIN_ID) { say('Неверная сеть.', 'error'); return }
+    }
+    provider = p; signer = p.getSigner(); me = await signer.getAddress()
+    bps = new ethers.Contract(BPS_ADDR, ABI, signer)
     $('btn-wallet').textContent = short(me); $('btn-wallet').classList.add('connected')
-    const pill = $('net-pill')
-    pill.textContent = chainId === 1 ? 'MAINNET' : chainId === 11155111 ? 'Sepolia' : 'chain ' + chainId
-    pill.classList.toggle('main', chainId === 1)
-    bps = new ethers.Contract(BPS_ADDR, BPS_ABI, signer)
     eth.on?.('accountsChanged', () => location.reload())
     eth.on?.('chainChanged', () => location.reload())
-    $('btn-prepare').disabled = false
-    await loadAll()
+    setBusy(false)
+    await refreshAll(); say('', '')
   } catch (e) { say('Не удалось подключиться: ' + errText(e), 'error') }
 }
 
 // ---------- загрузка ----------
-async function loadAll() {
-  if (!provider) return
+async function refreshAll() {
+  await loadTokens()
+  await Promise.all([loadStats(), loadDividends(), loadOffers(), loadInfo(), loadOwner().catch(e => { console.error('loadOwner', e); $('ol-owner').textContent = 'не удалось прочитать' })])
+}
+
+async function tokenMeta(a) {
+  const k = a.toLowerCase(); if (meta[k]) return meta[k]
   try {
-    if ((await provider.getCode(BPS_ADDR)) === '0x') throw new Error('В этой сети по адресу контракта ничего нет — проверьте сеть в MetaMask.')
-    const [bOwner, bPending, list, len, max] = await Promise.all([
-      bps.owner(), bps.pendingOwner(), bps.getDistributionTokens(), bps.distributionTokensLength(), bps.MAX_DISTRIBUTION_TOKENS()])
-    const toks = await Promise.all(list.map(async a => {
-      let sym = short(a)
-      try { sym = await new ethers.Contract(a, ERC20_ABI, provider).symbol() } catch {}
-      symbols[a.toLowerCase()] = sym
-      return { a, sym }
-    }))
-    const ownerKind = await addressKind(bOwner, provider)
+    const t = new ethers.Contract(a, ERC20_ABI, reader())
+    const [s, d] = await Promise.all([t.symbol(), t.decimals()])
+    meta[k] = { symbol: s, decimals: d }
+  } catch { meta[k] = { symbol: short(a), decimals: 18 } }
+  return meta[k]
+}
 
-    // адрес Safe: из ссылки кабинета (?safe=), иначе сохранённый в браузере
-    const urlSafe = Q.get('safe') && ethers.utils.isAddress(Q.get('safe')) ? ethers.utils.getAddress(Q.get('safe')) : null
-    const saved = store.get()
-    safeAddr = urlSafe || (saved && ethers.utils.isAddress(saved) ? ethers.utils.getAddress(saved) : null)
-    if (urlSafe && !saved && (await addressKind(urlSafe, provider)) === 'safe') store.set(urlSafe)
-    if (pendingLink && !same(pendingLink.safe, safeAddr)) safeAddr = ethers.utils.getAddress(pendingLink.safe)
-    if (safeAddr) $('in-safe').value = safeAddr
+async function loadTokens() {
+  try {
+    tokens = await ro().getDistributionTokens()
+    await Promise.all(tokens.map(tokenMeta))
+    const sel = $('o-token'), prev = sel.value
+    sel.innerHTML = '<option value="">Выберите токен</option>' +
+      tokens.map(a => `<option value="${a}">${esc(m(a).symbol)}</option>`).join('') +
+      '<option value="__custom">Другой адрес…</option>'
+    if (prev) sel.value = prev
+  } catch (e) { console.error('loadTokens', e) }
+}
 
-    // вкладка «Настройка»: передача с кошелька
-    const showDirect = same(bOwner, me) && safeAddr && !same(bPending, safeAddr)
-    $('card-direct').classList.toggle('hidden', !showDirect)
-    $('direct-owner').textContent = `${bOwner} (${KIND_RU[ownerKind]})`
-    $('direct-safe').textContent = safeAddr || ''
+async function loadStats() {
+  if (!me) return
+  try {
+    const c = ro()
+    const [bal, free, locked, cust, active] = await Promise.all([
+      c.balanceOf(me), c.freeBalanceOf(me), c.lockedBalanceOf(me), c.custodyOf(me), c.activeSupply()])
+    $('st-bal').textContent = fmt(bal, DEC)
+    $('st-free').textContent = fmt(free, DEC)
+    $('st-locked').textContent = fmt(locked, DEC)
+    $('st-cust').textContent = fmt(cust, DEC)
+    $('st-pct').textContent = active.gt(0)
+      ? (parseFloat(exact(bal, DEC)) / parseFloat(exact(active, DEC)) * 100).toFixed(3) + '%' : '—'
+  } catch (e) { console.error('loadStats', e) }
+}
 
-    if (!safeAddr) {
-      $('need-setup').classList.remove('hidden')
-      ;['card-state', 'card-new', 'card-op'].forEach(id => $(id).classList.add('hidden'))
-      view('setup')
-      return
+async function loadDividends() {
+  const el = $('div-list'); if (!me) return
+  if (!tokens.length) { el.innerHTML = '<div class="empty">Распределяемые токены ещё не добавлены.</div>'; $('btn-claim-all').disabled = true; return }
+  const c = ro(); let any = false
+  // по токену отдельно: сломанный токен не должен гасить весь список
+  const rows = await Promise.all(tokens.map(async (a) => {
+    const t = m(a)
+    try {
+      const [e, n] = await c.pendingDividends(me, a)
+      if (!n.isZero()) any = true
+      const part = !e.isZero() && n.lt(e)
+      return `<div class="tok">
+        <div class="tok-i">${esc(t.symbol.slice(0, 3).toUpperCase())}</div>
+        <div class="tok-n"><div class="tok-name">${esc(t.symbol)}</div><div class="tok-a">${short(a)}</div></div>
+        <div class="tok-v"><div class="tok-p${e.isZero() ? ' zero' : ''}">${fmt(e, t.decimals, 6)}</div>
+          ${part ? `<div class="tok-w">сейчас доступно ${fmt(n, t.decimals, 6)}</div>` : ''}</div>
+        <button class="btn btn-sm btn-ok" data-act onclick="doClaim('${a}')" ${n.isZero() ? 'disabled data-lock="1"' : ''}>Забрать</button>
+      </div>`
+    } catch {
+      return `<div class="tok"><div class="tok-i">!</div><div class="tok-n"><div class="tok-name">${esc(t.symbol)}</div>
+        <div class="tok-a">баланс токена не читается — возможно, токен сломан</div></div></div>`
     }
-    if ((await provider.getCode(safeAddr)) === '0x') throw new Error(`По адресу Safe ${short(safeAddr)} в этой сети ничего нет. Проверьте адрес во вкладке «Настройка».`)
-    safe = new ethers.Contract(safeAddr, SAFE_ABI, signer)
-    const [own, thr, nonce] = await Promise.all([safe.getOwners(), safe.getThreshold(), safe.nonce()])
-    owners = own; threshold = thr.toNumber()
-
-    const safeOwns = same(bOwner, safeAddr), safePending = same(bPending, safeAddr)
-    $('state').innerHTML = `
-      <div class="ir"><span class="ik">Safe</span><span class="iv">${short(safeAddr)} · подписей нужно ${threshold} из ${owners.length}</span></div>
-      <div class="ir"><span class="ik">Владелец контракта</span><span class="iv" style="color:${safeOwns ? 'var(--green)' : 'var(--amber)'}">${short(bOwner)} — ${safeOwns ? 'этот Safe' : KIND_RU[ownerKind]}</span></div>
-      ${bPending !== ZERO ? `<div class="ir"><span class="ik">Ожидает принятия</span><span class="iv">${short(bPending)}${safePending ? ' — этот Safe' : ''}</span></div>` : ''}
-      <div class="ir"><span class="ik">Токены дохода</span><span class="iv">${len} из ${max}${toks.map(t => ` · ${esc(t.sym)}`).join('')}</span></div>
-      <div class="ir"><span class="ik">Подписанты</span><span class="iv">${owners.map(o => same(o, me) ? `<b style="color:var(--purple)">${short(o)} — вы</b>` : short(o)).join(', ')}</span></div>`
-    $('role').textContent = isOwner(me) ? 'вы подписант' : 'только просмотр'
-    $('role').className = 'badge ' + (isOwner(me) ? 'ok' : 'wait')
-
-    const opts = owners.map(o => `<option value="${o}">${o}${same(o, me) ? ' — это вы' : ''}</option>`).join('')
-    $('sr-owner').innerHTML = opts; $('ss-old').innerHTML = opts
-    $('sa-thr').value = threshold
-    $('sr-thr').value = Math.max(1, Math.min(threshold, owners.length - 1))
-    $('st-thr').value = threshold
-    $('st-hint').textContent = `Сейчас ${threshold} из ${owners.length}. Можно от 1 до ${owners.length}.`
-
-    $('need-setup').classList.add('hidden')
-    ;['card-state', 'card-new'].forEach(id => $(id).classList.remove('hidden'))
-
-    if (pendingLink) { const p = pendingLink; pendingLink = null; await openFromLink(p); return }
-    if (op) await refreshOp()
-    if (safePending) say('Safe назначен кандидатом, но ещё не принял владение. Начните с операции «Принять владение».', 'info')
-    else if (!safeOwns && !showDirect) say(`Контрактом владеет не этот Safe, а ${short(bOwner)} (${KIND_RU[ownerKind]}). Операции с контрактом отсюда не пройдут.`, 'info')
-  } catch (e) { say(errText(e), 'error') }
+  }))
+  el.innerHTML = rows.join('')
+  $('btn-claim-all').disabled = busy || !signer || !any
 }
 
-// ---------- настройка ----------
-async function saveSafe() {
-  const v = $('in-safe').value.trim()
-  if (!ethers.utils.isAddress(v)) { say('Некорректный адрес Safe.', 'error'); return }
-  if (!provider) { say('Сначала подключите кошелёк.', 'error'); return }
-  const kind = await addressKind(v, provider)
-  if (kind !== 'safe') { say(`По этому адресу не Safe, а ${KIND_RU[kind]}. Проверьте адрес и сеть.`, 'error'); return }
-  store.set(ethers.utils.getAddress(v))
-  say('Safe сохранён.', 'success')
-  await loadAll()
-  if (!same(await bps.owner(), me)) view('manage')
+async function logs(filter) {
+  const c = ro(), latest = await reader().getBlockNumber()
+  const from = START_BLOCK > 0 ? START_BLOCK : Math.max(0, latest - LOG_WINDOW)
+  try { return await c.queryFilter(filter, from, latest) }
+  catch { return await c.queryFilter(filter, Math.max(0, latest - 9000), latest) }
+}
+function uniq(pairs) {
+  const s = new Set()
+  return pairs.filter(([a, b]) => { const k = (a + b).toLowerCase(); if (s.has(k)) return false; s.add(k); return true })
+}
+async function resolve(pairs) {
+  const c = ro(), out = []
+  await Promise.all(uniq(pairs).map(async ([seller, buyer]) => {
+    try {
+      const o = await c.otcOffers(seller, buyer)
+      if (o.units.gt(0)) { await tokenMeta(o.paymentToken); out.push({ seller, buyer, units: o.units, price: o.price, token: o.paymentToken, deadline: o.deadline.toNumber() }) }
+    } catch {}
+  }))
+  return out.sort((a, b) => a.deadline - b.deadline)
 }
 
-async function directTransfer() {
+async function loadOffers() {
+  if (!me) return
   try {
-    if (!confirm(`Назначить Safe ${safeAddr} кандидатом во владельцы контракта?\n\nПолномочия останутся у вас, пока подписанты не примут владение.`)) return
-    if (!await mainnetGuard('Передача владения контрактом Safe')) return
-    say('Передаём владение…', 'info')
-    await (await bps.transferOwnership(safeAddr)).wait()
-    say('Готово. Теперь во вкладке «Управление» подготовьте операцию «Принять владение».', 'success')
-    await loadAll(); view('manage')
-  } catch (e) { say('Не удалось передать: ' + errText(e), 'error') }
+    const c = ro()
+    const [inL, outL] = await Promise.all([logs(c.filters.OTCCreated(null, me)), logs(c.filters.OTCCreated(me, null))])
+    const inc = await resolve(inL.map(l => [l.args.seller, me]))
+    const out = await resolve(outL.map(l => [me, l.args.buyer]))
+    $('in-list').innerHTML = inc.length ? inc.map(o => card(o, true)).join('')
+      : '<div class="empty">Вам пока никто не предлагал доли.<br/>Предложение появится здесь, когда держатель создаст его на ваш адрес.</div>'
+    $('out-list').innerHTML = out.length ? out.map(o => card(o, false)).join('') : '<div class="empty">Открытых предложений нет.</div>'
+  } catch (e) { console.error('loadOffers', e); $('in-list').innerHTML = '<div class="empty">Не удалось прочитать историю событий.</div>' }
 }
 
-async function createSafe() {
-  if (!provider) { say('Сначала подключите кошелёк.', 'error'); return }
+function card(o, incoming) {
+  const t = m(o.token), now = Math.floor(Date.now() / 1000)
+  const dead = o.deadline <= now, soon = !dead && o.deadline - now < 86400
+  const badge = dead ? '<span class="badge dead">истекло</span>' : soon ? '<span class="badge warn">истекает сегодня</span>' : '<span class="badge ok">открыто</span>'
+  let act
+  if (dead) act = `<button class="btn btn-sm" data-act onclick="doCancelExpired('${o.seller}','${o.buyer}')">Снять истёкшее</button>`
+  else if (incoming) act = `<button class="btn btn-sm btn-ok" data-act onclick="doBuy('${o.seller}')">Купить за ${esc(fmt(o.price, t.decimals, 4))} ${esc(t.symbol)}</button>`
+  else act = `<button class="btn btn-sm btn-bad" data-act onclick="doCancel('${o.buyer}')">Отменить</button>`
+  return `<div class="offer${incoming && !dead ? ' in' : ''}">
+    <div class="offer-h"><span class="offer-w">${incoming ? 'от ' + short(o.seller) : 'для ' + short(o.buyer)}</span>${badge}</div>
+    <div class="offer-g">
+      <div><div class="offer-l">Долей</div><div class="offer-v">${fmt(o.units, DEC)}</div></div>
+      <div><div class="offer-l">Цена</div><div class="offer-v">${fmt(o.price, t.decimals, 4)} ${esc(t.symbol)}</div></div>
+      <div><div class="offer-l">${dead ? 'Истекло' : 'До'}</div><div class="offer-v">${date(o.deadline)}</div></div>
+    </div>
+    <div class="offer-a">${act}</div></div>`
+}
+
+async function loadInfo() {
+  const el = $('info')
   try {
-    const list = $('c-owners').value.split(/[\s,;]+/).map(x => x.trim()).filter(Boolean)
-    if (!list.length) throw new Error('Добавьте хотя бы одного подписанта.')
-    const bad = list.find(a => !ethers.utils.isAddress(a)); if (bad) throw new Error('Некорректный адрес: ' + bad)
-    const own = list.map(a => ethers.utils.getAddress(a))
-    if (new Set(own.map(a => a.toLowerCase())).size !== own.length) throw new Error('В списке есть повторы.')
-    const thr = parseInt($('c-thr').value, 10)
-    if (!(thr >= 1 && thr <= own.length)) throw new Error(`Нужно подписей: от 1 до ${own.length}.`)
-    const fac = ethers.utils.getAddress($('c-factory').value.trim())
-    const sing = ethers.utils.getAddress($('c-singleton').value.trim())
-    const fb = ethers.utils.getAddress($('c-fallback').value.trim())
-    const salt = ethers.BigNumber.from($('c-salt').value.trim() || '0')
-    for (const [n, a] of [['фабрики', fac], ['синглтона', sing], ['fallback handler', fb]])
-      if ((await provider.getCode(a)) === '0x') throw new Error(`По адресу ${n} нет контракта в этой сети.`)
-    const init = iSafe.encodeFunctionData('setup', [own, thr, ZERO, '0x', fb, ZERO, 0, ZERO])
-    const factory = new ethers.Contract(fac, FACTORY_ABI, signer)
-    const predicted = await factory.callStatic.createProxyWithNonce(sing, init, salt)
-    if ((await provider.getCode(predicted)) !== '0x') throw new Error(`Safe с такими параметрами уже есть: ${predicted}. Смените соль или используйте его.`)
-    if (!confirm(`Создать Safe?\n\nПодписей нужно: ${thr} из ${own.length}\nАдрес будет: ${predicted}\n\nПодписанты:\n${own.join('\n')}`)) return
-    if (!await mainnetGuard('Создание Safe')) return
-    say('Создаём Safe…', 'info')
-    await (await factory.createProxyWithNonce(sing, init, salt)).wait()
-    $('create-result').innerHTML = `<div class="blob">${predicted}</div>`
-    $('in-safe').value = predicted; store.set(predicted)
-    say('Safe создан и сохранён.', 'success')
-    await loadAll()
-  } catch (e) { say('Не удалось создать Safe: ' + errText(e), 'error') }
+    const c = ro()
+    const [owner, pending, ts, active, cust] = await Promise.all([c.owner(), c.pendingOwner(), c.totalSupply(), c.activeSupply(), c.custodyTotal()])
+    const kind = await addressKind(owner, reader())
+    const zero = ethers.constants.AddressZero
+    const warn = []
+    const rows = await Promise.all(tokens.map(async (a) => {
+      const t = m(a)
+      let short_ = null, uns = null
+      try { short_ = await c.shortfall(a) } catch {}
+      try { uns = await c.unsyncedBalance(a) } catch {}
+      if (short_ && short_.gt(0)) warn.push(`Контракту не хватает ${fmt(short_, t.decimals)} ${t.symbol} на покрытие начислений.`)
+      if (short_ === null) warn.push(`Баланс ${t.symbol} не читается — возможно, токен сломан.`)
+      const sync = uns && uns.gt(0)
+        ? `<button class="btn btn-sm" data-act onclick="doSync('${a}')" style="margin-left:8px">Разложить ${fmt(uns, t.decimals)}</button>` : ''
+      return `<div class="ir"><span class="ik">${esc(t.symbol)}</span><span class="iv">${short(a)}${sync}</span></div>`
+    }))
+    $('warn').innerHTML = warn.map(esc).join('<br/>'); $('warn').classList.toggle('show', warn.length > 0)
+
+    const lnk = $('admin-link')
+    if (kind === 'safe') { lnk.href = `safe-admin.html?safe=${owner}&bps=${BPS_ADDR}`; lnk.classList.remove('hidden') }
+    else if (me && owner.toLowerCase() === me.toLowerCase()) { lnk.href = `safe-admin.html?bps=${BPS_ADDR}`; lnk.classList.remove('hidden') }
+    else lnk.classList.add('hidden')
+
+    el.innerHTML = `
+      <div class="ir"><span class="ik">Адрес</span><span class="iv"><a href="${EXPLORER}/address/${BPS_ADDR}" target="_blank" rel="noopener">${short(BPS_ADDR)}</a></span></div>
+      <div class="ir"><span class="ik">Владелец</span><span class="iv">${short(owner)} <span class="badge ${kind === 'safe' ? 'ok' : 'warn'}">${KIND_RU[kind]}</span></span></div>
+      ${pending !== zero ? `<div class="ir"><span class="ik">Ожидает принятия</span><span class="iv">${short(pending)}</span></div>` : ''}
+      <div class="ir"><span class="ik">Всего долей</span><span class="iv">${fmt(ts, DEC, 0)}</span></div>
+      <div class="ir"><span class="ik">В распределении</span><span class="iv">${fmt(active, DEC, 0)}</span></div>
+      <div class="ir"><span class="ik">Припарковано</span><span class="iv">${fmt(cust, DEC, 0)}</span></div>
+      <div class="div">распределяемые токены</div>
+      ${rows.length ? rows.join('') : '<div class="empty">Пока не добавлены.</div>'}`
+  } catch (e) { console.error('loadInfo', e); el.innerHTML = '<div class="empty">Не удалось прочитать контракт. Проверьте адрес и сеть.</div>' }
 }
 
-// ---------- новая операция ----------
-function pick(ev, name) {
-  action = name
-  const card = ev.currentTarget.closest('.card')
-  card.querySelectorAll('.op').forEach(b => b.classList.remove('active'))
-  card.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
-  ev.currentTarget.classList.add('active'); $('p-' + name).classList.add('active')
+/// Тип адреса. Наличие кода ещё не значит «контракт»: кошелёк, обновлённый
+/// до смарт-аккаунта по EIP-7702 (MetaMask в Sepolia и основной сети это
+/// предлагает), получает код-делегат вида 0xef0100 + адрес. Мультиподписью
+/// считаем только адрес, который действительно отвечает как Safe.
+async function addressKind(a, rp) {
+  const code = await rp.getCode(a)
+  if (code === '0x') return 'wallet'
+  if (/^0xef0100[0-9a-fA-F]{40}$/.test(code)) return 'wallet7702'
+  try {
+    await new ethers.Contract(a, ['function getThreshold() view returns (uint256)'], rp).getThreshold()
+    return 'safe'
+  } catch { return 'contract' }
 }
-function prevOwnerOf(a) {
-  const i = owners.findIndex(o => same(o, a))
-  if (i < 0) throw new Error('Такого подписанта в Safe нет.')
-  return i === 0 ? SENTINEL : owners[i - 1]
-}
-function buildTx() {
-  const addr = (id, what) => { const v = $(id).value.trim(); if (!ethers.utils.isAddress(v)) throw new Error('Некорректный адрес: ' + what + '.'); return ethers.utils.getAddress(v) }
-  const num = (id, max) => { const n = parseInt($(id).value, 10); if (!(Number.isInteger(n) && n >= 1 && n <= max)) throw new Error(`Порог должен быть от 1 до ${max}.`); return n }
-  switch (action) {
-    case 'accept':        return { to: BPS_ADDR, data: iBps.encodeFunctionData('acceptOwnership', []) }
-    case 'addToken':      return { to: BPS_ADDR, data: iBps.encodeFunctionData('addDistributionToken', [addr('a-token', 'токен')]) }
-    case 'redemption':    return { to: BPS_ADDR, data: iBps.encodeFunctionData('redemption', [addr('r-token', 'токен'), addr('r-to', 'получатель')]) }
-    case 'transferOwner': return { to: BPS_ADDR, data: iBps.encodeFunctionData('transferOwnership', [addr('t-to', 'новый владелец')]) }
-    case 'safe:add': { const o = addr('sa-owner', 'новый подписант')
-      if (isOwner(o)) throw new Error('Этот адрес уже подписант.'); if (same(o, safeAddr)) throw new Error('Safe не может быть своим подписантом.')
-      return { to: safeAddr, data: iSafe.encodeFunctionData('addOwnerWithThreshold', [o, num('sa-thr', owners.length + 1)]) } }
-    case 'safe:remove': { if (owners.length <= 1) throw new Error('Нельзя удалить последнего подписанта.')
-      const o = $('sr-owner').value
-      return { to: safeAddr, data: iSafe.encodeFunctionData('removeOwner', [prevOwnerOf(o), o, num('sr-thr', owners.length - 1)]) } }
-    case 'safe:swap': { const o = $('ss-old').value, n = addr('ss-new', 'новый подписант')
-      if (isOwner(n)) throw new Error('Новый адрес уже подписант.'); if (same(n, safeAddr)) throw new Error('Safe не может быть своим подписантом.')
-      return { to: safeAddr, data: iSafe.encodeFunctionData('swapOwner', [prevOwnerOf(o), o, n]) } }
-    case 'safe:threshold': return { to: safeAddr, data: iSafe.encodeFunctionData('changeThreshold', [num('st-thr', owners.length)]) }
+const KIND_RU = { wallet: 'кошелёк', wallet7702: 'кошелёк · смарт-аккаунт', safe: 'мультиподпись', contract: 'контракт' }
+
+// ---------- действия ----------
+const doClaim = (a) => run('Забираем доход', async () => { await (await bps.claim(a)).wait(); say('Готово.', 'success') })
+const doClaimAll = () => run('Забираем по всем токенам', async () => { await (await bps.claimAll()).wait(); say('Готово.', 'success') })
+const doSync = (a) => run('Раскладываем приток', async () => { await (await bps.syncToken(a)).wait(); say('Приток распределён.', 'success') })
+
+async function pickToken() {
+  const v = $('o-token').value
+  if (v === '__custom') {
+    const a = prompt('Адрес токена оплаты (0x...)')
+    if (!a || !ethers.utils.isAddress(a)) throw new Error('Некорректный адрес токена.')
+    return ethers.utils.getAddress(a)
   }
-  throw new Error('Выберите операцию.')
+  if (!v) throw new Error('Выберите токен оплаты.')
+  return v
+}
+const units = (id) => {
+  const v = $(id).value
+  if (!v || parseFloat(v) <= 0) throw new Error('Укажите количество долей.')
+  return ethers.utils.parseUnits(v, DEC)
+}
+const addr = (id, what) => {
+  const v = $(id).value.trim()
+  if (!ethers.utils.isAddress(v)) throw new Error('Некорректный адрес: ' + what + '.')
+  return ethers.utils.getAddress(v)
 }
 
-/// Разбор вызова + проверка, что это одна из разрешённых операций
-function parseCall(to, data) {
-  const onSafe = same(to, safeAddr), onBps = same(to, BPS_ADDR)
-  if (!onSafe && !onBps) throw new Error('Операция адресована не контракту и не этому Safe — страница такое не подписывает.')
-  let p; try { p = (onSafe ? iSafe : iBps).parseTransaction({ data }) } catch { throw new Error('Операции нет в списке разрешённых — страница её не подписывает. Не подписывайте её нигде и сообщите коллегам.') }
-  if (!(onSafe ? ALLOWED.safe : ALLOWED.bps).includes(p.name)) throw new Error('Эту операцию страница не подписывает: ' + p.name)
-  return { onSafe, name: p.name, args: p.args }
-}
+const doCreateOTC = () => run('Создаём предложение', async () => {
+  const buyer = addr('o-buyer', 'покупатель')
+  if (buyer.toLowerCase() === me.toLowerCase()) throw new Error('Нельзя продавать самому себе.')
+  const u = units('o-units')
+  const tok = await pickToken(), t = await tokenMeta(tok)
+  const pv = $('o-price').value
+  if (!pv || parseFloat(pv) <= 0) throw new Error('Укажите цену.')
+  const price = ethers.utils.parseUnits(pv, t.decimals)
+  const days = parseInt($('o-days').value, 10)
+  if (!(days >= 1 && days <= 365)) throw new Error('Срок — от 1 до 365 дней.')
+  if ((await bps.freeBalanceOf(me)).lt(u)) throw new Error('Недостаточно свободных долей.')
+  if ((await bps.otcOffers(me, buyer)).units.gt(0)) throw new Error('Этому адресу уже есть предложение — сначала отмените его.')
+  const deadline = Math.floor(Date.now() / 1000) + days * 86400
+  await (await bps.createOTC(buyer, u, price, tok, deadline)).wait()
+  ;['o-buyer', 'o-units', 'o-price'].forEach(id => $(id).value = '')
+  say(`Предложение создано для ${short(buyer)}.`, 'success')
+})
 
-async function symbolOf(a) {
-  const k = a.toLowerCase(); if (symbols[k]) return symbols[k]
-  try { symbols[k] = await new ethers.Contract(a, ERC20_ABI, provider).symbol() } catch { symbols[k] = 'токен' }
-  return symbols[k]
-}
-/// Описание операции простыми словами — то, что видит каждый подписант
-async function describe(to, data) {
-  const { name, args } = parseCall(to, data)
-  switch (name) {
-    case 'acceptOwnership': return { what: 'Safe принимает владение контрактом', sub: 'После этого все функции владельца выполняются только по подписям участников Safe.' }
-    case 'addDistributionToken': return { what: `Добавить токен дохода ${await symbolOf(args[0])}`, sub: `Адрес токена: ${args[0]}`,
-      danger: 'Необратимо: токен навсегда останется в распределении, вывести его будет нельзя.' }
-    case 'redemption': return { what: `Вывести весь ${await symbolOf(args[0])} с контракта`, sub: `Токен: ${args[0]}\nПолучатель: ${args[1]}`,
-      danger: 'Средства уйдут наружу. Особенно внимательно сверьте получателя.' }
-    case 'transferOwnership': return { what: 'Передать владение контрактом', sub: `Новый владелец: ${args[0]}\nПолномочия перейдут, только когда он сам примет владение.`,
-      danger: 'После принятия этот Safe потеряет управление контрактом.' }
-    case 'addOwnerWithThreshold': return { what: 'Добавить подписанта в Safe', sub: `Новый подписант: ${args[0]}\nПодписей нужно станет: ${args[1]} из ${owners.length + 1}` }
-    case 'removeOwner': return { what: 'Удалить подписанта из Safe', sub: `Удаляется: ${args[1]}\nПодписей нужно станет: ${args[2]} из ${owners.length - 1}`,
-      danger: 'Убедитесь, что оставшиеся подписанты смогут набрать нужное число подписей.' }
-    case 'swapOwner': return { what: 'Заменить подписанта в Safe', sub: `Был: ${args[1]}\nСтанет: ${args[2]}`,
-      danger: 'Убедитесь, что ключ нового подписанта под контролем.' }
-    case 'changeThreshold': return { what: `Изменить число нужных подписей на ${args[0]} из ${owners.length}`, sub: '',
-      danger: args[0].toNumber() === owners.length ? 'Потеря любого одного ключа сделает Safe неуправляемым.' : '' }
+const doCancel = (buyer) => run('Отменяем', async () => { await (await bps.cancelOTC(buyer)).wait(); say('Предложение отменено, доли свободны.', 'success') })
+const doCancelExpired = (s, b) => run('Снимаем истёкшее', async () => { await (await bps.cancelExpiredOTC(s, b)).wait(); say('Снято, доли вернулись продавцу.', 'success') })
+
+const doBuy = (seller) => run('Покупаем', async () => {
+  // условия и nonce читаются прямо перед покупкой: при подмене предложения
+  // продавцом транзакция откатится с TermsChanged, а не исполнится вслепую
+  const o = await bps.otcOffers(seller, me)
+  if (o.units.isZero()) throw new Error('Предложение больше недоступно.')
+  if (o.deadline.toNumber() <= Math.floor(Date.now() / 1000)) throw new Error('Срок предложения истёк.')
+  const t = await tokenMeta(o.paymentToken)
+  if (!confirm(`Купить ${exact(o.units, DEC)} долей\nЗаплатить ${exact(o.price, t.decimals)} ${t.symbol}\nПродавец ${seller}`)) return false
+  const tok = new ethers.Contract(o.paymentToken, ERC20_ABI, signer)
+  const bal = await tok.balanceOf(me)
+  if (bal.lt(o.price)) throw new Error(`Нужно ${exact(o.price, t.decimals)} ${t.symbol}, а на балансе ${exact(bal, t.decimals)}.`)
+  if ((await tok.allowance(me, BPS_ADDR)).lt(o.price)) {
+    say(`Разрешаем списание ${t.symbol}…`, 'info')
+    await (await tok.approve(BPS_ADDR, o.price)).wait()
   }
+  say('Покупаем…', 'info')
+  await (await bps.executeOTC(seller, o.units, o.price, o.paymentToken, o.nonce)).wait()
+  say('Готово. Доли ваши и уже приносят доход.', 'success')
+})
+
+const doSend = () => run('Переводим', async () => {
+  const to = addr('s-to', 'получатель'), u = units('s-amt')
+  const msg = to.toLowerCase() === BPS_ADDR.toLowerCase()
+    ? `Это адрес самого контракта: ${exact(u, DEC)} долей будут ПРИПАРКОВАНЫ на ваше имя и перестанут приносить доход. Продолжить?`
+    : `Перевести ${exact(u, DEC)} долей на ${to}?`
+  if (!confirm(msg)) return false
+  await (await bps.transfer(to, u)).wait()
+  ;['s-to', 's-amt'].forEach(id => $(id).value = '')
+  say('Переведено.', 'success')
+})
+
+const doPark = () => run('Паркуем', async () => {
+  const u = units('p-amt')
+  if (!confirm(`Припарковать ${exact(u, DEC)} долей?\n\nОни перестанут приносить доход, ваша часть потока достанется остальным. Компенсации нет. Вернуть сможете только вы.`)) return false
+  await (await bps.park(u)).wait(); $('p-amt').value = ''
+  say('Доли припаркованы.', 'success')
+})
+const doUnpark = () => run('Возвращаем', async () => {
+  await (await bps.unpark(units('p-amt'))).wait(); $('p-amt').value = ''
+  say('Доли снова приносят доход.', 'success')
+})
+
+// ---------- владелец ----------
+let ownerAddr = null, pendingAddr = null, ownerKind = 'wallet'
+
+async function loadOwner() {
+  const c = ro()
+  ;[ownerAddr, pendingAddr] = await Promise.all([c.owner(), c.pendingOwner()])
+  ownerKind = await addressKind(ownerAddr, reader())
+  const isMe = (a) => me && a && a.toLowerCase() === me.toLowerCase()
+  // Если подключённый кошелёк и есть владелец — он может подписывать сам,
+  // даже если это смарт-аккаунт EIP-7702. Safe подключиться кошельком не может.
+  const amOwner = isMe(ownerAddr)
+
+  $('own-card').classList.toggle('hidden', !amOwner)
+  $('pend-card').classList.toggle('hidden', !isMe(pendingAddr))
+  $('safe-card').classList.toggle('hidden', ownerKind !== 'safe' || !me)
+
+  const kindBadge = `<span class="badge ${ownerKind === 'safe' ? 'ok' : 'warn'}">${KIND_RU[ownerKind]}</span>`
+  $('ol-owner').innerHTML = `<a href="${EXPLORER}/address/${ownerAddr}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${short(ownerAddr)}</a> ${kindBadge}${isMe(ownerAddr) ? ' <span class="badge ok">это вы</span>' : ''}`
+  let note = ''
+  if (ownerKind === 'safe') note = 'Функции владельца выполняются подписями участников Safe — в панели мультиподписи.'
+  else if (!me) note = 'Подключите кошелёк владельца, чтобы открыть панель управления.'
+  else if (isMe(ownerAddr)) note = ''
+  else if (isMe(pendingAddr)) note = 'Вам передают владение — примите его в карточке ниже.'
+  else note = `Панель управления открывается только владельцу. Вы подключены как ${short(me)} — переключите аккаунт в MetaMask на ${short(ownerAddr)}.`
+  $('ol-note').textContent = note
+  $('safe-card-link').href = `safe-admin.html?safe=${ownerAddr}&bps=${BPS_ADDR}`
+  $('oo-safe-link').href = `safe-admin.html?bps=${BPS_ADDR}`
+  if (!amOwner) return
+
+  const [len, max] = await Promise.all([c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS()])
+  $('oa-slots').textContent = `Занято слотов: ${len} из ${max}. Освободить нельзя.`
+  const zero = ethers.constants.AddressZero
+  $('oo-pending').innerHTML = pendingAddr !== zero
+    ? `<div class="danger"><b>Передача уже запущена</b>Ждём принятия от ${esc(pendingAddr)}. Новая передача на другой адрес заменит эту.</div>` : ''
+
 }
 
-/// Проверки до сбора подписей — чтобы не тратить подписи на заведомый отказ
-async function preflight(to, data) {
-  const { onSafe, name, args } = parseCall(to, data)
-  if (onSafe) return
-  const [bOwner, bPending] = await Promise.all([bps.owner(), bps.pendingOwner()])
-  if (name === 'acceptOwnership') {
-    if (same(bOwner, safeAddr)) throw new Error('Safe уже владелец контракта — принимать нечего.')
-    if (!same(bPending, safeAddr)) throw new Error('Safe не назначен кандидатом. Сначала владелец должен передать ему владение (вкладка «Настройка»).')
-    return
-  }
-  if (!same(bOwner, safeAddr)) throw new Error(`Контрактом владеет ${short(bOwner)}, а не этот Safe — операция не пройдёт.`)
-  if (name === 'addDistributionToken') {
-    const t = args[0]
-    if ((await provider.getCode(t)) === '0x') throw new Error('По адресу токена нет контракта.')
-    try { await new ethers.Contract(t, ERC20_ABI, provider).balanceOf(BPS_ADDR) } catch { throw new Error('Токен не отвечает — добавлять нельзя.') }
-    if (await bps.isDistributionToken(t)) throw new Error('Токен уже добавлен.')
-    if ((await bps.distributionTokensLength()).gte(await bps.MAX_DISTRIBUTION_TOKENS())) throw new Error('Слоты для токенов закончились.')
-  }
-  if (name === 'redemption') {
-    if (await bps.wasDistributionToken(args[0])) throw new Error('Этот токен распределялся — вывести его нельзя никогда.')
-    let bal; try { bal = await new ethers.Contract(args[0], ERC20_ABI, provider).balanceOf(BPS_ADDR) } catch { throw new Error('Баланс токена не читается.') }
-    if (bal.isZero()) throw new Error('На контракте нет этого токена.')
-  }
-}
-
-async function prepare() {
+/// Всё, что можно проверить до необратимой транзакции.
+async function ownCheckToken() {
+  const box = $('oa-check'), btn = $('btn-own-add')
+  btn.disabled = true
+  const lines = [], add = (ok, t) => lines.push({ ok, t })
   try {
-    const { to, data } = buildTx()
-    await preflight(to, data)
-    const nonce = await safe.nonce()
-    await openOp({ to, data, nonce, sigs: {} })
-    say('', '')
-  } catch (e) { say(errText(e), 'error') }
+    const t = addr('oa-token', 'токен'), c = ro()
+    const code = await reader().getCode(t)
+    add(code !== '0x', code !== '0x' ? 'По адресу есть контракт' : 'По адресу нет контракта — это кошелёк или пустой адрес')
+    if (t.toLowerCase() === BPS_ADDR.toLowerCase()) add(false, 'Нельзя добавить сам контракт долей')
+    const [already, was, len, max] = await Promise.all([c.isDistributionToken(t), c.wasDistributionToken(t), c.distributionTokensLength(), c.MAX_DISTRIBUTION_TOKENS()])
+    add(!already, already ? 'Токен уже добавлен' : 'Токен ещё не добавлен')
+    if (was && !already) add(false, 'Токен уже был распределяемым')
+    add(len.lt(max), len.lt(max) ? `Свободных слотов: ${max.sub(len)}` : 'Слоты закончились')
+    if (code !== '0x') {
+      try {
+        const bal = await new ethers.Contract(t, ERC20_ABI, reader()).balanceOf(BPS_ADDR)
+        const mt = await tokenMeta(t)
+        add(true, `balanceOf отвечает: на контракте ${exact(bal, mt.decimals)} ${mt.symbol}`)
+      } catch { add(false, 'balanceOf не отвечает — добавлять нельзя, это заблокирует переводы долей') }
+    }
+  } catch (e) { add(false, errText(e)) }
+  box.innerHTML = lines.map(x => `<div class="chk ${x.ok ? 'ok' : 'bad'}">${x.ok ? '✓' : '✕'} ${esc(x.t)}</div>`).join('')
+  btn.disabled = lines.some(x => !x.ok)
 }
 
-async function openOp(o) {
-  const hash = await safe.getTransactionHash(o.to, 0, o.data, 0, 0, 0, 0, ZERO, ZERO, o.nonce)
-  // подписи принимаются, только если действительно подписывают ЭТОТ хеш и от подписанта Safe
-  const sigs = {}
-  for (const s of Object.values(o.sigs || {})) { const w = verifySig(s, hash); if (w) sigs[w.owner.toLowerCase()] = w.sig }
-  op = { to: o.to, data: o.data, nonce: ethers.BigNumber.from(o.nonce), hash, sigs }
-  const d = await describe(op.to, op.data)
-  $('op-what').textContent = d.what
-  $('op-sub').innerHTML = esc(d.sub).replace(/\n/g, '<br/>')
-  $('op-danger').innerHTML = d.danger ? `<div class="danger" style="margin-top:12px"><b>Внимание</b>${esc(d.danger)}</div>` : ''
-  $('op-code').textContent = codeOf(hash)
-  $('out-hash').textContent = hash
-  $('out-data').textContent = op.data
-  $('in-sigs').value = ''
-  $('card-op').classList.remove('hidden')
-  await refreshOp()
-  $('card-op').scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
-function closeOp() { op = null; $('card-op').classList.add('hidden'); history.replaceState(null, '', location.pathname + location.search) }
+const ownAddToken = () => run('Добавляем токен', async () => {
+  const t = addr('oa-token', 'токен')
+  if (prompt('НЕОБРАТИМОЕ ДЕЙСТВИЕ\n\nТокен ' + t + ' будет добавлен в распределение навсегда. Убрать его и вывести через redemption будет нельзя никогда.\n\nДля подтверждения введите: ДОБАВИТЬ') !== 'ДОБАВИТЬ') { say('Отменено.', 'info'); return false }
+  await (await bps.addDistributionToken(t)).wait()
+  $('oa-token').value = ''; $('oa-check').innerHTML = ''; $('btn-own-add').disabled = true
+  say('Токен добавлен в распределение.', 'success')
+})
 
-async function openFromLink(p) {
-  try {
-    if (chainId && p.chain && p.chain !== chainId) throw new Error('Ссылка сделана для другой сети — переключите сеть в MetaMask.')
-    view('manage')
-    // операция пересчитывается и проверяется заново — ссылке ничего не доверяем
-    parseCall(p.to, p.data)
-    await openOp({ to: p.to, data: p.data, nonce: p.nonce, sigs: p.sigs })
-    say('Операция открыта из ссылки. Проверьте описание и код проверки.', 'info')
-  } catch (e) { say('Не удалось открыть ссылку: ' + errText(e), 'error') }
-}
+const ownRedemption = () => run('Выводим', async () => {
+  const t = addr('or-token', 'токен'), to = addr('or-to', 'получатель')
+  if (await ro().wasDistributionToken(t)) throw new Error('Этот токен распределялся контрактом — вывести его нельзя никогда.')
+  const mt = await tokenMeta(t)
+  let bal; try { bal = await new ethers.Contract(t, ERC20_ABI, reader()).balanceOf(BPS_ADDR) } catch { throw new Error('Баланс токена не читается.') }
+  if (bal.isZero()) throw new Error('На контракте нет этого токена.')
+  if (!confirm(`Вывести ${exact(bal, mt.decimals)} ${mt.symbol}\nна адрес ${to}?`)) return false
+  await (await bps.redemption(t, to)).wait()
+  $('or-token').value = ''
+  say('Выведено.', 'success')
+})
 
-// ---------- подписи ----------
-/// Подпись → адрес подписанта. v=31/32 — personal_sign (MetaMask), v=27/28 — голый хеш (cast).
-function verifySig(item, hash) {
-  hash = hash || op?.hash
-  const hex = String(item).trim().replace(/^0x/, '')
-  if (!/^[0-9a-fA-F]{130}$/.test(hex) || !hash) return null
-  const r = '0x' + hex.slice(0, 64), s = '0x' + hex.slice(64, 128), v = parseInt(hex.slice(128), 16)
-  try {
-    let who
-    if (v === 31 || v === 32) who = ethers.utils.verifyMessage(ethers.utils.arrayify(hash), ethers.utils.joinSignature({ r, s, v: v - 4 }))
-    else if (v === 27 || v === 28) who = ethers.utils.recoverAddress(hash, { r, s, v })
-    else return null
-    return isOwner(who) ? { owner: who, sig: '0x' + hex } : null
-  } catch { return null }
-}
+const ownTransfer = () => run('Передаём владение', async () => {
+  const to = addr('oo-to', 'новый владелец')
+  if (to.toLowerCase() === me.toLowerCase()) throw new Error('Вы уже владелец.')
+  if (to.toLowerCase() === BPS_ADDR.toLowerCase()) throw new Error('Контракт не может владеть сам собой.')
+  const toKind = await addressKind(to, reader())
+  const isContract = toKind === 'safe'
+  if (toKind === 'contract' && !confirm(`${to} — контракт, но не Safe. Если он не умеет вызывать acceptOwnership, владение просто не перейдёт. Продолжить?`)) return false
+  if (!confirm(`Назначить ${to} (${KIND_RU[toKind]}) кандидатом во владельцы?\n\nПолномочия останутся у вас, пока новый владелец не примет.`)) return false
+  await (await bps.transferOwnership(to)).wait()
+  $('oo-to').value = ''
+  say(isContract ? 'Готово. Теперь подписанты Safe должны провести «Принять владение» в панели мультиподписи.' : 'Готово. Новый владелец должен принять владение.', 'success')
+})
 
-/// Все подписи из всех источников в виде, который примет Safe
-async function collect() {
-  const flags = await Promise.all(owners.map(o => safe.approvedHashes(o, op.hash)))
-  const by = new Map()
-  owners.forEach((o, k) => { if (flags[k].eq(1)) by.set(o.toLowerCase(), { owner: o, how: 'в блокчейне', sig: ethers.utils.hexZeroPad(o, 32).slice(2) + '0'.repeat(64) + '01' }) })
-  const extra = ($('in-sigs').value || '').split(/[\s,;]+/).filter(Boolean)
-  for (const s of [...Object.values(op.sigs), ...extra]) {
-    const w = verifySig(s); if (w && !by.has(w.owner.toLowerCase())) by.set(w.owner.toLowerCase(), { owner: w.owner, how: 'подписал', sig: w.sig.slice(2) })
-  }
-  const list = [...by.values()].sort((a, b) => ethers.BigNumber.from(a.owner).lt(ethers.BigNumber.from(b.owner)) ? -1 : 1)
-  return { list, packed: '0x' + list.map(x => x.sig).join('') }
-}
-
-async function refreshOp() {
-  if (!op) return
-  const current = await safe.nonce()
-  const stale = !current.eq(op.nonce)
-  const { list } = await collect()
-  const got = new Set(list.map(x => x.owner.toLowerCase()))
-  const byOwner = Object.fromEntries(list.map(x => [x.owner.toLowerCase(), x.how]))
-  const enough = list.length >= threshold
-  const iSigned = me && got.has(me.toLowerCase())
-
-  $('op-count').textContent = `Подписи: ${list.length} из ${threshold}`
-  $('op-bar').style.width = Math.min(100, list.length / threshold * 100) + '%'
-  $('op-people').innerHTML = owners.map(o => {
-    const k = o.toLowerCase(), mine = same(o, me)
-    return `<div class="person"><span class="pa${mine ? ' me' : ''}">${o}${mine ? ' — вы' : ''}</span>
-      <span class="badge ${got.has(k) ? 'ok' : 'wait'}">${got.has(k) ? '✓ ' + byOwner[k] : 'ждём'}</span></div>`
-  }).join('')
-
-  const next = $('op-next'); next.className = 'next'
-  if (stale) { next.className = 'next stale'; next.textContent = 'Операция устарела: Safe уже исполнил другую операцию, и эти подписи больше не действуют. Закройте её и подготовьте заново.' }
-  else if (enough) { next.className = 'next done'; next.textContent = 'Подписей достаточно. Нажмите «Исполнить» — это может сделать любой, кто открыл эту операцию.' }
-  else if (!isOwner(me)) next.textContent = 'Вы не подписант этого Safe. Можно только наблюдать и, когда подписей хватит, нажать «Исполнить».'
-  else if (!iSigned) next.textContent = 'Прочитайте описание, сверьте код проверки с коллегами и нажмите «Подписать».'
-  else next.textContent = `Вы подписали. Отправьте ссылку ниже следующему подписанту — нужно ещё ${threshold - list.length}.`
-
-  $('btn-sign').disabled = stale || !isOwner(me) || iSigned
-  $('btn-sign').textContent = iSigned ? 'Вы подписали' : 'Подписать'
-  $('btn-approve').disabled = stale || !isOwner(me) || iSigned
-  $('btn-exec').disabled = stale || !enough
-
-  const hasOffchain = Object.keys(op.sigs).length > 0
-  $('share').classList.toggle('hidden', stale || enough || !hasOffchain)
-  $('share-link').value = linkFor(op)
-}
-
-async function signOp() {
-  try {
-    if (op && parseCall(op.to, op.data).name === 'addDistributionToken' &&
-        prompt('НЕОБРАТИМАЯ ОПЕРАЦИЯ\n\nТокен останется в распределении навсегда.\n\nДля подтверждения введите: ДОБАВИТЬ') !== 'ДОБАВИТЬ') { say('Отменено.', 'info'); return }
-    const p = ethers.utils.splitSignature(await signer.signMessage(ethers.utils.arrayify(op.hash)))
-    // MetaMask подписывает с префиксом; Safe узнаёт такие подписи по v, увеличенному на 4
-    const sig = ethers.utils.hexConcat([p.r, p.s, ethers.utils.hexlify(p.v + 4)])
-    const w = verifySig(sig)
-    if (!w) throw new Error('Подпись не прошла проверку — вероятно, подключён не тот кошелёк.')
-    op.sigs[w.owner.toLowerCase()] = sig
-    await refreshOp()
-    say('Подписано. Подпись бесплатна — отправьте ссылку дальше или нажмите «Исполнить», если подписей хватает.', 'success')
-  } catch (e) { say('Не удалось подписать: ' + errText(e), 'error') }
-}
-
-async function approveOnchain() {
-  try {
-    if (!await mainnetGuard('Подтверждение операции в блокчейне')) return
-    say('Подтверждаем в блокчейне…', 'info')
-    await (await safe.approveHash(op.hash)).wait()
-    await refreshOp()
-    say('Подтверждено в блокчейне — его увидят все, ссылку пересылать не нужно.', 'success')
-  } catch (e) { say('Не удалось: ' + errText(e), 'error') }
-}
-
-async function importLink() {
-  try {
-    const p = parseLink($('import-link').value)
-    if (!same(p.to, op.to) || p.data !== op.data || String(p.nonce) !== op.nonce.toString())
-      throw new Error('Это ссылка на другую операцию.')
-    let added = 0
-    for (const s of Object.values(p.sigs || {})) { const w = verifySig(s); if (w && !op.sigs[w.owner.toLowerCase()]) { op.sigs[w.owner.toLowerCase()] = w.sig; added++ } }
-    $('import-link').value = ''
-    await refreshOp()
-    say(added ? `Добавлено подписей: ${added}.` : 'Новых подписей в ссылке нет.', added ? 'success' : 'info')
-  } catch (e) { say(errText(e), 'error') }
-}
-
-function copyLink() {
-  navigator.clipboard.writeText($('share-link').value).then(() => say('Ссылка скопирована.', 'success'), () => { $('share-link').select(); say('Выделите и скопируйте ссылку вручную.', 'info') })
-}
-
-async function execute() {
-  try {
-    const { list, packed } = await collect()
-    if (list.length < threshold) throw new Error(`Подписей ${list.length} из ${threshold}.`)
-    if (!await mainnetGuard('Исполнение операции')) return
-    say('Исполняем…', 'info')
-    await (await safe.execTransaction(op.to, 0, op.data, 0, 0, 0, 0, ZERO, ZERO, packed)).wait()
-    const done = $('op-what').textContent
-    closeOp()
-    await loadAll()
-    say(`Исполнено: ${done}.`, 'success')
-  } catch (e) { say('Не удалось исполнить: ' + errText(e), 'error') }
-}
+const ownAccept = () => run('Принимаем владение', async () => {
+  if (!confirm('Принять владение контрактом?')) return false
+  await (await bps.acceptOwnership()).wait()
+  say('Вы теперь владелец контракта.', 'success')
+})
 
 // ---------- старт ----------
-$('bps-addr').textContent = BPS_ADDR
-$('dash-link').href = BPS_ADDR === DEFAULT_BPS ? 'index.html' : `index.html?bps=${BPS_ADDR}`
-try { if (location.hash.includes('op=')) pendingLink = parseLink(location.hash) } catch (e) { say(e.message, 'error') }
-const saved0 = Q.get('safe') || store.get()
-if (saved0) $('in-safe').value = saved0
-if (!saved0 && !pendingLink) view('setup')
-if (pendingLink) say('Вам прислали операцию на подпись. Подключите кошелёк, чтобы её открыть.', 'info')
+;(async () => {
+  try {
+    const net = await rpc.getNetwork()
+    const pill = $('net-pill')
+    pill.textContent = net.chainId === 1 ? 'MAINNET' : net.chainId === 11155111 ? 'Sepolia' : 'chain ' + net.chainId
+    if (net.chainId === 1) pill.classList.add('main')
+  } catch {}
+  try { await loadTokens(); await Promise.all([loadInfo(), loadOwner()]) } catch (e) { console.error(e) }
+})()
 </script>
 </body>
 </html>
