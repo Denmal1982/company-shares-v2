@@ -171,7 +171,7 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
     </div>
 
     <div class="panel active" id="o-add">
-      <div class="danger"><b>Необратимо</b>Слот занимается навсегда — из пяти. Токен навсегда исключается из вывода через redemption. Каждый перевод долей дорожает на один внешний вызов.</div>
+      <div class="danger"><b>Необратимо</b>Слот занимается навсегда. Токен навсегда исключается из вывода через redemption. Каждый перевод долей дорожает на один внешний вызов.</div>
       <div class="row"><label for="oa-token">Адрес токена</label><input class="mono" id="oa-token" placeholder="0x..." autocomplete="off"/>
         <div class="hint">Fee-on-transfer и rebase-токены добавлять нельзя — программно они не определяются, проверьте токен сами.</div></div>
       <div id="oa-check"></div>
@@ -285,11 +285,11 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:1px 5
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
 // ---------- настройки ----------
-const DEFAULT_BPS = "0x77761a369e4940835dc558e4c4dd4d25f4b5f8c2"
+const DEFAULT_BPS = "0x77761A369e4940835DC558e4c4dd4d25f4B5f8c2"
 const CHAIN_ID    = 1
 const RPC_URL     = "https://ethereum-rpc.publicnode.com"
 const EXPLORER    = "https://etherscan.io"
-const START_BLOCK = 0          // блок деплоя — ускоряет поиск предложений
+const START_BLOCK = 26088641   // блок деплоя контракта — отсюда ищутся предложения
 const LOG_WINDOW  = 45000
 const DEC         = 18
 
@@ -467,6 +467,22 @@ async function run(label, fn) {
 const announced = []
 window.addEventListener('eip6963:announceProvider', (e) => announced.push(e.detail))
 window.dispatchEvent(new Event('eip6963:requestProvider'))
+/// EIP-747: просим кошелёк показать токен в списке активов.
+/// Решение принимает пользователь — кошелёк рисует своё окно подтверждения.
+async function addToWallet() {
+  const eth = await findWallet()
+  if (!eth) { say('Кошелёк не найден. Токен можно добавить вручную по адресу ' + BPS_ADDR, 'error'); return }
+  try {
+    const added = await eth.request({
+      method: 'wallet_watchAsset',
+      params: { type: 'ERC20', options: { address: BPS_ADDR, symbol: 'BPS', decimals: DEC } }
+    })
+    say(added ? 'Токен добавлен в кошелёк.' : 'Добавление отменено.', added ? 'success' : 'info')
+  } catch (e) {
+    say('Кошелёк не принял запрос. Добавьте токен вручную по адресу ' + BPS_ADDR, 'error')
+  }
+}
+
 async function findWallet() {
   for (let i = 0; i < 20; i++) {
     const mm = announced.find(d => /metamask/i.test(d.info?.name || d.info?.rdns || ''))
@@ -578,7 +594,8 @@ async function loadDividends() {
 
 async function logs(filter) {
   const c = ro(), latest = await reader().getBlockNumber()
-  const from = START_BLOCK > 0 ? START_BLOCK : Math.max(0, latest - LOG_WINDOW)
+  const start = START_BLOCK > 0 && START_BLOCK <= latest ? START_BLOCK : Math.max(0, latest - LOG_WINDOW)
+  const from = Math.min(start, latest)
   try { return await c.queryFilter(filter, from, latest) }
   catch { return await c.queryFilter(filter, Math.max(0, latest - 9000), latest) }
 }
@@ -655,7 +672,8 @@ async function loadInfo() {
     else lnk.classList.add('hidden')
 
     el.innerHTML = `
-      <div class="ir"><span class="ik">Адрес</span><span class="iv"><a href="${EXPLORER}/address/${BPS_ADDR}" target="_blank" rel="noopener">${short(BPS_ADDR)}</a></span></div>
+      <div class="ir"><span class="ik">Адрес</span><span class="iv"><a href="${EXPLORER}/address/${BPS_ADDR}" target="_blank" rel="noopener">${short(BPS_ADDR)}</a>
+        <button class="btn btn-sm" data-act onclick="addToWallet()" style="margin-left:8px">Добавить в кошелёк</button></span></div>
       <div class="ir"><span class="ik">Владелец</span><span class="iv">${short(owner)} <span class="badge ${kind === 'safe' ? 'ok' : 'warn'}">${KIND_RU[kind]}</span></span></div>
       ${pending !== zero ? `<div class="ir"><span class="ik">Ожидает принятия</span><span class="iv">${short(pending)}</span></div>` : ''}
       <div class="ir"><span class="ik">Всего долей</span><span class="iv">${fmt(ts, DEC, 0)}</span></div>
